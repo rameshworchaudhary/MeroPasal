@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, PackageOpen } from "lucide-react";
 import ProductGrid from "@/components/product/ProductGrid";
 import ProductFilters from "@/components/product/ProductFilters";
 import { getCategoryBySlug, getActiveCategories } from "@/lib/firebase/categories";
@@ -38,7 +37,34 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
   const sp = await searchParams;
 
   const category = await getCategoryBySlug(slug);
-  if (!category) notFound();
+
+  if (!category) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <nav className="flex items-center gap-1.5 text-sm text-muted-foreground mb-6">
+          <Link href="/" className="hover:text-primary transition-colors">Home</Link>
+          <ChevronRight className="h-3.5 w-3.5" />
+          <Link href="/categories" className="hover:text-primary transition-colors">Categories</Link>
+        </nav>
+
+        <div className="flex flex-col items-center justify-center py-20 text-center px-4">
+          <div className="mb-5 flex h-20 w-20 items-center justify-center rounded-full border border-[#d4b982] bg-[#f1ebe1]">
+            <PackageOpen className="h-9 w-9 text-[#8b6b35]" />
+          </div>
+          <p className="font-serif text-xl tracking-wide text-[#292722]">Product Not Available</p>
+          <p className="mt-2 text-sm text-[#777166] max-w-sm">
+            This category isn&apos;t live yet — check back soon or explore our other categories.
+          </p>
+          <Link
+            href="/categories"
+            className="mt-5 inline-flex items-center gap-1.5 rounded-xl bg-[#292722] px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-white hover:bg-[#403b32] transition-colors"
+          >
+            Browse Categories
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   const filters: FiltersType = {
     categoryId: category.id,

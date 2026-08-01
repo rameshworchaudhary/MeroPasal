@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight, Tag, ArrowRight, Smartphone } from "lucide-react";
+import { ChevronLeft, ChevronRight, Tag, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { Banner } from "@/lib/types/banner";
@@ -51,6 +51,34 @@ const FALLBACK_BANNERS = [
     badge: "FASHION CARNIVAL",
   },
 ];
+
+/**
+ * Resolves the correct href for a banner's CTA button.
+ * Real banners (from Firestore/admin panel) store `linkType` + `linkValue`
+ * separately (e.g. linkType="category", linkValue="electronics") — the
+ * raw linkValue is NOT a valid path on its own. Fallback/demo banners
+ * already store a full path in linkValue, so those pass through as-is.
+ */
+function resolveBannerHref(slide: Banner | (typeof FALLBACK_BANNERS)[0]): string {
+  if (!("linkType" in slide)) {
+    return slide.linkValue || "/products";
+  }
+
+  const { linkType, linkValue } = slide as Banner;
+  if (!linkValue) return "/products";
+
+  switch (linkType) {
+    case "category":
+      return `/categories/${linkValue}`;
+    case "product":
+      return `/products/${linkValue}`;
+    case "url":
+      return linkValue;
+    case "none":
+    default:
+      return "/products";
+  }
+}
 
 export default function HeroBanner({ banners }: HeroBannerProps) {
   const slides = banners.length > 0 ? banners : FALLBACK_BANNERS;
@@ -134,7 +162,7 @@ export default function HeroBanner({ banners }: HeroBannerProps) {
                     className="rounded-xl bg-white text-slate-900 hover:bg-slate-100 px-4 py-1.5 h-8 text-xs font-bold shadow-xs transition-all hover:scale-102"
                     asChild
                   >
-                    <Link href={(currentSlide as (typeof FALLBACK_BANNERS)[0]).linkValue || "/products"}>
+                    <Link href={resolveBannerHref(currentSlide)}>
                       {(currentSlide as Banner).buttonText || "Shop Now"} <ArrowRight className="ml-1 h-3.5 w-3.5 text-slate-900" />
                     </Link>
                   </Button>
@@ -188,15 +216,15 @@ export default function HeroBanner({ banners }: HeroBannerProps) {
           <div className="h-full rounded-2xl border border-slate-200 bg-gradient-to-br from-blue-50/70 via-slate-50 to-emerald-50/50 p-4 shadow-2xs relative overflow-hidden flex flex-row lg:flex-col justify-between items-center lg:items-start transition-all hover:border-blue-300">
             <div className="flex-1 pr-2 lg:pr-0">
               <span className="text-[9px] font-extrabold uppercase tracking-widest text-blue-700 bg-blue-100/90 px-2 py-0.5 rounded-md">
-                Exchange Offer
+                Sports Zone
               </span>
 
               <h3 className="text-sm sm:text-base lg:text-lg font-extrabold text-slate-900 leading-tight mt-2">
-                Up to Rs. 15,000 Off
+                Gear Up For The Game
               </h3>
 
               <p className="text-[11px] text-slate-600 mt-0.5 font-medium line-clamp-1 lg:line-clamp-2">
-                On your old smartphone or electronic device
+                Fitness, cricket, football & outdoor sports essentials
               </p>
 
               <div className="mt-2 sm:mt-3">
@@ -206,20 +234,23 @@ export default function HeroBanner({ banners }: HeroBannerProps) {
                   className="h-7 rounded-xl border-slate-300 bg-white hover:bg-blue-50 text-slate-800 text-[11px] font-bold shadow-2xs hover:text-blue-600 px-3"
                   asChild
                 >
-                  <Link href="/categories/mobiles">
+                  <Link href="/categories/sports">
                     Explore Now <ChevronRight className="ml-1 h-3 w-3" />
                   </Link>
                 </Button>
               </div>
             </div>
 
-            {/* Smartphone Exchange Graphic */}
+            {/* Sports Category Photo */}
             <div className="shrink-0 flex justify-end lg:w-full lg:mt-3">
-              <div className="relative h-14 w-14 lg:h-20 lg:w-20 flex items-center justify-center rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white shadow-xs rotate-2">
-                <Smartphone className="h-7 w-7 lg:h-10 lg:w-10 text-emerald-300" />
-                <span className="absolute -bottom-1 -right-1 bg-amber-400 text-slate-900 text-[8px] lg:text-[9px] font-black px-1.5 py-0.5 rounded-full shadow-2xs">
-                  SWAP
-                </span>
+              <div className="relative h-14 w-14 lg:h-20 lg:w-20 overflow-hidden rounded-2xl shadow-xs rotate-2">
+                <Image
+                  src="https://images.unsplash.com/photo-1517649763962-0c623266ddc0?auto=format&fit=crop&w=200&q=80"
+                  alt="Sports category"
+                  fill
+                  className="object-cover"
+                  sizes="80px"
+                />
               </div>
             </div>
           </div>

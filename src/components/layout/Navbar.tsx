@@ -269,9 +269,9 @@ export default function Navbar({ categories = [] }: NavbarProps) {
 
             {/* Right Actions */}
             <div className="flex items-center gap-1.5 sm:gap-2.5">
-              {/* Become Seller Link (Desktop) */}
+              {/* Become Seller Link (Desktop) — goes straight to seller login */}
               <Link
-                href="/seller/register"
+                href="/login?mode=seller"
                 className="hidden xl:flex items-center gap-1.5 rounded-xl border border-amber-400/30 bg-amber-400/10 px-3 py-2 text-xs font-bold text-amber-300 hover:bg-amber-400/20 hover:border-amber-400 transition-all"
               >
                 <Store className="h-3.5 w-3.5 text-amber-400" />
@@ -315,38 +315,41 @@ export default function Navbar({ categories = [] }: NavbarProps) {
                 </DropdownMenuContent>
               </DropdownMenu>
 
-              {/* Wishlist */}
-              <Link href="/wishlist">
+              {/* Wishlist & Cart — hidden on mobile since MobileBottomNav already shows them; visible from md up */}
+              <div className="hidden md:flex items-center gap-1.5 sm:gap-2.5">
+                {/* Wishlist */}
+                <Link href="/wishlist">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="relative rounded-2xl text-slate-300 hover:bg-slate-900 hover:text-white"
+                  >
+                    <Heart className="h-5 w-5" />
+                    {mounted && wishlistCount > 0 && (
+                      <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-rose-500 text-[10px] text-white flex items-center justify-center font-bold">
+                        {wishlistCount > 9 ? "9+" : wishlistCount}
+                      </span>
+                    )}
+                    <span className="sr-only">Wishlist</span>
+                  </Button>
+                </Link>
+
+                {/* Cart Drawer */}
                 <Button
                   variant="ghost"
                   size="icon"
                   className="relative rounded-2xl text-slate-300 hover:bg-slate-900 hover:text-white"
+                  onClick={toggleCart}
                 >
-                  <Heart className="h-5 w-5" />
-                  {mounted && wishlistCount > 0 && (
-                    <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-rose-500 text-[10px] text-white flex items-center justify-center font-bold">
-                      {wishlistCount > 9 ? "9+" : wishlistCount}
+                  <ShoppingCart className="h-5 w-5" />
+                  {mounted && itemCount > 0 && (
+                    <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-blue-600 text-[10px] font-bold text-white shadow-md shadow-blue-500/20">
+                      {itemCount > 9 ? "9+" : itemCount}
                     </span>
                   )}
-                  <span className="sr-only">Wishlist</span>
+                  <span className="sr-only">Cart</span>
                 </Button>
-              </Link>
-
-              {/* Cart Drawer */}
-              <Button
-                variant="ghost"
-                size="icon"
-                className="relative rounded-2xl text-slate-300 hover:bg-slate-900 hover:text-white"
-                onClick={toggleCart}
-              >
-                <ShoppingCart className="h-5 w-5" />
-                {mounted && itemCount > 0 && (
-                  <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-blue-600 text-[10px] font-bold text-white shadow-md shadow-blue-500/20">
-                    {itemCount > 9 ? "9+" : itemCount}
-                  </span>
-                )}
-                <span className="sr-only">Cart</span>
-              </Button>
+              </div>
 
               {/* Quick Admin Access Button if Admin */}
               {isAdmin && (
@@ -565,6 +568,19 @@ export default function Navbar({ categories = [] }: NavbarProps) {
                 <Button variant="outline" className="flex-1 rounded-xl border-slate-800 bg-slate-900 text-slate-200 hover:bg-slate-800" asChild onClick={() => setMobileMenuOpen(false)}>
                   <Link href="/register">Register</Link>
                 </Button>
+              </div>
+            )}
+
+            {profile?.role !== "seller" && (
+              <div className="px-5 pt-4">
+                <Link
+                  href="/login?mode=seller"
+                  className="flex items-center justify-center gap-1.5 rounded-xl border border-amber-400/30 bg-amber-400/10 px-3 py-2.5 text-xs font-bold text-amber-300 hover:bg-amber-400/20 hover:border-amber-400 transition-all"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <Store className="h-3.5 w-3.5 text-amber-400" />
+                  <span>Sell on Kinbey</span>
+                </Link>
               </div>
             )}
 
