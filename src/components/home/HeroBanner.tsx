@@ -18,7 +18,7 @@ const FALLBACK_BANNERS = [
     id: "dashain",
     title: "Maha Dashain Mega Dhamaka",
     subtitle: "Celebrate Nepal's biggest festival with up to 70% OFF + Flat Rs. 1,000 Vouchers",
-    image: "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&w=1200&q=85",
+    image: "/images/hero/Dashain.jpg",
     buttonText: "Shop Dashain Deals",
     linkValue: "/products?featured=true",
     badge: "DASHAIN SALE 2083",
@@ -27,7 +27,7 @@ const FALLBACK_BANNERS = [
     id: "electronics",
     title: "Nepal Electronics & Tech Expo",
     subtitle: "Unbeatable deals on 5G Smartphones, Laptops, Smart TVs & more",
-    image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=1200&q=85",
+    image: "/images/hero/Electronic.jpg",
     buttonText: "Shop Now",
     linkValue: "/categories/electronics",
     badge: "TECH FESTIVAL",
@@ -36,7 +36,7 @@ const FALLBACK_BANNERS = [
     id: "tihar",
     title: "Tihar Lights & Celebration Sale",
     subtitle: "Illuminate your home! Discounts on Decorative LED Lights, Dry Fruits & Appliances",
-    image: "https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=1200&q=85",
+    image: "/images/hero/Tihar.jpg",
     buttonText: "Explore Tihar Specials",
     linkValue: "/categories/home",
     badge: "TIHAR FESTIVAL OFFER",
@@ -45,7 +45,7 @@ const FALLBACK_BANNERS = [
     id: "fashion",
     title: "Fashion Carnival & Trends",
     subtitle: "Authentic Kurti Sets, Dhaka Topi, Sneakers and Premium Western Wear",
-    image: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=1200&q=85",
+    image: "/images/hero/Fashion.jpg",
     buttonText: "Explore Fashion",
     linkValue: "/categories/fashion",
     badge: "FASHION CARNIVAL",
@@ -245,7 +245,7 @@ export default function HeroBanner({ banners }: HeroBannerProps) {
             <div className="shrink-0 flex justify-end lg:w-full lg:mt-3">
               <div className="relative h-14 w-14 lg:h-20 lg:w-20 overflow-hidden rounded-2xl shadow-xs rotate-2">
                 <Image
-                  src="https://images.unsplash.com/photo-1517649763962-0c623266ddc0?auto=format&fit=crop&w=200&q=80"
+                  src="/images/hero/Sports.jpg"
                   alt="Sports category"
                   fill
                   className="object-cover"

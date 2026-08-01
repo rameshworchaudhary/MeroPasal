@@ -182,10 +182,8 @@ export default function SellerSidebar() {
           position: "sticky",
           top: 0,
           flexShrink: 0,
-          display: "flex",
-          flexDirection: "column",
         }}
-        className="hidden lg:flex"
+        className="hidden lg:flex lg:flex-col"
       >
         <SidebarInner />
       </aside>

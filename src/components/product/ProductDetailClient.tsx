@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ShoppingCart, Heart, Star, ChevronRight, Share2, Shield,
@@ -44,6 +45,7 @@ export default function ProductDetailClient({
   const [quantity, setQuantity] = useState(1);
   const [selectedVariants, setSelectedVariants] = useState<Record<string, string>>({});
   const [isZoomed, setIsZoomed] = useState(false);
+  const router = useRouter();
 
   const { addItem, isInCart } = useCart();
   const { isInWishlist, toggleItem: toggleWishlist } = useWishlist();
@@ -89,6 +91,31 @@ export default function ProductDetailClient({
       variant: Object.keys(selectedVariants).length > 0 ? selectedVariants : undefined,
     });
     toast.success("Added to cart!");
+  };
+
+  const handleBuyNow = () => {
+    if (isOutOfStock) return;
+    const hasUnselectedVariants = product.variants?.some(
+      (v) => !selectedVariants[v.name]
+    );
+    if (hasUnselectedVariants) {
+      toast.error("Please select all options before proceeding");
+      return;
+    }
+    if (!inCart) {
+      addItem({
+        productId: product.id,
+        name: product.name,
+        slug: product.slug,
+        image: product.thumbnailImage,
+        price: product.price,
+        comparePrice: product.comparePrice,
+        quantity,
+        stock: product.stock,
+        variant: Object.keys(selectedVariants).length > 0 ? selectedVariants : undefined,
+      });
+    }
+    router.push("/checkout");
   };
 
   const handleToggleWishlist = () => {
@@ -334,6 +361,14 @@ export default function ProductDetailClient({
             >
               <ShoppingCart className="h-4 w-4 mr-2" />
               {isOutOfStock ? "Out of Stock" : inCart ? "Added to Cart" : "Add to Cart"}
+            </Button>
+            <Button
+              size="lg"
+              className="flex-1 min-h-[44px] rounded-full bg-[#b99558] text-white hover:bg-[#a3813f]"
+              onClick={handleBuyNow}
+              disabled={isOutOfStock}
+            >
+              Buy Now
             </Button>
             <Button
               size="lg"

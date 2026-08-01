@@ -70,6 +70,29 @@ export default function ProductCard({
     }
   };
 
+  const handleBuyNow = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (isOutOfStock) return;
+    if (product.variants && product.variants.length > 0) {
+      router.push(`/products/${product.slug}`);
+      return;
+    }
+    if (!inCart) {
+      addItem({
+        productId: product.id,
+        name: product.name,
+        slug: product.slug,
+        image: product.thumbnailImage,
+        price: product.price,
+        comparePrice: product.comparePrice,
+        quantity: 1,
+        stock: product.stock,
+      });
+    }
+    router.push("/checkout");
+  };
+
   const handleToggleWishlist = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -163,14 +186,14 @@ export default function ProductCard({
             </button>
           </div>
 
-          {/* Quick add button */}
+          {/* Quick add buttons */}
           {showQuickAdd && !isOutOfStock && (
-            <div className="absolute bottom-0 left-0 right-0 z-10 sm:translate-y-full sm:group-hover:translate-y-0 transition-transform duration-200">
+            <div className="absolute bottom-0 left-0 right-0 z-10 flex sm:translate-y-full sm:group-hover:translate-y-0 transition-transform duration-200">
               <button
                 onClick={handleAddToCart}
                 disabled={isAddingToCart || inCart}
                 className={cn(
-                  "flex min-h-[36px] sm:min-h-[40px] w-full items-center justify-center gap-1.5 py-1.5 sm:py-2 px-2 text-[10px] font-extrabold uppercase tracking-wider transition-colors shadow-xs",
+                  "flex min-h-[36px] sm:min-h-[40px] flex-1 items-center justify-center gap-1.5 py-1.5 sm:py-2 px-2 text-[10px] font-extrabold uppercase tracking-wider transition-colors shadow-xs",
                   inCart
                     ? "bg-emerald-600 text-white"
                     : "bg-blue-600 sm:bg-slate-900 text-white hover:bg-blue-700"
@@ -183,6 +206,12 @@ export default function ProductCard({
                 ) : (
                   <><ShoppingCart className="h-3.5 w-3.5" /> Add to Cart</>
                 )}
+              </button>
+              <button
+                onClick={handleBuyNow}
+                className="flex min-h-[36px] sm:min-h-[40px] flex-1 items-center justify-center gap-1.5 py-1.5 sm:py-2 px-2 text-[10px] font-extrabold uppercase tracking-wider transition-colors shadow-xs bg-amber-500 text-white hover:bg-amber-600"
+              >
+                Buy Now
               </button>
             </div>
           )}

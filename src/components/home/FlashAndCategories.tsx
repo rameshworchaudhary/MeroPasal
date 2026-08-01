@@ -98,7 +98,7 @@ export default function FlashAndCategories({ products }: FlashAndCategoriesProps
                       {/* Thumbnail Image */}
                       <div className="relative aspect-square w-full overflow-hidden rounded-lg bg-white mb-1.5">
                         <Image
-                          src={product.thumbnailImage || "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=300&q=80"}
+                          src={product.thumbnailImage || "/images/flash/Flash1.jpg"}
                           alt={product.name}
                           fill
                           className="object-contain p-1 transition-transform duration-300 group-hover:scale-105"
