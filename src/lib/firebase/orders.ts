@@ -99,13 +99,20 @@ export async function getOrderByOrderNumber(orderNumber: string): Promise<Order 
 }
 
 export async function getOrdersByUser(userId: string): Promise<Order[]> {
+  // Deliberately NOT combining where() + orderBy() here — that requires a
+  // Firestore composite index to be created manually in the console, and if
+  // it's missing the query throws and silently returns no orders (which is
+  // what was happening). Filtering by userId alone needs no composite index;
+  // we sort newest-first in JS instead.
   const q = query(
     collection(db, COLLECTIONS.ORDERS),
-    where("userId", "==", userId),
-    orderBy("createdAt", "desc")
+    where("userId", "==", userId)
   );
   const snapshot = await getDocs(q);
-  return snapshot.docs.map(mapOrderDoc);
+  const orders = snapshot.docs.map(mapOrderDoc);
+  return orders.sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  );
 }
 
 export async function getAllOrders(): Promise<Order[]> {

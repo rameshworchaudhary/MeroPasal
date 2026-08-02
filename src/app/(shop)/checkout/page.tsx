@@ -46,24 +46,22 @@ const PAYMENT_METHODS: {
     logoText: "Rs",
     desc: "Pay in cash when your order is delivered to your doorstep",
   },
-  // eSewa and Khalti temporarily disabled — kept here (commented out) to
-  // re-enable later. Just uncomment the two objects below.
-  // {
-  //   id: "esewa",
-  //   label: "eSewa Wallet",
-  //   color: "text-emerald-700",
-  //   bg: "bg-[#60BB46]",
-  //   logoText: "e",
-  //   desc: "Pay instantly & securely with eSewa digital wallet",
-  // },
-  // {
-  //   id: "khalti",
-  //   label: "Khalti Wallet",
-  //   color: "text-purple-800",
-  //   bg: "bg-[#5C2D91]",
-  //   logoText: "K",
-  //   desc: "Pay easily with Khalti e-payment service",
-  // },
+  {
+    id: "esewa",
+    label: "eSewa Wallet",
+    color: "text-emerald-700",
+    bg: "bg-[#60BB46]",
+    logoText: "e",
+    desc: "Pay instantly & securely with eSewa digital wallet",
+  },
+  {
+    id: "khalti",
+    label: "Khalti Wallet",
+    color: "text-purple-800",
+    bg: "bg-[#5C2D91]",
+    logoText: "K",
+    desc: "Pay easily with Khalti e-payment service",
+  },
 ];
 
 export default function CheckoutPage() {

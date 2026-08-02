@@ -14,6 +14,7 @@ import { formatCurrency, formatDate } from "@/lib/utils";
 import { ORDER_STATUS_LABELS, ORDER_STATUS_COLORS } from "@/lib/constants/site";
 import type { Order } from "@/lib/types/order";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export default function OrdersPage() {
   const { user, loading: authLoading } = useAuth();
@@ -29,6 +30,10 @@ export default function OrdersPage() {
     if (user) {
       getOrdersByUser(user.uid)
         .then(setOrders)
+        .catch((err) => {
+          console.error("Failed to load orders:", err);
+          toast.error("Couldn't load your orders. Please try again.");
+        })
         .finally(() => setLoading(false));
     }
   }, [user, authLoading, router]);
