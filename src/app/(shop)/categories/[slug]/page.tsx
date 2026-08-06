@@ -25,8 +25,8 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
   const category = await getCategoryBySlug(slug);
   if (!category) return { title: "Category Not Found" };
   return {
-    title: `${category.name} - Kinyo`,
-    description: category.description || `Shop ${category.name} products on Kinyo`,
+    title: `${category.name} - NexShop`,
+    description: category.description || `Shop ${category.name} products on NexShop`,
   };
 }
 

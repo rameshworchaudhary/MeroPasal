@@ -5,11 +5,17 @@ import { getStorage, type FirebaseStorage } from "firebase/storage";
 
 const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "meropasal-ce87a";
 
+let rawBucket = process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || `${projectId}.appspot.com`;
+if (rawBucket.startsWith("gs://")) {
+  rawBucket = rawBucket.replace("gs://", "");
+}
+rawBucket = rawBucket.replace(/\/$/, "");
+
 const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "AIzaSy_demo_key_kinyo",
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "AIzaSy_demo_key_nexshop",
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || `${projectId}.firebaseapp.com`,
   projectId: projectId,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || `${projectId}.appspot.com`,
+  storageBucket: rawBucket,
   messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || "100000000000",
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || "1:100000000000:web:1234567890",
 };

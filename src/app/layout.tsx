@@ -26,8 +26,8 @@ export const metadata: Metadata = {
     "mero pasal",
     "nepal online store",
   ],
-  authors: [{ name: "Kinyo" }],
-  creator: "Kinyo",
+  authors: [{ name: "NexShop" }],
+  creator: "NexShop",
   openGraph: {
     type: "website",
     locale: "en_US",

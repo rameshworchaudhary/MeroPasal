@@ -55,7 +55,7 @@ export default function FloatingActions() {
                 🇳🇵
               </div>
               <div>
-                <h4 className="text-xs font-bold text-white">Kinbey Support</h4>
+                <h4 className="text-xs font-bold text-white">NexShop Support</h4>
                 <p className="text-[10px] text-emerald-400 font-medium">Online 24/7 across Nepal</p>
               </div>
             </div>

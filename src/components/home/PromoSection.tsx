@@ -84,7 +84,7 @@ export default function PromoSection({ banners }: PromoSectionProps) {
                     )}
                     <div className="absolute inset-x-0 bottom-0 p-3.5 sm:p-5 text-white">
                       <p className="mb-0.5 text-[9px] font-extrabold uppercase tracking-widest text-amber-300">
-                        Kinbey Special
+                        NexShop Special
                       </p>
                       <p className="font-serif text-base sm:text-xl font-bold leading-tight text-white">{promo.title}</p>
                       {subtitle && (

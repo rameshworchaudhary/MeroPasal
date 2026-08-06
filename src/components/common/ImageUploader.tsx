@@ -49,9 +49,10 @@ export default function ImageUploader({
       const url = await uploadImage(file, folder);
       onChange(url);
       toast.success("Image uploaded successfully!");
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Image upload failed:", error);
-      toast.error("Failed to upload image. Please try again.");
+      const msg = error instanceof Error ? error.message : "Failed to upload image. Please try again.";
+      toast.error(msg);
     } finally {
       setUploading(false);
     }
@@ -111,7 +112,7 @@ export default function ImageUploader({
           <div className="flex-1 min-w-0 pr-10">
             <p className="text-xs font-semibold text-slate-200 truncate">{value.split("/").pop()?.split("?")[0] || "Image File"}</p>
             <p className="text-[11px] text-emerald-400 font-medium flex items-center gap-1 mt-1">
-              ✓ Direct Firebase Storage Upload
+              ✓ Image Uploaded Successfully
             </p>
             <Button
               type="button"

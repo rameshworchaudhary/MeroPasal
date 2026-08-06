@@ -51,6 +51,8 @@ export interface Product {
   isActive: boolean;
   isTrending: boolean;
   weight?: number;
+  discountPercentage?: number;
+  freeDelivery?: boolean;
   status: "active" | "draft" | "archived";
   sellerId?: string;
   sellerName?: string;
@@ -83,6 +85,8 @@ export interface ProductFormInput {
   isActive: boolean;
   isTrending: boolean;
   weight?: number;
+  discountPercentage?: number;
+  freeDelivery?: boolean;
   status: "active" | "draft" | "archived";
   categoryName: string;
   subCategoryName?: string;

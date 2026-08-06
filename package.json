@@ -1,8 +1,8 @@
 {
-  "name": "kinyo",
+  "name": "nexshop",
   "version": "1.0.0",
   "private": true,
-  "description": "Kinyo - Nepal Ko Aafnai Online Pasal",
+  "description": "NexShop - Nepal Ko Aafnai Online Pasal",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

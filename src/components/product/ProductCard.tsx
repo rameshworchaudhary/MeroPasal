@@ -37,8 +37,8 @@ export default function ProductCard({
     setMounted(true);
   }, []);
 
-  const discount = product.comparePrice
-    ? calculateDiscount(product.comparePrice, product.price)
+  const discount = typeof product.discountPercentage === "number" && product.discountPercentage > 0
+    ? product.discountPercentage
     : 0;
 
   // Default to false on server, real value on client
@@ -138,7 +138,7 @@ export default function ProductCard({
           <div className="absolute top-2 left-2 flex flex-col gap-1 z-10">
             {discount > 0 && (
               <Badge className="border-0 bg-rose-600 px-1.5 sm:px-2 py-0.5 text-[9px] sm:text-[10px] font-extrabold tracking-wide text-white shadow-xs">
-                -{discount}%
+                {discount}% OFF
               </Badge>
             )}
             {product.isTrending && !discount && (
@@ -266,9 +266,11 @@ export default function ProductCard({
             </div>
 
             <div className="flex items-center justify-between gap-1 mt-1 flex-wrap">
-              <span className="inline-flex items-center rounded-md bg-emerald-50 px-1.5 py-0.5 text-[9px] font-extrabold text-emerald-700 border border-emerald-200/80">
-                Free Delivery
-              </span>
+              {product.freeDelivery === true && (
+                <span className="inline-flex items-center rounded-md bg-emerald-50 px-1.5 py-0.5 text-[9px] font-extrabold text-emerald-700 border border-emerald-200/80">
+                  Free Delivery
+                </span>
+              )}
               {product.soldCount > 10 && (
                 <p className="text-[10px] font-medium text-slate-400">
                   {product.soldCount > 1000

@@ -1,6 +1,6 @@
 {
-  "name": "Kinbey",
-  "description": "Kinbey - Sabai kura, ekai thau ma | Nepal's Premium Online Marketplace",
+  "name": "NexShop",
+  "description": "NexShop - Sabai kura, ekai thau ma | Nepal's Premium Online Marketplace",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

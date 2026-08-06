@@ -35,7 +35,7 @@ export default function NewsletterSection() {
               <Mail className="h-5 w-5" />
             </div>
           </div>
-          <p className="mb-1 text-[10px] font-extrabold uppercase tracking-widest text-amber-400">The Kinbey Newsletter</p>
+          <p className="mb-1 text-[10px] font-extrabold uppercase tracking-widest text-amber-400">The NexShop Newsletter</p>
           <h2 className="mb-2 font-serif text-2xl sm:text-3xl font-extrabold text-white">Get Exclusive Nepal Offers</h2>
           <p className="mx-auto mb-6 max-w-md text-xs sm:text-sm leading-relaxed text-slate-300">
             Subscribe for secret flash sales, new arrival alerts, and special discount vouchers delivered directly to your inbox.
@@ -48,7 +48,7 @@ export default function NewsletterSection() {
               className="flex items-center justify-center gap-2 font-bold text-emerald-400 text-sm"
             >
               <CheckCircle className="h-5 w-5" />
-              <span>Thank you for subscribing to Kinbey Nepal!</span>
+              <span>Thank you for subscribing to NexShop Nepal!</span>
             </motion.div>
           ) : (
             <form onSubmit={handleSubmit} className="mx-auto flex max-w-md flex-col sm:flex-row gap-2">

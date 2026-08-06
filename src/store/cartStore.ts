@@ -96,7 +96,7 @@ export const useCartStore = create<CartStore>()(
       },
     }),
     {
-      name: "Kinyo-cart",
+      name: "NexShop-cart",
       // Only persist items, not UI state
       partialize: (state) => ({ items: state.items }),
     }

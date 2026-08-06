@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -18,8 +18,12 @@ import {
 import ImageUploader from "@/components/admin/ImageUploader";
 import { slugify } from "@/lib/utils";
 import { createProduct, updateProduct } from "@/lib/firebase/products";
+import { collection, getDocs } from "firebase/firestore";
+import { db, auth } from "@/lib/firebase/config";
+import { useAuthStore } from "@/store/authStore";
 import type { Category } from "@/lib/types/category";
 import type { Product, ProductFormInput } from "@/lib/types/product";
+import type { UserProfile } from "@/lib/types/user";
 import { toast } from "sonner";
 
 const specSchema = z.object({ key: z.string(), value: z.string() });
@@ -40,6 +44,8 @@ const productSchema = z.object({
   lowStockThreshold: z.coerce.number().min(0).default(5),
   unit: z.string().optional(),
   weight: z.coerce.number().optional(),
+  discountPercentage: z.coerce.number().min(0).max(100).optional(),
+  freeDelivery: z.boolean().default(false),
   tagsInput: z.string().optional(),
   specifications: z.array(specSchema),
   isFeatured: z.boolean().default(false),
@@ -58,10 +64,28 @@ interface ProductFormProps {
 export default function ProductForm({ categories, initialData }: ProductFormProps) {
   const router = useRouter();
   const isEdit = !!initialData;
+  const { user, profile } = useAuthStore();
 
   const [images, setImages] = useState<string[]>(initialData?.images || []);
   const [thumbnailImage, setThumbnailImage] = useState(initialData?.thumbnailImage || "");
   const [submitting, setSubmitting] = useState(false);
+  const [sellers, setSellers] = useState<UserProfile[]>([]);
+  const [selectedSellerId, setSelectedSellerId] = useState<string>(initialData?.sellerId || "none");
+
+  useEffect(() => {
+    const fetchSellers = async () => {
+      try {
+        const snap = await getDocs(collection(db, "users"));
+        const sellerUsers = snap.docs
+          .map((d) => ({ ...d.data(), uid: d.id } as UserProfile))
+          .filter((u) => u.role === "seller");
+        setSellers(sellerUsers);
+      } catch (err) {
+        console.error("Failed to fetch sellers:", err);
+      }
+    };
+    fetchSellers();
+  }, []);
 
   const {
     register, handleSubmit, control, watch, setValue, formState: { errors },
@@ -83,6 +107,8 @@ export default function ProductForm({ categories, initialData }: ProductFormProp
       lowStockThreshold: initialData?.lowStockThreshold ?? 5,
       unit: initialData?.unit || "piece",
       weight: initialData?.weight,
+      discountPercentage: initialData?.discountPercentage ?? 0,
+      freeDelivery: initialData?.freeDelivery ?? false,
       tagsInput: initialData?.tags?.join(", ") || "",
       specifications: initialData?.specifications?.length ? initialData.specifications : [{ key: "", value: "" }],
       isFeatured: initialData?.isFeatured ?? false,
@@ -121,6 +147,23 @@ export default function ProductForm({ categories, initialData }: ProductFormProp
 
       const specifications = data.specifications.filter((s) => s.key.trim() && s.value.trim());
 
+      const chosenSeller = sellers.find((s) => s.uid === selectedSellerId);
+
+      let effectiveSellerId: string;
+      let effectiveSellerName: string;
+      let isSellerProduct = false;
+
+      if (selectedSellerId !== "none" && chosenSeller) {
+        effectiveSellerId = chosenSeller.uid;
+        effectiveSellerName = chosenSeller.sellerProfile?.shopName || chosenSeller.displayName || "Store";
+        isSellerProduct = true;
+      } else {
+        const currentUid = user?.uid || auth.currentUser?.uid || "admin";
+        effectiveSellerId = initialData?.sellerId || currentUid;
+        effectiveSellerName = initialData?.sellerName || profile?.sellerProfile?.shopName || profile?.displayName || "NexShop Direct";
+        isSellerProduct = false;
+      }
+
       const payload: ProductFormInput = {
         name: data.name,
         slug: data.slug,
@@ -141,12 +184,18 @@ export default function ProductForm({ categories, initialData }: ProductFormProp
         lowStockThreshold: data.lowStockThreshold,
         unit: data.unit,
         weight: data.weight,
+        discountPercentage: data.discountPercentage && data.discountPercentage > 0 ? Number(data.discountPercentage) : 0,
+        freeDelivery: !!data.freeDelivery,
         tags,
         specifications,
         isFeatured: data.isFeatured,
         isActive: data.isActive,
         isTrending: data.isTrending,
         status: data.status,
+        sellerId: effectiveSellerId,
+        sellerName: effectiveSellerName,
+        isSellerProduct,
+        isAdminApproved: true,
       };
 
       if (isEdit && initialData) {
@@ -264,6 +313,11 @@ export default function ProductForm({ categories, initialData }: ProductFormProp
                 <p className="text-xs text-muted-foreground">Shows as strikethrough price</p>
               </div>
               <div className="space-y-1.5">
+                <Label htmlFor="discountPercentage">Discount Percentage (%)</Label>
+                <Input id="discountPercentage" type="number" min="0" max="100" placeholder="e.g. 0, 10, 20" {...register("discountPercentage")} />
+                <p className="text-xs text-muted-foreground">Enter discount percentage (e.g. 20 for 20% OFF). Set 0 for no discount.</p>
+              </div>
+              <div className="space-y-1.5">
                 <Label htmlFor="costPrice">Cost Price (Rs.)</Label>
                 <Input id="costPrice" type="number" step="0.01" {...register("costPrice")} />
                 <p className="text-xs text-muted-foreground">For internal profit tracking</p>
@@ -332,6 +386,24 @@ export default function ProductForm({ categories, initialData }: ProductFormProp
               )}
 
               <div className="space-y-1.5">
+                <Label>Assigned Store / Seller</Label>
+                <Select value={selectedSellerId} onValueChange={(v) => setSelectedSellerId(v)}>
+                  <SelectTrigger><SelectValue placeholder="Select store/seller" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">Default (NexShop Direct)</SelectItem>
+                    {sellers.map((s) => (
+                      <SelectItem key={s.uid} value={s.uid}>
+                        {s.sellerProfile?.shopName || s.displayName}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-[11px] text-muted-foreground">
+                  Assign this product to a specific store/seller or list directly under NexShop.
+                </p>
+              </div>
+
+              <div className="space-y-1.5">
                 <Label>Status</Label>
                 <Select value={watch("status")} onValueChange={(v) => setValue("status", v as "active" | "draft" | "archived")}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
@@ -360,6 +432,19 @@ export default function ProductForm({ categories, initialData }: ProductFormProp
               <div className="flex items-center justify-between">
                 <Label htmlFor="isTrending" className="cursor-pointer">Trending Product</Label>
                 <Switch id="isTrending" checked={watch("isTrending")} onCheckedChange={(v) => setValue("isTrending", v)} />
+              </div>
+              <div className="flex items-center justify-between border-t pt-3">
+                <div>
+                  <Label className="cursor-pointer">Free Delivery</Label>
+                  <p className="text-[11px] text-muted-foreground">Offer free delivery for this product</p>
+                </div>
+                <Select value={watch("freeDelivery") ? "yes" : "no"} onValueChange={(v) => setValue("freeDelivery", v === "yes")}>
+                  <SelectTrigger className="w-24"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="no">No</SelectItem>
+                    <SelectItem value="yes">Yes</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </CardContent>
           </Card>

@@ -128,7 +128,7 @@ export default function HeroBanner({ banners }: HeroBannerProps) {
               {/* Banner Background */}
               <Image
                 src={bgImage}
-                alt={(currentSlide as Banner).title || "Kinbey Banner"}
+                alt={(currentSlide as Banner).title || "NexShop Banner"}
                 fill
                 className="object-cover object-center transition-transform duration-[6000ms] scale-102"
                 priority={current === 0}

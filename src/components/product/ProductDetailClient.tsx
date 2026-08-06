@@ -51,8 +51,8 @@ export default function ProductDetailClient({
   const { isInWishlist, toggleItem: toggleWishlist } = useWishlist();
   const { user } = useAuth();
 
-  const discount = product.comparePrice
-    ? calculateDiscount(product.comparePrice, product.price)
+  const discount = typeof product.discountPercentage === "number" && product.discountPercentage > 0
+    ? product.discountPercentage
     : 0;
 
   const inCart = isInCart(product.id, selectedVariants);
@@ -194,7 +194,7 @@ export default function ProductDetailClient({
             </AnimatePresence>
             {discount > 0 && (
               <Badge className="absolute left-4 top-4 border-0 bg-[#292722] px-3 py-1.5 text-xs font-semibold text-[#f8f5ef]">
-                -{discount}% OFF
+                {discount}% OFF
               </Badge>
             )}
             <div className="absolute right-4 top-4 rounded-full border border-white/50 bg-[#292722]/60 p-2 text-white backdrop-blur-sm">
@@ -385,13 +385,15 @@ export default function ProductDetailClient({
 
           {/* Delivery info */}
           <div className="space-y-4 rounded-xl border border-[#ded6ca] bg-[#fcfaf6] p-5">
-            <div className="flex items-start gap-3">
-              <Truck className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#8b6b35]" />
-              <div>
-                <p className="text-sm font-medium text-[#514c43]">Free Delivery</p>
-                <p className="text-xs text-[#8e887d]">On orders above Rs. 5,000</p>
+            {product.freeDelivery === true && (
+              <div className="flex items-start gap-3">
+                <Truck className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#8b6b35]" />
+                <div>
+                  <p className="text-sm font-medium text-[#514c43]">Free Delivery</p>
+                  <p className="text-xs text-[#8e887d]">Free delivery available on this item</p>
+                </div>
               </div>
-            </div>
+            )}
             <div className="flex items-start gap-3">
               <RotateCcw className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#8b6b35]" />
               <div>

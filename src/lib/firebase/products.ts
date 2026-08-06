@@ -269,29 +269,121 @@ export async function getAllProductsForAdmin(): Promise<Product[]> {
   return snapshot.docs.map(mapProductDoc);
 }
 
+function removeUndefinedFields<T extends Record<string, any>>(obj: T): T {
+  const result: Record<string, any> = {};
+  for (const [key, value] of Object.entries(obj)) {
+    if (value !== undefined) {
+      result[key] = value;
+    }
+  }
+  return result as T;
+}
+
 export async function createProduct(input: ProductFormInput): Promise<string> {
-  const docRef = await addDoc(collection(db, COLLECTIONS.PRODUCTS), {
+  let sellerName = input.sellerName;
+
+  if (input.sellerId && !sellerName) {
+    try {
+      const sellerSnap = await getDoc(doc(db, COLLECTIONS.USERS, input.sellerId));
+      if (sellerSnap.exists()) {
+        const sData = sellerSnap.data();
+        sellerName = sData?.sellerProfile?.shopName || sData?.displayName || "Store";
+      }
+    } catch (e) {
+      console.warn("Could not fetch seller name:", e);
+    }
+  }
+
+  const rawPayload = {
     ...input,
+    ...(sellerName ? { sellerName } : {}),
     rating: 0,
     reviewCount: 0,
     soldCount: 0,
     viewCount: 0,
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
-  });
+  };
+
+  const payload = removeUndefinedFields(rawPayload);
+
+  const docRef = await addDoc(collection(db, COLLECTIONS.PRODUCTS), payload);
+
+  if (input.sellerId) {
+    try {
+      const sellerRef = doc(db, COLLECTIONS.USERS, input.sellerId);
+      const sellerSnap = await getDoc(sellerRef);
+      if (sellerSnap.exists()) {
+        const sData = sellerSnap.data();
+        if (sData?.sellerProfile) {
+          await updateDoc(sellerRef, {
+            "sellerProfile.totalProducts": increment(1),
+            updatedAt: serverTimestamp(),
+          });
+        }
+      }
+    } catch (err) {
+      console.warn("Error updating seller totalProducts in createProduct:", err);
+    }
+  }
+
   return docRef.id;
 }
 
 export async function updateProduct(id: string, input: Partial<ProductFormInput>): Promise<void> {
   const ref = doc(db, COLLECTIONS.PRODUCTS, id);
-  await updateDoc(ref, {
+  const oldSnap = await getDoc(ref);
+  const oldSellerId = oldSnap.exists() ? oldSnap.data()?.sellerId : undefined;
+
+  const payload = removeUndefinedFields({
     ...input,
     updatedAt: serverTimestamp(),
   });
+
+  await updateDoc(ref, payload);
+
+  const newSellerId = input.sellerId;
+  if (newSellerId !== undefined && oldSellerId !== newSellerId) {
+    if (oldSellerId) {
+      try {
+        await updateDoc(doc(db, COLLECTIONS.USERS, oldSellerId), {
+          "sellerProfile.totalProducts": increment(-1),
+          updatedAt: serverTimestamp(),
+        });
+      } catch (err) {
+        console.warn("Error decrementing old seller totalProducts:", err);
+      }
+    }
+    if (newSellerId) {
+      try {
+        await updateDoc(doc(db, COLLECTIONS.USERS, newSellerId), {
+          "sellerProfile.totalProducts": increment(1),
+          updatedAt: serverTimestamp(),
+        });
+      } catch (err) {
+        console.warn("Error incrementing new seller totalProducts:", err);
+      }
+    }
+  }
 }
 
 export async function deleteProduct(id: string): Promise<void> {
-  await deleteDoc(doc(db, COLLECTIONS.PRODUCTS, id));
+  const ref = doc(db, COLLECTIONS.PRODUCTS, id);
+  const snap = await getDoc(ref);
+  if (snap.exists()) {
+    const data = snap.data();
+    if (data.sellerId) {
+      try {
+        await updateDoc(doc(db, COLLECTIONS.USERS, data.sellerId), {
+          "sellerProfile.totalProducts": increment(-1),
+          updatedAt: serverTimestamp(),
+        });
+      } catch (err) {
+        console.warn("Error decrementing seller totalProducts on delete:", err);
+      }
+    }
+  }
+  await deleteDoc(ref);
 }
 
 export async function incrementProductViewCount(id: string): Promise<void> {

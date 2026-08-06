@@ -57,10 +57,10 @@ export default function AdminSidebar() {
           onClick={() => setMobileOpen(false)}
         >
           <div className="h-9 w-9 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
-            <span className="text-white font-bold text-sm">M</span>
+            <span className="text-white font-bold text-sm">N</span>
           </div>
           <div>
-            <p className="font-bold text-white text-base leading-none">Kinyo</p>
+            <p className="font-bold text-white text-base leading-none">NexShop</p>
             <p className="text-xs text-gray-500 leading-none mt-1">Admin Panel</p>
           </div>
         </Link>
@@ -155,9 +155,9 @@ export default function AdminSidebar() {
           </button>
           <Link href="/admin" className="flex items-center gap-2">
             <div className="flex h-7 w-7 items-center justify-center rounded-full bg-blue-600 font-extrabold text-xs text-white">
-              K
+              N
             </div>
-            <span className="font-bold text-sm text-white tracking-wide">Kinbey Admin</span>
+            <span className="font-bold text-sm text-white tracking-wide">NexShop Admin</span>
           </Link>
         </div>
 
@@ -181,10 +181,10 @@ export default function AdminSidebar() {
             <div className="flex items-center justify-between p-4 border-b border-slate-800">
               <Link href="/admin" onClick={() => setMobileOpen(false)} className="flex items-center gap-2">
                 <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center font-extrabold text-white text-sm">
-                  K
+                  N
                 </div>
                 <div>
-                  <p className="font-extrabold text-white text-sm">Kinbey Nepal</p>
+                  <p className="font-extrabold text-white text-sm">NexShop Nepal</p>
                   <p className="text-[10px] text-blue-400 font-bold uppercase">Admin Panel</p>
                 </div>
               </Link>

@@ -46,8 +46,8 @@ export async function initiateKhaltiPayment(
     purchase_order_id: params.orderId,
     purchase_order_name: params.orderName,
     customer_info: {
-      name: params.customerName || "Kinyo Customer",
-      email: params.customerEmail || "customer@Kinyo.com.np",
+      name: params.customerName || "NexShop Customer",
+      email: params.customerEmail || "customer@nexshop.com.np",
       phone: params.customerPhone || "9800000000",
     },
   };

@@ -60,7 +60,7 @@ export default function SellerPendingPage() {
                   "Our team will review your seller application within 1-2 business days",
                   "You will receive an email notification once your account is approved",
                   "After approval, you can login and start adding your products",
-                  "Your products will be visible to customers on Kinyo",
+                  "Your products will be visible to customers on NexShop",
                 ].map((step, i) => (
                   <div key={i} className="flex items-start gap-3">
                     <div className="h-6 w-6 rounded-full bg-green-100 text-green-700 flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">

@@ -33,7 +33,7 @@ const footerLinks = {
     { label: "Become a Seller", href: "/seller/apply" },
     { label: "Seller Dashboard", href: "/seller/dashboard" },
     { label: "Seller Policies", href: "/seller-policy" },
-    { label: "Fulfillment by Kinbey", href: "/fulfillment" },
+    { label: "Fulfillment by NexShop", href: "/fulfillment" },
   ],
   support: [
     { label: "Help Center", href: "/help" },
@@ -80,10 +80,10 @@ export default function Footer() {
           <div className="xs:col-span-2 lg:col-span-2 space-y-4">
             <div className="flex items-center gap-2.5">
               <div className="h-10 w-10 rounded-2xl bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-600/30 text-white font-black text-xl tracking-tighter">
-                K
+                N
               </div>
               <div>
-                <p className="font-extrabold text-white text-2xl leading-none tracking-tight">Kinbey</p>
+                <p className="font-extrabold text-white text-2xl leading-none tracking-tight">NexShop</p>
                 <p className="text-[11px] text-blue-400 font-semibold mt-0.5">Sabai kura, ekai thau ma 🇳🇵</p>
               </div>
             </div>
@@ -146,7 +146,7 @@ export default function Footer() {
 
           {/* Shopping Links */}
           <div>
-            <h3 className="font-bold text-white text-sm uppercase tracking-wider mb-4">Shop Kinbey</h3>
+            <h3 className="font-bold text-white text-sm uppercase tracking-wider mb-4">Shop NexShop</h3>
             <ul className="space-y-2.5">
               {footerLinks.shopping.map((link) => (
                 <li key={link.href}>
@@ -181,7 +181,7 @@ export default function Footer() {
           {/* Seller Corner */}
           <div>
             <h3 className="font-bold text-white text-sm uppercase tracking-wider mb-4 flex items-center gap-1.5">
-              <Store className="h-4 w-4 text-emerald-400" /> Sell on Kinbey
+              <Store className="h-4 w-4 text-emerald-400" /> Sell on NexShop
             </h3>
             <ul className="space-y-2.5">
               {footerLinks.seller.map((link) => (
@@ -241,7 +241,7 @@ export default function Footer() {
       <div className="border-t border-slate-800/80 bg-slate-950">
         <div className="container mx-auto px-4 py-5">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
-            <p>© {new Date().getFullYear()} Kinbey Technologies Pvt. Ltd. All rights reserved.</p>
+            <p>© {new Date().getFullYear()} NexShop Technologies Pvt. Ltd. All rights reserved.</p>
             <p className="flex items-center gap-1 text-slate-300 font-semibold">
               Crafted for Nepal 🇳🇵
             </p>

@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
     const result = await initiateKhaltiPayment({
       amount,
       orderId,
-      orderName: orderNumber || `Kinyo Order ${orderId}`,
+      orderName: orderNumber || `NexShop Order ${orderId}`,
       customerName,
       customerEmail,
       customerPhone,

@@ -1,5 +1,5 @@
 /**
- * Kinyo Database Seed Script
+ * NexShop Database Seed Script
  *
  * Populates Firestore with initial data so the store isn't empty on first run:
  * - Sample categories with subcategories
@@ -145,7 +145,7 @@ const SHIPPING_ZONES = [
 ];
 
 async function seed() {
-  console.log("🌱 Starting Kinyo database seed...\n");
+  console.log("🌱 Starting NexShop database seed...\n");
 
   // Seed categories
   console.log("📁 Seeding categories...");

@@ -89,7 +89,7 @@ export default async function HomePage() {
       {arrivals.length > 0 && (
         <ProductSection
           title="✨ New Arrivals"
-          subtitle="Fresh products added to Kinbey this week"
+          subtitle="Fresh products added to NexShop this week"
           products={arrivals}
           viewAllHref="/products?sortBy=newest"
           badge="New"
@@ -105,7 +105,7 @@ export default async function HomePage() {
       {/* 11. Payment Gateways (eSewa & Khalti Only) */}
       <NepalPaymentBar />
 
-      {/* 12. Why Choose Kinbey */}
+      {/* 12. Why Choose NexShop */}
       <WhyChooseUs />
 
       {/* 13. Newsletter */}

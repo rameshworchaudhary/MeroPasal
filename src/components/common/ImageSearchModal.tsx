@@ -87,7 +87,7 @@ export default function ImageSearchModal({ isOpen, onClose }: ImageSearchModalPr
             <div className="inline-flex items-center gap-1.5 rounded-full bg-blue-500/10 px-3 py-1 text-xs font-semibold text-blue-400 border border-blue-500/20 mb-3">
               <Sparkles className="h-3.5 w-3.5" /> AI Visual Lens
             </div>
-            <h3 className="text-xl font-bold text-white">Search Kinbey By Image</h3>
+            <h3 className="text-xl font-bold text-white">Search NexShop By Image</h3>
             <p className="mt-1 text-xs text-slate-400">
               Upload a screenshot or photo to find similar products instantly
             </p>

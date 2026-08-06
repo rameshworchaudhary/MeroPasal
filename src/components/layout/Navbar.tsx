@@ -148,7 +148,7 @@ export default function Navbar({ categories = [] }: NavbarProps) {
         <div className="container mx-auto px-3 sm:px-6">
           <div className="flex min-h-[4rem] sm:min-h-[4.75rem] items-center justify-between gap-3 sm:gap-6">
             {/* Logo + Tagline */}
-            <Link href="/" className="group flex-shrink-0" aria-label="Kinbey Home">
+            <Link href="/" className="group flex-shrink-0" aria-label="NexShop Home">
               <div className="flex items-center gap-2.5 sm:gap-3">
                 <div className="flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-2xl bg-gradient-to-tr from-blue-600 via-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-600/30 transition-transform duration-300 group-hover:scale-105">
                   <Sparkles className="h-5 w-5 sm:h-6 sm:w-6 text-amber-300 animate-pulse" />
@@ -156,7 +156,7 @@ export default function Navbar({ categories = [] }: NavbarProps) {
                 <div>
                   <div className="flex items-center gap-1.5">
                     <span className="text-xl sm:text-2xl font-black tracking-tight text-white font-serif">
-                      Kinbey
+                      NexShop
                     </span>
                     <span className="rounded-full bg-amber-400/20 px-2 py-0.5 text-[9px] sm:text-[10px] font-bold text-amber-300 border border-amber-400/30">
                       NEPAL
@@ -275,7 +275,7 @@ export default function Navbar({ categories = [] }: NavbarProps) {
                 className="hidden xl:flex items-center gap-1.5 rounded-xl border border-amber-400/30 bg-amber-400/10 px-3 py-2 text-xs font-bold text-amber-300 hover:bg-amber-400/20 hover:border-amber-400 transition-all"
               >
                 <Store className="h-3.5 w-3.5 text-amber-400" />
-                <span>Sell on Kinbey</span>
+                <span>Sell on NexShop</span>
               </Link>
 
               {/* Notifications */}
@@ -302,7 +302,7 @@ export default function Navbar({ categories = [] }: NavbarProps) {
                   <DropdownMenuSeparator className="bg-slate-800" />
                   <div className="space-y-2 py-1 text-xs">
                     <div className="p-2.5 rounded-xl bg-slate-800/80 border border-slate-700/60">
-                      <p className="font-bold text-white text-xs">🎉 Welcome to Kinbey Nepal!</p>
+                      <p className="font-bold text-white text-xs">🎉 Welcome to NexShop Nepal!</p>
                       <p className="text-slate-400 text-[11px] mt-0.5">
                         Enjoy free delivery across all 77 districts on orders over Rs. 5,000.
                       </p>
@@ -460,7 +460,7 @@ export default function Navbar({ categories = [] }: NavbarProps) {
               <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
               <Input
                 type="search"
-                placeholder="Search Kinbey..."
+                placeholder="Search NexShop..."
                 className="h-10 rounded-2xl border border-slate-800 bg-slate-900/90 pl-10 pr-20 text-xs text-slate-100 placeholder:text-slate-500"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -579,7 +579,7 @@ export default function Navbar({ categories = [] }: NavbarProps) {
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   <Store className="h-3.5 w-3.5 text-amber-400" />
-                  <span>Sell on Kinbey</span>
+                  <span>Sell on NexShop</span>
                 </Link>
               </div>
             )}

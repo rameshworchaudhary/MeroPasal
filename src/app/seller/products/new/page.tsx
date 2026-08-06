@@ -43,6 +43,8 @@ const productSchema = z.object({
   lowStockThreshold: z.coerce.number().min(0).default(5),
   unit: z.string().optional(),
   weight: z.coerce.number().optional(),
+  discountPercentage: z.coerce.number().min(0).max(100).optional(),
+  freeDelivery: z.boolean().default(false),
   tagsInput: z.string().optional(),
   specifications: z.array(z.object({ key: z.string(), value: z.string() })),
   isFeatured: z.boolean().default(false),
@@ -76,6 +78,8 @@ export default function SellerNewProductPage() {
       lowStockThreshold: 5,
       unit: "piece",
       stock: 0,
+      discountPercentage: 0,
+      freeDelivery: false,
       isFeatured: false,
       thumbnailImage: "",
     },
@@ -126,6 +130,8 @@ export default function SellerNewProductPage() {
         lowStockThreshold: data.lowStockThreshold,
         unit: data.unit,
         weight: data.weight,
+        discountPercentage: data.discountPercentage && data.discountPercentage > 0 ? Number(data.discountPercentage) : 0,
+        freeDelivery: !!data.freeDelivery,
         tags,
         specifications: specs,
         isFeatured: data.isFeatured,
@@ -271,6 +277,11 @@ export default function SellerNewProductPage() {
                   <Input id="comparePrice" type="number" step="0.01" placeholder="Strikethrough price" {...register("comparePrice")} />
                 </div>
                 <div className="space-y-1.5">
+                  <Label htmlFor="discountPercentage">Discount Percentage (%)</Label>
+                  <Input id="discountPercentage" type="number" min="0" max="100" placeholder="e.g. 0, 10, 20" {...register("discountPercentage")} />
+                  <p className="text-xs text-muted-foreground">Enter discount percentage (e.g. 20 for 20% OFF). Set 0 for no discount.</p>
+                </div>
+                <div className="space-y-1.5">
                   <Label htmlFor="costPrice">Cost Price (Rs.)</Label>
                   <Input id="costPrice" type="number" step="0.01" placeholder="Your cost" {...register("costPrice")} />
                 </div>
@@ -347,7 +358,7 @@ export default function SellerNewProductPage() {
             {/* Options */}
             <Card>
               <CardHeader><CardTitle className="text-base">Options</CardTitle></CardHeader>
-              <CardContent>
+              <CardContent className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
                     <Label htmlFor="isFeatured" className="cursor-pointer">Request Featured</Label>
@@ -358,6 +369,19 @@ export default function SellerNewProductPage() {
                     checked={watch("isFeatured")}
                     onCheckedChange={(v) => setValue("isFeatured", v)}
                   />
+                </div>
+                <div className="flex items-center justify-between border-t pt-3">
+                  <div>
+                    <Label className="cursor-pointer">Free Delivery</Label>
+                    <p className="text-xs text-muted-foreground mt-0.5">Offer free delivery for this product</p>
+                  </div>
+                  <Select value={watch("freeDelivery") ? "yes" : "no"} onValueChange={(v) => setValue("freeDelivery", v === "yes")}>
+                    <SelectTrigger className="w-24"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="no">No</SelectItem>
+                      <SelectItem value="yes">Yes</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </CardContent>
             </Card>

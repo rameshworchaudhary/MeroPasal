@@ -1,17 +1,17 @@
 export const SITE_CONFIG = {
-  name: "Kinbey",
+  name: "NexShop",
   tagline: "Sabai kura, ekai thau ma",
   description:
-    "Kinbey is Nepal's premier online marketplace — shop electronics, fashion, groceries, home essentials and more with fast delivery across all 77 districts.",
-  url: "https://kinbey.com.np",
+    "NexShop is Nepal's premier online marketplace — shop electronics, fashion, groceries, home essentials and more with fast delivery across all 77 districts.",
+  url: "https://nexshop.com.np",
   ogImage: "/images/og-image.jpg",
   links: {
-    facebook: "https://facebook.com/kinbey.np",
-    instagram: "https://instagram.com/kinbey.np",
-    tiktok: "https://tiktok.com/@kinbey.np",
+    facebook: "https://facebook.com/nexshop.np",
+    instagram: "https://instagram.com/nexshop.np",
+    tiktok: "https://tiktok.com/@nexshop.np",
   },
   contact: {
-    email: "support@kinbey.com.np",
+    email: "support@nexshop.com.np",
     phone: "+977 9742491352",
     address: "Kathmandu & Pokhara, Nepal",
   },

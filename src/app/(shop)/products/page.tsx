@@ -9,7 +9,7 @@ import type { ProductFilters as FiltersType } from "@/lib/types/product";
 
 export const metadata: Metadata = {
   title: "All Products",
-  description: "Browse all products on Kinyo",
+  description: "Browse all products on NexShop",
 };
 
 export const revalidate = 120;

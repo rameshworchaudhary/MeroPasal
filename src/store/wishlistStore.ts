@@ -49,7 +49,7 @@ export const useWishlistStore = create<WishlistStore>()(
       getCount: () => get().items.length,
     }),
     {
-      name: "Kinyo-wishlist",
+      name: "NexShop-wishlist",
     }
   )
 );

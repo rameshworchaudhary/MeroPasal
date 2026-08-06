@@ -57,9 +57,10 @@ export default function ImageUploader({
         onThumbnailChange(newImages[0]);
       }
       toast.success(`${urls.length} image(s) uploaded successfully`);
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to upload images. Check Firebase Storage configuration.");
+    } catch (err: unknown) {
+      console.error("Firebase Storage error:", err);
+      const msg = err instanceof Error ? err.message : "Failed to upload images. Check Firebase Storage configuration.";
+      toast.error(msg);
     } finally {
       setUploading(false);
     }

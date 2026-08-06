@@ -33,7 +33,7 @@ const MODES = [
     color: "text-blue-500",
     bg: "bg-blue-500/10 border-blue-500/30",
     activeBg: "bg-blue-600",
-    description: "Shop on Kinyo",
+    description: "Shop on NexShop",
   },
   {
     id: "seller" as LoginMode,
@@ -189,12 +189,12 @@ function LoginFormContent() {
         <CardHeader className="text-center pb-2">
           <div className="flex justify-center mb-3">
             <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center shadow-lg shadow-blue-500/20 border border-blue-400/30">
-              <span className="text-white font-serif font-bold text-xl">K</span>
+              <span className="text-white font-serif font-bold text-xl">N</span>
             </div>
           </div>
           <CardTitle className="text-2xl font-bold tracking-tight text-white">Welcome Back</CardTitle>
           <CardDescription className="text-slate-400">
-            {mode === "seller" ? "Access your Seller Dashboard" : mode === "admin" ? "Access Admin Panel" : "Sign in to Kinyo Nepal"}
+            {mode === "seller" ? "Access your Seller Dashboard" : mode === "admin" ? "Access Admin Panel" : "Sign in to NexShop Nepal"}
           </CardDescription>
         </CardHeader>
 
@@ -357,7 +357,7 @@ function LoginFormContent() {
           )}
           {mode === "seller" && (
             <p className="text-sm text-slate-400">
-              Want to sell on Kinyo?{" "}
+              Want to sell on NexShop?{" "}
               <Link href="/register?role=seller" className="text-emerald-400 font-semibold hover:underline">
                 Register Seller Shop
               </Link>

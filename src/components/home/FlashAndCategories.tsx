@@ -6,7 +6,7 @@ import Image from "next/image";
 import { Zap, Clock, Smartphone, Laptop, Tv, Headphones, Watch, Camera, Printer, BatteryCharging, Speaker, MoreHorizontal } from "lucide-react";
 import type { Product } from "@/lib/types/product";
 import type { Category } from "@/lib/types/category";
-import { formatCurrency, calculateDiscount } from "@/lib/utils";
+import { formatCurrency } from "@/lib/utils";
 
 interface FlashAndCategoriesProps {
   products: Product[];
@@ -83,9 +83,12 @@ export default function FlashAndCategories({ products }: FlashAndCategoriesProps
             {/* Flash Products Grid */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
               {flashProducts.map((product, idx) => {
-                const discount = product.comparePrice
-                  ? calculateDiscount(product.comparePrice, product.price)
-                  : 15;
+                const discount =
+                  typeof product.discountPercentage === "number" &&
+                  Number.isFinite(product.discountPercentage) &&
+                  product.discountPercentage > 0
+                    ? product.discountPercentage
+                    : 0;
                 const itemsLeft = Math.max(12, 128 - idx * 24);
 
                 return (
@@ -122,9 +125,11 @@ export default function FlashAndCategories({ products }: FlashAndCategoriesProps
                             {formatCurrency(product.comparePrice)}
                           </span>
                         )}
-                        <span className="text-[9px] font-extrabold text-emerald-600">
-                          {discount}% OFF
-                        </span>
+                        {discount > 0 && (
+                          <span className="text-[9px] font-extrabold text-emerald-600">
+                            {discount}% OFF
+                          </span>
+                        )}
                       </div>
                     </div>
 

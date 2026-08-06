@@ -116,7 +116,7 @@ function RegisterContent() {
     setGoogleLoading(true);
     try {
       await loginWithGoogle();
-      toast.success("Welcome to Kinyo!");
+      toast.success("Welcome to NexShop!");
       router.push("/");
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Google signup failed. Please try again.";
@@ -136,11 +136,11 @@ function RegisterContent() {
         <CardHeader className="text-center pb-2">
           <div className="flex justify-center mb-3">
             <div className="h-12 w-12 rounded-full bg-primary flex items-center justify-center">
-              <span className="text-white font-bold text-xl">M</span>
+              <span className="text-white font-bold text-xl">N</span>
             </div>
           </div>
           <CardTitle className="text-2xl">Create Account</CardTitle>
-          <CardDescription>Join Kinyo today</CardDescription>
+          <CardDescription>Join NexShop today</CardDescription>
         </CardHeader>
 
         <CardContent className="space-y-4 pt-4">

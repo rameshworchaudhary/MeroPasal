@@ -41,10 +41,10 @@ export default function WhyChooseUs() {
     <section className="container mx-auto px-3.5 sm:px-6 py-8 sm:py-12 border-t border-slate-200/80">
       <div className="mb-6 sm:mb-8 text-center max-w-xl mx-auto">
         <p className="text-[10px] font-bold uppercase tracking-wider text-blue-600 mb-1">
-          The Kinbey Guarantee
+          The NexShop Guarantee
         </p>
         <h2 className="font-serif text-2xl sm:text-3xl font-extrabold text-slate-900">
-          Why Choose Kinbey Nepal?
+          Why Choose NexShop Nepal?
         </h2>
         <p className="mt-1 text-xs sm:text-sm text-slate-500 font-medium">
           Nepal&apos;s most trusted online shopping marketplace designed for speed & convenience

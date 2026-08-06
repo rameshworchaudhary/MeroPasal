@@ -18,6 +18,7 @@ import {
 } from "@/lib/constants/site";
 
 export const metadata: Metadata = { title: "Order Details" };
+export const dynamic = "force-dynamic";
 
 interface OrderDetailPageProps {
   params: Promise<{ id: string }>;
@@ -42,7 +43,7 @@ export default async function OrderDetailPage({ params, searchParams }: OrderDet
           <div>
             <p className="font-bold text-green-800">Order Placed Successfully!</p>
             <p className="text-sm text-green-700">
-              Thank you for shopping with Kinyo. We'll notify you as your order progresses.
+              Thank you for shopping with NexShop. We'll notify you as your order progresses.
             </p>
           </div>
         </div>

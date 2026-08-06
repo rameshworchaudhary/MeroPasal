@@ -15,7 +15,7 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
   const product = await getProductBySlug(slug);
   if (!product) return { title: "Product Not Found" };
   return {
-    title: `${product.name} - Kinyo`,
+    title: `${product.name} - NexShop`,
     description: product.shortDescription || product.description.slice(0, 160),
     openGraph: {
       title: product.name,
@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
   };
 }
 
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
 
 export default async function ProductPage({ params }: ProductPageProps) {
   const { slug } = await params;

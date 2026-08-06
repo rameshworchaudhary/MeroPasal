@@ -4,6 +4,11 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: "https",
+        hostname: "firebasestorage.googleapis.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
         hostname: "media.itechstore.com.np",
         pathname: "/**",
       },
@@ -16,4 +21,4 @@ const nextConfig = {
   },
 };
 
-export default nextConfig;
+module.exports = nextConfig;

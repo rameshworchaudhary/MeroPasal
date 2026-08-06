@@ -9,9 +9,9 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         <div className="container mx-auto px-4 h-14 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
             <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center">
-              <span className="text-white font-bold text-sm">M</span>
+              <span className="text-white font-bold text-sm">N</span>
             </div>
-            <span className="font-bold text-lg text-primary">Kinyo</span>
+            <span className="font-bold text-lg text-primary">NexShop</span>
           </Link>
           <Link href="/" className="text-sm text-muted-foreground hover:text-primary transition-colors">
             ← Back to store
@@ -26,7 +26,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
 
       {/* Footer */}
       <footer className="border-t py-4 text-center text-xs text-muted-foreground bg-background/80">
-        © {new Date().getFullYear()} Kinyo — Nepal Ko Aafnai Online Pasal
+        © {new Date().getFullYear()} NexShop — Nepal Ko Aafnai Online Pasal
       </footer>
     </div>
   );

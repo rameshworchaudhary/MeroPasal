@@ -5,7 +5,7 @@ import { getActiveCategories } from "@/lib/firebase/categories";
 
 export const metadata: Metadata = {
   title: "All Categories",
-  description: "Browse all product categories on Kinyo",
+  description: "Browse all product categories on NexShop",
 };
 
 export const revalidate = 300;

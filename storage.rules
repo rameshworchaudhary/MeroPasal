@@ -18,22 +18,22 @@ service firebase.storage {
         request.resource.contentType.matches('image/.*');
     }
 
-    // Product images - public read, admin write only
+    // Product images - public read, signed in write
     match /products/{allPaths=**} {
       allow read: if true;
-      allow write: if isAdmin() && isValidImage();
+      allow write: if isSignedIn() && isValidImage();
     }
 
-    // Category images - public read, admin write only
+    // Category images - public read, signed in write
     match /categories/{allPaths=**} {
       allow read: if true;
-      allow write: if isAdmin() && isValidImage();
+      allow write: if isSignedIn() && isValidImage();
     }
 
-    // Banner images - public read, admin write only
+    // Banner images - public read, signed in write
     match /banners/{allPaths=**} {
       allow read: if true;
-      allow write: if isAdmin() && isValidImage();
+      allow write: if isSignedIn() && isValidImage();
     }
 
     // User-uploaded review images - public read, owner write only

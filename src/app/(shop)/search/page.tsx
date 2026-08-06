@@ -11,8 +11,8 @@ interface SearchPageProps {
 export async function generateMetadata({ searchParams }: SearchPageProps): Promise<Metadata> {
   const { q } = await searchParams;
   return {
-    title: q ? `Search: "${q}" - Kinyo` : "Search - Kinyo",
-    description: `Search results for ${q} on Kinyo`,
+    title: q ? `Search: "${q}" - NexShop` : "Search - NexShop",
+    description: `Search results for ${q} on NexShop`,
   };
 }
 

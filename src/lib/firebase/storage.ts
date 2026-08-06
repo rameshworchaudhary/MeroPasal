@@ -1,20 +1,41 @@
 import {
-  ref, uploadBytes, getDownloadURL, deleteObject,
+  ref,
+  uploadBytes,
+  getDownloadURL,
+  deleteObject,
 } from "firebase/storage";
-import { storage } from "./config";
+import { auth, storage } from "./config";
 
 /**
- * Upload a single image file to Firebase Storage under a given folder.
- * Returns the public download URL.
+ * Upload a single image file directly to Firebase Storage under a given folder.
+ * Requires the user to be logged in via Firebase Auth.
+ * Returns the actual Firebase Storage public download URL.
  */
 export async function uploadImage(file: File, folder: string): Promise<string> {
+  const currentUser = auth.currentUser;
+  if (!currentUser) {
+    throw new Error(
+      "Authentication required: You must be logged in to upload files to Firebase Storage."
+    );
+  }
+
   const timestamp = Date.now();
   const safeName = file.name.replace(/[^a-zA-Z0-9.]/g, "_");
   const path = `${folder}/${timestamp}_${safeName}`;
-  const storageRef = ref(storage, path);
+  const metadata = {
+    contentType: file.type || "image/jpeg",
+  };
 
-  await uploadBytes(storageRef, file);
-  return getDownloadURL(storageRef);
+  const storageRef = ref(storage, path);
+  
+  try {
+    await uploadBytes(storageRef, file, metadata);
+    const downloadUrl = await getDownloadURL(storageRef);
+    return downloadUrl;
+  } catch (error: unknown) {
+    console.error("Firebase Storage Upload Error:", error);
+    throw error;
+  }
 }
 
 /**
@@ -28,10 +49,12 @@ export async function uploadMultipleImages(files: File[], folder: string): Promi
  * Delete an image from Firebase Storage given its full download URL.
  */
 export async function deleteImageByUrl(url: string): Promise<void> {
+  if (!url || !url.includes("firebasestorage.googleapis.com")) return;
   try {
     const storageRef = ref(storage, url);
     await deleteObject(storageRef);
-  } catch {
-    // Non-critical: image may already be deleted or URL may be external
+  } catch (err) {
+    console.warn("Storage delete failed (image may already be deleted or invalid URL):", err);
   }
 }
+
