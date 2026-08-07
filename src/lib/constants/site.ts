@@ -11,8 +11,8 @@ export const SITE_CONFIG = {
     tiktok: "https://tiktok.com/@nexshop.np",
   },
   contact: {
-    email: "support@nexshop.com.np",
-    phone: "+977 9742491352",
+    email: "nexshoponlinepvtltd@gmail.com",
+    phone: "+977 9864832320",
     address: "Kathmandu & Pokhara, Nepal",
   },
 };

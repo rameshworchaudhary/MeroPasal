@@ -76,7 +76,7 @@ export default function FloatingActions() {
               href={`tel:${SITE_CONFIG.contact.phone}`}
               className="flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-xs font-bold text-white hover:bg-blue-500 transition-all"
             >
-              <PhoneCall className="h-3.5 w-3.5" /> Call +977 9742491352
+              <PhoneCall className="h-3.5 w-3.5" /> Call {SITE_CONFIG.contact.phone}
             </a>
             <a
               href={`https://wa.me/${SITE_CONFIG.contact.phone.replace(/[^0-9]/g, "")}`}

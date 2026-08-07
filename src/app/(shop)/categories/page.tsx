@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   description: "Browse all product categories on NexShop",
 };
 
-export const revalidate = 300;
+export const dynamic = "force-dynamic";
 
 export default async function CategoriesPage() {
   const categories = await getActiveCategories();

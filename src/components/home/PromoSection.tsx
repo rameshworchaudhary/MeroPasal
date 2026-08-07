@@ -13,27 +13,24 @@ interface PromoSectionProps {
 const FALLBACK_PROMOS = [
   {
     id: "p1",
-    title: "Electronics Sale",
-    subtitle: "Up to 40% off",
-    image: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&q=80",
-    linkValue: "/categories/electronics",
-    bgColor: "from-blue-900 to-blue-600",
+    title: "Maha Dashain Dhamaka",
+    subtitle: "Up to 70% off festival electronics & fashion",
+    image: "/images/hero/maha-dashain.jpg",
+    linkValue: "/products?featured=true",
   },
   {
     id: "p2",
-    title: "Fashion Week",
-    subtitle: "New arrivals daily",
-    image: "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=600&q=80",
-    linkValue: "/categories/fashion",
-    bgColor: "from-pink-900 to-pink-600",
+    title: "Electronics & Tech Expo",
+    subtitle: "Smartphones, Laptops, Earbuds & Smartwatches",
+    image: "/images/hero/electronics.jpg",
+    linkValue: "/categories/electronics",
   },
   {
     id: "p3",
-    title: "Home & Kitchen",
-    subtitle: "Upgrade your space",
-    image: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=600&q=80",
-    linkValue: "/categories/home",
-    bgColor: "from-amber-900 to-amber-600",
+    title: "Fashion & Trends",
+    subtitle: "Authentic festival apparel, footwear & accessories",
+    image: "/images/hero/fashion.jpg",
+    linkValue: "/categories/fashion",
   },
 ];
 
@@ -41,14 +38,14 @@ export default function PromoSection({ banners }: PromoSectionProps) {
   const promos = banners.length >= 2 ? banners : FALLBACK_PROMOS;
 
   return (
-    <section className="max-w-[1400px] mx-auto px-3 sm:px-6 my-4 sm:my-5">
-      <div className="rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-5 shadow-2xs">
-        <div className="mb-3.5 sm:mb-4 flex items-center justify-between pb-3 border-b border-slate-100">
+    <section className="max-w-[1400px] mx-auto px-3 sm:px-6 my-4 sm:my-6">
+      <div className="rounded-xl border border-neutral-200 bg-white p-4 sm:p-5 shadow-2xs">
+        <div className="mb-4 flex items-center justify-between pb-3 border-b border-neutral-100">
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-wider text-blue-600 mb-0.5">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-black mb-0.5">
               Special Highlights
             </p>
-            <h2 className="font-serif text-base sm:text-xl font-extrabold text-slate-900">
+            <h2 className="font-serif text-base sm:text-xl font-bold text-black">
               The Nepal Seasonal Edit
             </h2>
           </div>
@@ -62,35 +59,35 @@ export default function PromoSection({ banners }: PromoSectionProps) {
             return (
               <motion.div
                 key={promo.id}
-                initial={{ opacity: 0, y: 15 }}
+                initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.08 }}
               >
                 <Link href={href}>
-                  <div className="group relative h-36 sm:h-48 cursor-pointer overflow-hidden rounded-xl border border-slate-800 bg-slate-950 shadow-2xs">
+                  <div className="group relative h-36 sm:h-48 cursor-pointer overflow-hidden rounded-xl border border-neutral-200 bg-black shadow-2xs">
                     {image ? (
                       <>
                         <Image
                           src={image}
                           alt={promo.title}
                           fill
-                          className="object-cover transition-transform duration-500 group-hover:scale-105"
+                          className="object-cover transition-transform duration-300 group-hover:scale-105"
                           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/40 to-transparent" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
                       </>
                     ) : (
-                      <div className="absolute inset-0 bg-gradient-to-br from-blue-900 via-slate-900 to-indigo-950" />
+                      <div className="absolute inset-0 bg-black" />
                     )}
-                    <div className="absolute inset-x-0 bottom-0 p-3.5 sm:p-5 text-white">
-                      <p className="mb-0.5 text-[9px] font-extrabold uppercase tracking-widest text-amber-300">
-                        NexShop Special
+                    <div className="absolute inset-x-0 bottom-0 p-4 text-white">
+                      <p className="mb-0.5 text-[9px] font-bold uppercase tracking-widest text-neutral-300">
+                        NexShop Edit
                       </p>
-                      <p className="font-serif text-base sm:text-xl font-bold leading-tight text-white">{promo.title}</p>
+                      <p className="font-serif text-base sm:text-lg font-bold leading-tight text-white">{promo.title}</p>
                       {subtitle && (
-                        <p className="mt-0.5 text-xs text-slate-300 line-clamp-1">{subtitle}</p>
+                        <p className="mt-0.5 text-xs text-neutral-300 line-clamp-1">{subtitle}</p>
                       )}
-                      <span className="mt-2 inline-flex items-center text-[10px] font-bold text-blue-400 group-hover:text-amber-300 transition-colors">
+                      <span className="mt-2 inline-flex items-center text-[10px] font-bold text-white group-hover:underline">
                         Explore Collection <span className="ml-1">&rarr;</span>
                       </span>
                     </div>

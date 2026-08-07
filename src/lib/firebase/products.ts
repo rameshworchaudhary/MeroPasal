@@ -64,94 +64,223 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
   }
 }
 
+export function isProductInCategory(product: Product, categoryIdOrSlug?: string, subCategoryId?: string): boolean {
+  if (!product) return false;
+  if (!categoryIdOrSlug && !subCategoryId) return true;
+
+  // 1. If explicit subCategoryId filter passed, check subCategoryId exact match
+  if (subCategoryId) {
+    if (product.subCategoryId === subCategoryId) return true;
+    if (product.subCategoryName?.toLowerCase().replace(/\s+/g, "-") === subCategoryId.toLowerCase()) return true;
+    return false;
+  }
+
+  const cleanId = (categoryIdOrSlug || "").toLowerCase().replace("virtual_", "").trim();
+
+  // 2. Direct Firestore ID matches
+  if (product.categoryId === categoryIdOrSlug || product.categoryId === cleanId) {
+    return true;
+  }
+  if (product.subCategoryId === categoryIdOrSlug || product.subCategoryId === cleanId) {
+    return true;
+  }
+
+  // 3. Category / Subcategory Name / Slug matching rules
+  const catName = (product.categoryName || "").toLowerCase();
+  const subCatName = (product.subCategoryName || "").toLowerCase();
+  const prodName = (product.name || "").toLowerCase();
+
+  switch (cleanId) {
+    case "mobiles":
+    case "smartphones":
+    case "mobile-phones":
+    case "sub_phones":
+      return (
+        product.subCategoryId === "sub_phones" ||
+        catName === "mobiles" ||
+        catName === "mobile phones" ||
+        catName === "smartphones" ||
+        subCatName.includes("mobile") ||
+        subCatName.includes("smartphone") ||
+        subCatName.includes("phone") ||
+        prodName.includes("smartphone") ||
+        (prodName.includes("mobile") && !prodName.includes("oil") && !prodName.includes("cream"))
+      );
+
+    case "electronics":
+    case "tech":
+      return (
+        product.categoryId === "FHVoBenxn5sglbQ1FlkM" ||
+        catName.includes("electronic") ||
+        catName.includes("tech")
+      );
+
+    case "fashion":
+    case "apparel":
+    case "clothing":
+      return (
+        product.categoryId === "V1igsyVaIxZcb9YLsaV5" ||
+        catName.includes("fashion") ||
+        catName.includes("apparel") ||
+        catName.includes("clothing")
+      );
+
+    case "beauty":
+    case "beauty-personal-care":
+    case "personal-care":
+      return (
+        product.categoryId === "dvelBiuo3SFWtklxyWQy" ||
+        catName.includes("beauty") ||
+        catName.includes("personal care")
+      );
+
+    case "home":
+    case "home-kitchen":
+    case "home-living":
+    case "home-decor":
+      return (
+        product.categoryId === "cefuDmHyonTWwSo0LVHm" ||
+        catName.includes("home")
+      );
+
+    case "appliances":
+    case "home-appliances":
+      return (
+        catName.includes("appliance") ||
+        subCatName.includes("appliance")
+      );
+
+    case "kitchen":
+    case "kitchenware":
+    case "sub_kitchenware":
+      return (
+        product.subCategoryId === "sub_kitchenware" ||
+        catName.includes("kitchen") ||
+        subCatName.includes("kitchen")
+      );
+
+    case "sports":
+    case "sports-outdoors":
+    case "sports-fitness":
+      return (
+        product.categoryId === "B125wGTulQOVMtSVwHdw" ||
+        catName.includes("sport")
+      );
+
+    case "furniture":
+    case "sub_furniture":
+      return (
+        product.subCategoryId === "sub_furniture" ||
+        catName.includes("furniture") ||
+        subCatName.includes("furniture")
+      );
+
+    case "books":
+    case "books-stationery":
+      return (
+        catName.includes("book") ||
+        subCatName.includes("book")
+      );
+
+    case "grocery":
+    case "groceries":
+    case "supermarket":
+      return (
+        product.categoryId === "YkM5ZYepThTIxQG3bKCr" ||
+        catName.includes("grocer")
+      );
+
+    case "2-wheelers":
+    case "two-wheelers":
+    case "bikes":
+    case "automotive":
+      return (
+        catName.includes("2 wheeler") ||
+        catName.includes("two wheeler") ||
+        catName.includes("bike") ||
+        catName.includes("automotive")
+      );
+
+    default:
+      return catName === cleanId || subCatName === cleanId;
+  }
+}
+
 export async function getProducts(
   filters: ProductFilters = {},
-  pageSize = 20,
+  pageSize = 48,
   lastDoc?: QueryDocumentSnapshot<DocumentData>
 ): Promise<{ products: Product[]; lastDoc: QueryDocumentSnapshot<DocumentData> | null }> {
-  const constraints = [where("isActive", "==", true)];
+  // Always query active products
+  let allProducts = await getAllActiveProducts();
 
-  if (filters.categoryId) {
-    constraints.push(where("categoryId", "==", filters.categoryId));
-  }
-  if (filters.subCategoryId) {
-    constraints.push(where("subCategoryId", "==", filters.subCategoryId));
-  }
-
-  let sortField = "createdAt";
-  let sortDir: "asc" | "desc" = "desc";
-
-  switch (filters.sortBy) {
-    case "price-asc":
-      sortField = "price";
-      sortDir = "asc";
-      break;
-    case "price-desc":
-      sortField = "price";
-      sortDir = "desc";
-      break;
-    case "rating":
-      sortField = "rating";
-      sortDir = "desc";
-      break;
-    case "popular":
-      sortField = "soldCount";
-      sortDir = "desc";
-      break;
-    default:
-      sortField = "createdAt";
-      sortDir = "desc";
-  }
-
-  let q = query(
-    collection(db, COLLECTIONS.PRODUCTS),
-    ...constraints,
-    orderBy(sortField, sortDir),
-    fbLimit(pageSize)
-  );
-
-  if (lastDoc) {
-    q = query(
-      collection(db, COLLECTIONS.PRODUCTS),
-      ...constraints,
-      orderBy(sortField, sortDir),
-      startAfter(lastDoc),
-      fbLimit(pageSize)
+  // 1. Strict Category & Subcategory Filter
+  if (filters.categoryId || filters.subCategoryId) {
+    allProducts = allProducts.filter((p) =>
+      isProductInCategory(p, filters.categoryId, filters.subCategoryId)
     );
   }
 
-  const snapshot = await getDocs(q);
-  let products = snapshot.docs.map(mapProductDoc);
-
+  // 2. Price Filters
   if (filters.minPrice !== undefined) {
-    products = products.filter((p) => p.price >= filters.minPrice!);
+    allProducts = allProducts.filter((p) => p.price >= filters.minPrice!);
   }
   if (filters.maxPrice !== undefined) {
-    products = products.filter((p) => p.price <= filters.maxPrice!);
+    allProducts = allProducts.filter((p) => p.price <= filters.maxPrice!);
   }
+
+  // 3. Brand Filter
   if (filters.brand && filters.brand.length > 0) {
-    products = products.filter((p) => p.brand && filters.brand!.includes(p.brand));
+    allProducts = allProducts.filter((p) => p.brand && filters.brand!.includes(p.brand));
   }
+
+  // 4. Rating Filter
   if (filters.rating !== undefined) {
-    products = products.filter((p) => p.rating >= filters.rating!);
+    allProducts = allProducts.filter((p) => p.rating >= filters.rating!);
   }
+
+  // 5. In-Stock Filter
   if (filters.inStock) {
-    products = products.filter((p) => p.stock > 0);
+    allProducts = allProducts.filter((p) => p.stock > 0);
   }
+
+  // 6. Search Filter
   if (filters.search) {
-    const searchLower = filters.search.toLowerCase();
-    products = products.filter(
+    const searchLower = filters.search.toLowerCase().trim();
+    allProducts = allProducts.filter(
       (p) =>
         p.name.toLowerCase().includes(searchLower) ||
-        p.description.toLowerCase().includes(searchLower) ||
-        p.tags.some((tag) => tag.toLowerCase().includes(searchLower)) ||
+        p.description?.toLowerCase().includes(searchLower) ||
+        p.tags?.some((tag) => tag.toLowerCase().includes(searchLower)) ||
         (p.brand && p.brand.toLowerCase().includes(searchLower))
     );
   }
 
-  const newLastDoc = snapshot.docs.length > 0 ? snapshot.docs[snapshot.docs.length - 1] : null;
+  // 7. Sorting
+  switch (filters.sortBy) {
+    case "price-asc":
+      allProducts.sort((a, b) => a.price - b.price);
+      break;
+    case "price-desc":
+      allProducts.sort((a, b) => b.price - a.price);
+      break;
+    case "rating":
+      allProducts.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+      break;
+    case "popular":
+      allProducts.sort((a, b) => (b.soldCount || 0) - (a.soldCount || 0));
+      break;
+    case "newest":
+    default:
+      allProducts.sort((a, b) => {
+        const dateA = new Date(a.createdAt || a.updatedAt || 0).getTime();
+        const dateB = new Date(b.createdAt || b.updatedAt || 0).getTime();
+        return dateB - dateA;
+      });
+      break;
+  }
 
-  return { products, lastDoc: newLastDoc };
+  return { products: allProducts.slice(0, pageSize), lastDoc: null };
 }
 
 export async function getAllActiveProducts(): Promise<Product[]> {
@@ -165,26 +294,65 @@ export async function getAllActiveProducts(): Promise<Product[]> {
   }
 }
 
-export async function getFeaturedProducts(count = 8): Promise<Product[]> {
+export async function getHomepageSections(count = 100): Promise<{
+  featured: Product[];
+  trending: Product[];
+  newArrivals: Product[];
+}> {
   try {
     const allActive = await getAllActiveProducts();
-    
-    // Sort logic:
-    // 1. isBestSeller/isFeatured = true products appear first
-    // 2. Newest Best Seller products appear first (latest updatedAt/createdAt)
-    // 3. Remaining products appear below
+
+    const featured = [...allActive]
+      .sort((a, b) => {
+        const aBestSeller = !!(a.isBestSeller || a.isFeatured);
+        const bBestSeller = !!(b.isBestSeller || b.isFeatured);
+        if (aBestSeller && !bBestSeller) return -1;
+        if (!aBestSeller && bBestSeller) return 1;
+        const dateA = new Date(a.updatedAt || a.createdAt || 0).getTime();
+        const dateB = new Date(b.updatedAt || b.createdAt || 0).getTime();
+        return dateB - dateA;
+      })
+      .slice(0, count);
+
+    const trending = [...allActive]
+      .sort((a, b) => {
+        const aTrending = !!a.isTrending;
+        const bTrending = !!b.isTrending;
+        if (aTrending && !bTrending) return -1;
+        if (!aTrending && bTrending) return 1;
+        const dateA = new Date(a.updatedAt || a.createdAt || 0).getTime();
+        const dateB = new Date(b.updatedAt || b.createdAt || 0).getTime();
+        return dateB - dateA;
+      })
+      .slice(0, count);
+
+    const newArrivals = [...allActive]
+      .sort((a, b) => {
+        const dateA = new Date(a.createdAt || a.updatedAt || 0).getTime();
+        const dateB = new Date(b.createdAt || b.updatedAt || 0).getTime();
+        return dateB - dateA;
+      })
+      .slice(0, count);
+
+    return { featured, trending, newArrivals };
+  } catch (err) {
+    console.error("Error fetching homepage product sections:", err);
+    return { featured: [], trending: [], newArrivals: [] };
+  }
+}
+
+export async function getFeaturedProducts(count = 100, activeProducts?: Product[]): Promise<Product[]> {
+  try {
+    const allActive = activeProducts || (await getAllActiveProducts());
     const sorted = [...allActive].sort((a, b) => {
       const aBestSeller = !!(a.isBestSeller || a.isFeatured);
       const bBestSeller = !!(b.isBestSeller || b.isFeatured);
-
       if (aBestSeller && !bBestSeller) return -1;
       if (!aBestSeller && bBestSeller) return 1;
-
       const dateA = new Date(a.updatedAt || a.createdAt || 0).getTime();
       const dateB = new Date(b.updatedAt || b.createdAt || 0).getTime();
       return dateB - dateA;
     });
-
     return sorted.slice(0, count);
   } catch (err) {
     console.error("Error fetching featured/best-seller products:", err);
@@ -192,26 +360,18 @@ export async function getFeaturedProducts(count = 8): Promise<Product[]> {
   }
 }
 
-export async function getTrendingProducts(count = 8): Promise<Product[]> {
+export async function getTrendingProducts(count = 100, activeProducts?: Product[]): Promise<Product[]> {
   try {
-    const allActive = await getAllActiveProducts();
-
-    // Sort logic:
-    // 1. isTrending = true products appear first
-    // 2. Newest trending products appear first (latest updatedAt/createdAt)
-    // 3. Remaining products appear below
+    const allActive = activeProducts || (await getAllActiveProducts());
     const sorted = [...allActive].sort((a, b) => {
       const aTrending = !!a.isTrending;
       const bTrending = !!b.isTrending;
-
       if (aTrending && !bTrending) return -1;
       if (!aTrending && bTrending) return 1;
-
       const dateA = new Date(a.updatedAt || a.createdAt || 0).getTime();
       const dateB = new Date(b.updatedAt || b.createdAt || 0).getTime();
       return dateB - dateA;
     });
-
     return sorted.slice(0, count);
   } catch (err) {
     console.error("Error fetching trending products:", err);
@@ -219,7 +379,7 @@ export async function getTrendingProducts(count = 8): Promise<Product[]> {
   }
 }
 
-export async function getSimilarProducts(product: Product, count = 8): Promise<Product[]> {
+export async function getSimilarProducts(product: Product, count = 12): Promise<Product[]> {
   try {
     const q = query(
       collection(db, COLLECTIONS.PRODUCTS),
@@ -238,9 +398,9 @@ export async function getSimilarProducts(product: Product, count = 8): Promise<P
   }
 }
 
-export async function getNewArrivals(count = 8): Promise<Product[]> {
+export async function getNewArrivals(count = 100, activeProducts?: Product[]): Promise<Product[]> {
   try {
-    const allActive = await getAllActiveProducts();
+    const allActive = activeProducts || (await getAllActiveProducts());
     const sorted = [...allActive].sort((a, b) => {
       const dateA = new Date(a.createdAt || a.updatedAt || 0).getTime();
       const dateB = new Date(b.createdAt || b.updatedAt || 0).getTime();

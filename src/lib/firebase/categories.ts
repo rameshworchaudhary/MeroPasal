@@ -55,10 +55,84 @@ export async function getAllCategories(): Promise<Category[]> {
 
 export async function getCategoryBySlug(slug: string): Promise<Category | null> {
   try {
-    const q = query(collection(db, COLLECTIONS.CATEGORIES), where("slug", "==", slug));
-    const snapshot = await getDocs(q);
-    if (snapshot.empty) return null;
-    return mapCategoryDoc(snapshot.docs[0]);
+    // 1. Try exact match
+    let q = query(collection(db, COLLECTIONS.CATEGORIES), where("slug", "==", slug));
+    let snapshot = await getDocs(q);
+    if (!snapshot.empty) return mapCategoryDoc(snapshot.docs[0]);
+
+    // 2. Check known aliases
+    const aliases: Record<string, string[]> = {
+      mobiles: ["smartphones", "mobile-phones", "phones"],
+      electronics: ["electronics-gadgets", "tech"],
+      fashion: ["apparel", "clothing"],
+      beauty: ["beauty-personal-care", "beauty-care", "personal-care"],
+      home: ["home-kitchen", "home-decor", "home-living"],
+      appliances: ["home-appliances", "appliances-electronics"],
+      kitchen: ["kitchenware", "home-kitchen"],
+      sports: ["sports-outdoors", "sports-fitness"],
+      furniture: ["home-furniture"],
+      books: ["books-stationery"],
+      grocery: ["groceries", "supermarket"],
+      "2-wheelers": ["two-wheelers", "automotive", "vehicles", "bikes"],
+    };
+
+    const targetAliases = aliases[slug] || [];
+    for (const alias of targetAliases) {
+      q = query(collection(db, COLLECTIONS.CATEGORIES), where("slug", "==", alias));
+      snapshot = await getDocs(q);
+      if (!snapshot.empty) return mapCategoryDoc(snapshot.docs[0]);
+    }
+
+    // 3. Fallback: Match by category name
+    const allCats = await getActiveCategories();
+    const slugLower = slug.toLowerCase().replace(/-/g, " ");
+    const matched = allCats.find((c) => {
+      const nameLower = c.name.toLowerCase();
+      const catSlugLower = c.slug.toLowerCase();
+      return (
+        catSlugLower.includes(slug) ||
+        slug.includes(catSlugLower) ||
+        nameLower.includes(slugLower) ||
+        slugLower.includes(nameLower)
+      );
+    });
+
+    if (matched) return matched;
+
+    // 4. Synthetic fallback category for shortcuts not yet present in Firestore
+    const categoryNameMap: Record<string, string> = {
+      mobiles: "Mobiles",
+      electronics: "Electronics",
+      fashion: "Fashion",
+      beauty: "Beauty & Personal Care",
+      home: "Home & Living",
+      appliances: "Appliances",
+      kitchen: "Kitchen & Dining",
+      sports: "Sports & Outdoors",
+      furniture: "Furniture",
+      books: "Books & Stationery",
+      grocery: "Grocery",
+      "2-wheelers": "2 Wheelers",
+    };
+
+    if (categoryNameMap[slug]) {
+      return {
+        id: `virtual_${slug}`,
+        name: categoryNameMap[slug],
+        slug: slug,
+        description: `Explore all ${categoryNameMap[slug]} products on NexShop`,
+        image: "/images/placeholder.jpg",
+        icon: "🛍️",
+        subCategories: [],
+        isActive: true,
+        displayOrder: 99,
+        productCount: 0,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+    }
+
+    return null;
   } catch (err) {
     console.error("Error fetching category by slug:", err);
     return null;

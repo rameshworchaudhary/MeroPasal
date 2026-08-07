@@ -1,8 +1,9 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import { motion } from "framer-motion";
-import { PackageOpen } from "lucide-react";
+import { PackageOpen, ShoppingBag } from "lucide-react";
 import ProductCard from "@/components/product/ProductCard";
 import ProductCardSkeleton from "@/components/product/ProductCardSkeleton";
 import type { Product } from "@/lib/types/product";
@@ -16,7 +17,7 @@ interface ProductGridProps {
 export default function ProductGrid({
   products,
   loading = false,
-  emptyMessage = "No products found",
+  emptyMessage = "No products available in this category yet.",
 }: ProductGridProps) {
   if (loading) {
     return (
@@ -30,14 +31,23 @@ export default function ProductGrid({
 
   if (products.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 text-center px-4">
-        <div className="mb-5 flex h-20 w-20 items-center justify-center rounded-full border border-[#d4b982] bg-[#f1ebe1]">
-          <PackageOpen className="h-9 w-9 text-[#8b6b35]" />
+      <div className="flex flex-col items-center justify-center py-16 sm:py-24 text-center px-4 rounded-2xl border border-neutral-200 bg-white shadow-2xs my-4">
+        <div className="mb-4 flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-2xl border border-neutral-300 bg-neutral-100 text-black">
+          <PackageOpen className="h-8 w-8 sm:h-10 sm:w-10 text-neutral-800" />
         </div>
-        <p className="font-serif text-xl tracking-wide text-[#292722]">{emptyMessage}</p>
-        <p className="mt-2 text-sm text-[#777166]">
-          Try adjusting your filters or search query
+        <h3 className="font-serif text-xl sm:text-2xl font-bold tracking-tight text-black">
+          No products available
+        </h3>
+        <p className="mt-2 text-xs sm:text-sm text-neutral-600 max-w-md leading-relaxed">
+          {emptyMessage}
         </p>
+        <Link
+          href="/products"
+          className="mt-6 inline-flex items-center gap-2 rounded-xl bg-black px-6 py-3 text-xs sm:text-sm font-bold text-white shadow-sm hover:bg-neutral-800 transition-all uppercase tracking-wider"
+        >
+          <ShoppingBag className="h-4 w-4" />
+          <span>Continue Shopping</span>
+        </Link>
       </div>
     );
   }

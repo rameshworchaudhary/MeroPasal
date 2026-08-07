@@ -3,7 +3,7 @@
 import React, { useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ChevronLeft, ChevronRight, Sparkles, Flame } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { Category } from "@/lib/types/category";
 
 interface CategoryBarProps {
@@ -38,13 +38,13 @@ export default function CategoryBar({ categories = [] }: CategoryBarProps) {
   };
 
   return (
-    <div className="border-b border-slate-200/80 bg-white py-2.5 shadow-2xs">
+    <div className="border-b border-neutral-200 bg-white py-2.5">
       <div className="container mx-auto px-2 sm:px-6 relative flex items-center">
         {/* Left Scroll Button */}
         <button
           onClick={() => scroll("left")}
           aria-label="Scroll left"
-          className="hidden md:flex absolute left-2 z-10 h-7 w-7 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 shadow-sm transition-all hover:border-blue-500 hover:text-blue-600 hover:scale-105"
+          className="hidden md:flex absolute left-2 z-10 h-7 w-7 items-center justify-center rounded-full border border-neutral-300 bg-white text-neutral-800 shadow-xs transition-all hover:bg-black hover:text-white hover:border-black"
         >
           <ChevronLeft className="h-4 w-4" />
         </button>
@@ -56,21 +56,21 @@ export default function CategoryBar({ categories = [] }: CategoryBarProps) {
         >
           {CATEGORY_ITEMS.map((cat, idx) => {
             const href = cat.slug === "for-you" ? "/" : `/categories/${cat.slug}`;
-            const isActive = idx === 0 && pathname === "/" || pathname === href;
+            const isActive = (idx === 0 && pathname === "/") || pathname === href;
 
             return (
               <Link
                 key={cat.slug}
                 href={href}
-                className={`group flex flex-col items-center shrink-0 min-w-[62px] sm:min-w-[72px] transition-all relative pb-1 ${
-                  isActive ? "text-blue-600 font-bold" : "text-slate-700 font-medium hover:text-blue-600"
+                className={`group flex flex-col items-center shrink-0 min-w-[62px] sm:min-w-[72px] transition-all relative pb-1.5 ${
+                  isActive ? "text-black font-bold" : "text-neutral-600 font-medium hover:text-black"
                 }`}
               >
                 <div
-                  className={`flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-2xl text-lg sm:text-xl transition-all duration-200 group-hover:scale-105 ${
+                  className={`flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-xl text-lg sm:text-xl transition-all duration-200 group-hover:scale-105 ${
                     isActive
-                      ? "bg-blue-50 text-blue-600 shadow-2xs border border-blue-200"
-                      : "bg-slate-50 text-slate-700 group-hover:bg-blue-50/70"
+                      ? "bg-black text-white shadow-xs"
+                      : "bg-neutral-100 text-neutral-800 group-hover:bg-neutral-200"
                   }`}
                 >
                   {cat.icon}
@@ -79,9 +79,9 @@ export default function CategoryBar({ categories = [] }: CategoryBarProps) {
                   {cat.name}
                 </span>
 
-                {/* Active Underline Pill Indicator */}
+                {/* Active Underline Indicator */}
                 {isActive && (
-                  <span className="absolute bottom-0 h-0.5 w-8 rounded-full bg-blue-600 shadow-2xs" />
+                  <span className="absolute bottom-0 h-0.5 w-8 rounded-full bg-black" />
                 )}
               </Link>
             );
@@ -90,14 +90,25 @@ export default function CategoryBar({ categories = [] }: CategoryBarProps) {
           {/* More Link */}
           <Link
             href="/categories"
-            className="group flex flex-col items-center shrink-0 min-w-[62px] sm:min-w-[72px] text-slate-700 hover:text-blue-600 transition-all"
+            className={`group flex flex-col items-center shrink-0 min-w-[62px] sm:min-w-[72px] transition-all relative pb-1.5 ${
+              pathname === "/categories" ? "text-black font-bold" : "text-neutral-600 font-medium hover:text-black"
+            }`}
           >
-            <div className="flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-2xl bg-slate-50 text-slate-600 text-lg group-hover:bg-blue-50 group-hover:text-blue-600 transition-all">
+            <div
+              className={`flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-xl text-lg font-bold transition-all ${
+                pathname === "/categories"
+                  ? "bg-black text-white"
+                  : "bg-neutral-100 text-neutral-800 group-hover:bg-neutral-200"
+              }`}
+            >
               •••
             </div>
-            <span className="text-[11px] sm:text-xs mt-1.5 whitespace-nowrap font-semibold">
+            <span className="text-[11px] sm:text-xs mt-1.5 whitespace-nowrap">
               More
             </span>
+            {pathname === "/categories" && (
+              <span className="absolute bottom-0 h-0.5 w-8 rounded-full bg-black" />
+            )}
           </Link>
         </div>
 
@@ -105,7 +116,7 @@ export default function CategoryBar({ categories = [] }: CategoryBarProps) {
         <button
           onClick={() => scroll("right")}
           aria-label="Scroll right"
-          className="hidden md:flex absolute right-2 z-10 h-7 w-7 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 shadow-sm transition-all hover:border-blue-500 hover:text-blue-600 hover:scale-105"
+          className="hidden md:flex absolute right-2 z-10 h-7 w-7 items-center justify-center rounded-full border border-neutral-300 bg-white text-neutral-800 shadow-xs transition-all hover:bg-black hover:text-white hover:border-black"
         >
           <ChevronRight className="h-4 w-4" />
         </button>

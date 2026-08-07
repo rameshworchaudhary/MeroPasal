@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   description: "Browse all products on NexShop",
 };
 
-export const revalidate = 120;
+export const dynamic = "force-dynamic";
 
 interface ProductsPageProps {
   searchParams: Promise<{
@@ -60,7 +60,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
 
   // Extract unique brands from results for filter
   const brands = [...new Set(products.map((p) => p.brand).filter(Boolean) as string[])].sort();
-  const maxPrice = Math.max(...products.map((p) => p.comparePrice || p.price), 50000);
+  const maxPrice = Math.max(...products.map((p) => p.comparePrice || p.price || 0), 50000);
 
   const currentSort = params.sortBy || "newest";
   const totalProducts = products.length;

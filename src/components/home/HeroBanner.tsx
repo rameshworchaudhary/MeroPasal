@@ -19,7 +19,7 @@ const FALLBACK_BANNERS = [
     title: "Maha Dashain Mega Dhamaka",
     subtitle:
       "Celebrate Nepal's biggest festival with up to 70% OFF + Flat Rs. 1,000 Vouchers",
-    image: "/images/hero/Dashain.jpg",
+    image: "/images/hero/dashain.jpg",
     buttonText: "Shop Dashain Deals",
     linkValue: "/products?featured=true",
     badge: "DASHAIN SALE 2083",
@@ -28,11 +28,11 @@ const FALLBACK_BANNERS = [
     id: "electronics",
     title: "Nepal Electronics & Tech Expo",
     subtitle:
-      "Unbeatable deals on 5G Smartphones, Laptops, Smart TVs & more",
+      "Unbeatable deals on 5G Smartphones, Laptops, Smart TVs & accessories",
     image: "/images/hero/Electronic.jpg",
-    buttonText: "Shop Now",
+    buttonText: "Shop Tech",
     linkValue: "/categories/electronics",
-    badge: "TECH FESTIVAL",
+    badge: "TECH EXPO",
   },
   {
     id: "tihar",
@@ -42,7 +42,7 @@ const FALLBACK_BANNERS = [
     image: "/images/hero/Tihar.jpg",
     buttonText: "Explore Tihar Specials",
     linkValue: "/categories/home",
-    badge: "TIHAR FESTIVAL OFFER",
+    badge: "TIHAR SPECIAL",
   },
   {
     id: "fashion",
@@ -56,13 +56,6 @@ const FALLBACK_BANNERS = [
   },
 ];
 
-/**
- * Resolves the correct href for a banner's CTA button.
- * Real banners (from Firestore/admin panel) store `linkType` + `linkValue`
- * separately (e.g. linkType="category", linkValue="electronics") — the
- * raw linkValue is NOT a valid path on its own. Fallback/demo banners
- * already store a full path in linkValue, so those pass through as-is.
- */
 function resolveBannerHref(slide: Banner | (typeof FALLBACK_BANNERS)[0]): string {
   if (!("linkType" in slide)) {
     return slide.linkValue || "/products";
@@ -109,53 +102,52 @@ export default function HeroBanner({ banners }: HeroBannerProps) {
     (currentSlide as (typeof FALLBACK_BANNERS)[0]).image;
 
   const badgeText =
-    (currentSlide as (typeof FALLBACK_BANNERS)[0]).badge || "DASHAIN SALE 2083";
+    (currentSlide as (typeof FALLBACK_BANNERS)[0]).badge || "SPECIAL OFFER";
 
   return (
-    <section className="max-w-[1400px] mx-auto px-3 sm:px-6 my-2 sm:my-3">
+    <section className="max-w-[1400px] mx-auto px-3 sm:px-6 my-3 sm:my-4">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4">
-        {/* Main Hero Banner Slider (Left ~75% width on Desktop, COMPACT HEIGHT: 210px mobile, 350px desktop) */}
+        {/* Main Hero Banner Slider */}
         <div
-          className="lg:col-span-9 relative overflow-hidden rounded-2xl bg-slate-950 h-[210px] sm:h-[280px] lg:h-[350px] flex items-center shadow-xs group"
+          className="lg:col-span-9 relative overflow-hidden rounded-xl bg-black h-[220px] sm:h-[300px] lg:h-[360px] flex items-center shadow-sm group"
           onMouseEnter={() => setIsPaused(true)}
           onMouseLeave={() => setIsPaused(false)}
         >
           <AnimatePresence mode="wait">
             <motion.div
               key={current}
-              initial={{ opacity: 0, scale: 1.01 }}
-              animate={{ opacity: 1, scale: 1 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.35 }}
+              transition={{ duration: 0.3 }}
               className="absolute inset-0 flex items-center"
             >
-              {/* Banner Background */}
               <Image
                 src={bgImage}
                 alt={(currentSlide as Banner).title || "NexShop Banner"}
                 fill
-                className="object-cover object-center transition-transform duration-[6000ms] scale-102"
+                className="object-cover object-center"
                 priority={current === 0}
                 sizes="(max-width: 1024px) 100vw, 75vw"
                 referrerPolicy="no-referrer"
               />
 
-              {/* Dark Overlay Gradient */}
-              <div className="absolute inset-0 bg-gradient-to-r from-slate-950/95 via-slate-950/80 to-transparent" />
+              {/* Black Gradient Overlay */}
+              <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/70 to-transparent" />
 
               {/* Slide Content */}
-              <div className="relative z-10 p-4 sm:p-7 max-w-[88%] sm:max-w-lg text-white">
-                <div className="inline-flex items-center gap-1.5 rounded-md border border-amber-400/40 bg-amber-400/15 px-2.5 py-0.5 text-[9px] sm:text-[11px] font-bold uppercase tracking-wider text-amber-300 backdrop-blur-md mb-2">
-                  <Tag className="h-3 w-3 text-amber-400" />
+              <div className="relative z-10 p-4 sm:p-8 max-w-[90%] sm:max-w-lg text-white">
+                <div className="inline-flex items-center gap-1.5 rounded-md bg-white/20 border border-white/30 px-2.5 py-0.5 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-white backdrop-blur-md mb-2">
+                  <Tag className="h-3 w-3" />
                   <span>{badgeText}</span>
                 </div>
 
-                <h1 className="text-base sm:text-2xl lg:text-3xl font-extrabold tracking-tight font-serif leading-tight text-white drop-shadow-xs">
+                <h1 className="text-lg sm:text-2xl lg:text-3xl font-extrabold tracking-tight font-serif leading-tight text-white">
                   {(currentSlide as Banner).title}
                 </h1>
 
                 {(currentSlide as Banner).subtitle && (
-                  <p className="mt-1 text-[11px] sm:text-xs leading-relaxed text-slate-300 line-clamp-2 max-w-md">
+                  <p className="mt-1 text-[11px] sm:text-xs leading-relaxed text-neutral-300 line-clamp-2 max-w-md">
                     {(currentSlide as Banner).subtitle}
                   </p>
                 )}
@@ -163,11 +155,11 @@ export default function HeroBanner({ banners }: HeroBannerProps) {
                 <div className="mt-3 sm:mt-4 flex items-center gap-2">
                   <Button
                     size="sm"
-                    className="rounded-xl bg-white text-slate-900 hover:bg-slate-100 px-4 py-1.5 h-8 text-xs font-bold shadow-xs transition-all hover:scale-102"
+                    className="rounded-lg bg-white text-black hover:bg-neutral-200 px-4 py-1.5 h-8 text-xs font-bold shadow-xs transition-all"
                     asChild
                   >
                     <Link href={resolveBannerHref(currentSlide)}>
-                      {(currentSlide as Banner).buttonText || "Shop Now"} <ArrowRight className="ml-1 h-3.5 w-3.5 text-slate-900" />
+                      {(currentSlide as Banner).buttonText || "Shop Now"} <ArrowRight className="ml-1 h-3.5 w-3.5" />
                     </Link>
                   </Button>
                 </div>
@@ -175,23 +167,22 @@ export default function HeroBanner({ banners }: HeroBannerProps) {
             </motion.div>
           </AnimatePresence>
 
-          {/* Slider Left Arrow - Hidden on mobile to prevent overlapping text */}
+          {/* Slider Arrows */}
           {slides.length > 1 && (
             <button
               onClick={prev}
               aria-label="Previous banner"
-              className="hidden sm:flex absolute left-2.5 top-1/2 z-20 h-7 w-7 sm:h-8 sm:w-8 -translate-y-1/2 items-center justify-center rounded-full border border-slate-700/80 bg-slate-950/70 text-white backdrop-blur-xs transition-all hover:bg-blue-600 hover:scale-110 opacity-75 group-hover:opacity-100 shadow-xs"
+              className="hidden sm:flex absolute left-3 top-1/2 z-20 h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-black/70 text-white border border-white/20 transition-all hover:bg-black hover:scale-105"
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
           )}
 
-          {/* Slider Right Arrow - Hidden on mobile to prevent overlapping text */}
           {slides.length > 1 && (
             <button
               onClick={next}
               aria-label="Next banner"
-              className="hidden sm:flex absolute right-2.5 top-1/2 z-20 h-7 w-7 sm:h-8 sm:w-8 -translate-y-1/2 items-center justify-center rounded-full border border-slate-700/80 bg-slate-950/70 text-white backdrop-blur-xs transition-all hover:bg-blue-600 hover:scale-110 opacity-75 group-hover:opacity-100 shadow-xs"
+              className="hidden sm:flex absolute right-3 top-1/2 z-20 h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-black/70 text-white border border-white/20 transition-all hover:bg-black hover:scale-105"
             >
               <ChevronRight className="h-4 w-4" />
             </button>
@@ -199,7 +190,7 @@ export default function HeroBanner({ banners }: HeroBannerProps) {
 
           {/* Pagination Indicators */}
           {slides.length > 1 && (
-            <div className="absolute bottom-2.5 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5">
+            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5">
               {slides.map((_, i) => (
                 <button
                   key={i}
@@ -207,7 +198,7 @@ export default function HeroBanner({ banners }: HeroBannerProps) {
                   aria-label={`Go to slide ${i + 1}`}
                   className={cn(
                     "h-1.5 rounded-full transition-all duration-300",
-                    i === current ? "w-5 bg-blue-500" : "w-1.5 bg-white/40 hover:bg-white/80"
+                    i === current ? "w-6 bg-white" : "w-1.5 bg-white/40 hover:bg-white/70"
                   )}
                 />
               ))}
@@ -215,19 +206,19 @@ export default function HeroBanner({ banners }: HeroBannerProps) {
           )}
         </div>
 
-        {/* Side Offer Card (Right ~25% width on Desktop, matching height 350px on desktop) */}
-        <div className="lg:col-span-3 h-[140px] sm:h-[160px] lg:h-[350px]">
-          <div className="h-full rounded-2xl border border-slate-200 bg-gradient-to-br from-blue-50/70 via-slate-50 to-emerald-50/50 p-4 shadow-2xs relative overflow-hidden flex flex-row lg:flex-col justify-between items-center lg:items-start transition-all hover:border-blue-300">
+        {/* Side Banner Card: Sports Zone */}
+        <div className="lg:col-span-3 h-[140px] sm:h-[160px] lg:h-[360px]">
+          <div className="h-full rounded-xl border border-neutral-200 bg-white p-4 shadow-2xs relative overflow-hidden flex flex-row lg:flex-col justify-between items-center lg:items-start transition-all hover:border-black">
             <div className="flex-1 pr-2 lg:pr-0">
-              <span className="text-[9px] font-extrabold uppercase tracking-widest text-blue-700 bg-blue-100/90 px-2 py-0.5 rounded-md">
+              <span className="text-[9px] font-bold uppercase tracking-widest text-white bg-black px-2 py-0.5 rounded-md">
                 Sports Zone
               </span>
 
-              <h3 className="text-sm sm:text-base lg:text-lg font-extrabold text-slate-900 leading-tight mt-2">
+              <h3 className="text-sm sm:text-base lg:text-lg font-extrabold text-black leading-tight mt-2">
                 Gear Up For The Game
               </h3>
 
-              <p className="text-[11px] text-slate-600 mt-0.5 font-medium line-clamp-1 lg:line-clamp-2">
+              <p className="text-[11px] text-neutral-600 mt-0.5 font-medium line-clamp-1 lg:line-clamp-2">
                 Fitness, cricket, football & outdoor sports essentials
               </p>
 
@@ -235,7 +226,7 @@ export default function HeroBanner({ banners }: HeroBannerProps) {
                 <Button
                   size="sm"
                   variant="outline"
-                  className="h-7 rounded-xl border-slate-300 bg-white hover:bg-blue-50 text-slate-800 text-[11px] font-bold shadow-2xs hover:text-blue-600 px-3"
+                  className="h-7 rounded-lg border-black bg-black text-white hover:bg-neutral-800 text-[11px] font-bold px-3"
                   asChild
                 >
                   <Link href="/categories/sports">
@@ -247,10 +238,10 @@ export default function HeroBanner({ banners }: HeroBannerProps) {
 
             {/* Sports Category Photo */}
             <div className="shrink-0 flex justify-end lg:w-full lg:mt-3">
-              <div className="relative h-14 w-14 lg:h-20 lg:w-20 overflow-hidden rounded-2xl shadow-xs rotate-2">
+              <div className="relative h-14 w-14 lg:h-20 lg:w-20 overflow-hidden rounded-lg border border-neutral-200">
                 <Image
-                  src="/images/hero/Sports.jpg"
-                  alt="Sports category"
+                  src="/images/hero/sports-zone.jpg"
+                  alt="Sports Zone"
                   fill
                   className="object-cover"
                   sizes="80px"

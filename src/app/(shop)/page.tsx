@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import HeroBanner from "@/components/home/HeroBanner";
 import CategoryBar from "@/components/home/CategoryBar";
 import FeatureStrip from "@/components/home/FeatureStrip";
-import FlashAndCategories from "@/components/home/FlashAndCategories";
+import FlashSaleSection from "@/components/home/FlashSaleSection";
 import ProductSection from "@/components/home/ProductSection";
 import PromoSection from "@/components/home/PromoSection";
 import PopularBrands from "@/components/home/PopularBrands";
@@ -12,11 +12,7 @@ import NepalPaymentBar from "@/components/home/NepalPaymentBar";
 import NewsletterSection from "@/components/home/NewsletterSection";
 import { getActiveCategories } from "@/lib/firebase/categories";
 import { getActiveBannersByPosition } from "@/lib/firebase/banners";
-import {
-  getFeaturedProducts,
-  getTrendingProducts,
-  getNewArrivals,
-} from "@/lib/firebase/products";
+import { getHomepageSections } from "@/lib/firebase/products";
 import { SITE_CONFIG } from "@/lib/constants/site";
 
 export const metadata: Metadata = {
@@ -24,41 +20,40 @@ export const metadata: Metadata = {
   description: SITE_CONFIG.description,
 };
 
-// Revalidate every 5 minutes
-export const revalidate = 300;
+export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
   // Fetch all homepage data in parallel
-  const [heroBanners, secondaryBanners, categories, featuredProducts, trendingProducts, newArrivals] =
+  const [heroBanners, secondaryBanners, categories, productSections] =
     await Promise.allSettled([
       getActiveBannersByPosition("hero"),
       getActiveBannersByPosition("secondary"),
       getActiveCategories(),
-      getFeaturedProducts(12),
-      getTrendingProducts(12),
-      getNewArrivals(12),
+      getHomepageSections(100),
     ]);
 
   const hero = heroBanners.status === "fulfilled" ? heroBanners.value : [];
   const secondary = secondaryBanners.status === "fulfilled" ? secondaryBanners.value : [];
   const cats = categories.status === "fulfilled" ? categories.value : [];
-  const featured = featuredProducts.status === "fulfilled" ? featuredProducts.value : [];
-  const trending = trendingProducts.status === "fulfilled" ? trendingProducts.value : [];
-  const arrivals = newArrivals.status === "fulfilled" ? newArrivals.value : [];
+  const sections = productSections.status === "fulfilled" ? productSections.value : { featured: [], trending: [], newArrivals: [] };
+
+  const featured = sections.featured;
+  const trending = sections.trending;
+  const arrivals = sections.newArrivals;
 
   return (
-    <div className="pb-10 bg-slate-50 min-h-screen">
+    <div className="pb-10 bg-neutral-50 min-h-screen">
       {/* 1. Horizontal Category Navigation Bar */}
       <CategoryBar categories={cats} />
 
-      {/* 2. Hero Section: Compact height banner slider + Side Exchange Offer Card */}
+      {/* 2. Hero Section */}
       <HeroBanner banners={hero} />
 
       {/* 3. Feature Value Proposition Strip */}
       <FeatureStrip />
 
-      {/* 4. Flash Sale + Shop by Category Side-by-Side Grid */}
-      <FlashAndCategories products={featured} categories={cats} />
+      {/* 4. Full-width Flash Sale Section */}
+      <FlashSaleSection products={featured} />
 
       {/* 5. Trending in Nepal */}
       {trending.length > 0 && (

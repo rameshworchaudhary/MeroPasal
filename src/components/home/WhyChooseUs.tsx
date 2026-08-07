@@ -38,34 +38,36 @@ const FEATURES = [
 
 export default function WhyChooseUs() {
   return (
-    <section className="container mx-auto px-3.5 sm:px-6 py-8 sm:py-12 border-t border-slate-200/80">
-      <div className="mb-6 sm:mb-8 text-center max-w-xl mx-auto">
-        <p className="text-[10px] font-bold uppercase tracking-wider text-blue-600 mb-1">
-          The NexShop Guarantee
-        </p>
-        <h2 className="font-serif text-2xl sm:text-3xl font-extrabold text-slate-900">
-          Why Choose NexShop Nepal?
-        </h2>
-        <p className="mt-1 text-xs sm:text-sm text-slate-500 font-medium">
-          Nepal&apos;s most trusted online shopping marketplace designed for speed & convenience
-        </p>
-      </div>
+    <section className="max-w-[1400px] mx-auto px-3 sm:px-6 my-6 sm:my-8">
+      <div className="rounded-xl border border-neutral-200 bg-white p-5 sm:p-8 shadow-2xs">
+        <div className="mb-6 text-center max-w-xl mx-auto">
+          <p className="text-[10px] font-bold uppercase tracking-wider text-black mb-1">
+            The NexShop Guarantee
+          </p>
+          <h2 className="font-serif text-xl sm:text-2xl font-bold text-black">
+            Why Choose NexShop Nepal?
+          </h2>
+          <p className="mt-1 text-xs sm:text-sm text-neutral-500 font-medium">
+            Nepal&apos;s most trusted online shopping marketplace designed for speed & convenience
+          </p>
+        </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-        {FEATURES.map(({ icon: Icon, title, desc }) => (
-          <div
-            key={title}
-            className="flex items-start gap-3.5 p-3.5 sm:p-4 rounded-xl border border-slate-200/80 bg-white shadow-2xs hover:border-blue-300 transition-all"
-          >
-            <div className="flex h-10 w-10 sm:h-11 sm:w-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600 border border-blue-100">
-              <Icon className="h-5 w-5" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4">
+          {FEATURES.map(({ icon: Icon, title, desc }) => (
+            <div
+              key={title}
+              className="flex items-start gap-3.5 p-4 rounded-xl border border-neutral-200 bg-neutral-50 hover:border-black hover:bg-white transition-all"
+            >
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-black text-white">
+                <Icon className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="font-bold text-xs sm:text-sm text-black">{title}</p>
+                <p className="mt-0.5 text-xs text-neutral-500 leading-snug">{desc}</p>
+              </div>
             </div>
-            <div>
-              <p className="font-bold text-xs sm:text-sm text-slate-900">{title}</p>
-              <p className="mt-0.5 text-xs text-slate-500 leading-snug">{desc}</p>
-            </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </section>
   );

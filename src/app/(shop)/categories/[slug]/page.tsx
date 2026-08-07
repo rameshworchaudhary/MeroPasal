@@ -30,7 +30,7 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
   };
 }
 
-export const revalidate = 120;
+export const dynamic = "force-dynamic";
 
 export default async function CategoryPage({ params, searchParams }: CategoryPageProps) {
   const { slug } = await params;
@@ -83,7 +83,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
   ]);
 
   const brands = [...new Set(products.map((p) => p.brand).filter(Boolean) as string[])].sort();
-  const maxPrice = Math.max(...products.map((p) => p.comparePrice || p.price), 50000);
+  const maxPrice = Math.max(...products.map((p) => p.comparePrice || p.price || 0), 50000);
 
   return (
     <div className="container mx-auto px-4 py-8">

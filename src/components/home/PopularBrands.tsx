@@ -47,23 +47,23 @@ const BRANDS = [
 
 export default function PopularBrands() {
   return (
-    <section className="max-w-[1400px] mx-auto px-3 sm:px-6 my-4 sm:my-5">
-      <div className="rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-5 shadow-2xs">
-        <div className="mb-4 flex items-center justify-between pb-3 border-b border-slate-100">
+    <section className="max-w-[1400px] mx-auto px-3 sm:px-6 my-4 sm:my-6">
+      <div className="rounded-xl border border-neutral-200 bg-white p-4 sm:p-5 shadow-2xs">
+        <div className="mb-4 flex items-center justify-between pb-3 border-b border-neutral-100">
           <div>
             <div className="flex items-center gap-1.5 mb-0.5">
-              <Award className="h-4 w-4 text-blue-600" />
-              <p className="text-[10px] font-bold uppercase tracking-wider text-blue-600">
+              <Award className="h-4 w-4 text-black" />
+              <p className="text-[10px] font-bold uppercase tracking-wider text-black">
                 Verified Partners
               </p>
             </div>
-            <h2 className="font-serif text-base sm:text-xl font-extrabold text-slate-900">
+            <h2 className="font-serif text-base sm:text-xl font-bold text-black">
               Popular Brands in Nepal
             </h2>
           </div>
           <Link
             href="/products"
-            className="flex items-center gap-1 text-xs font-bold text-blue-600 hover:text-blue-700 transition-colors"
+            className="flex items-center gap-1 text-xs font-bold text-black hover:underline transition-colors"
           >
             All Brands <ArrowRight className="h-3.5 w-3.5" />
           </Link>
@@ -73,28 +73,28 @@ export default function PopularBrands() {
           {BRANDS.map((brand, index) => (
             <motion.div
               key={brand.name}
-              initial={{ opacity: 0, y: 15 }}
+              initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.04 }}
             >
               <Link
                 href={`/products?brand=${encodeURIComponent(brand.slug)}`}
-                className="group relative flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-slate-50/50 p-2 sm:p-3 text-center transition-all duration-300 hover:border-blue-300 hover:bg-white hover:shadow-2xs"
+                className="group relative flex flex-col overflow-hidden rounded-xl border border-neutral-200 bg-neutral-50 p-2 sm:p-3 text-center transition-all duration-200 hover:border-black hover:bg-white"
               >
-                <div className="relative h-20 sm:h-28 w-full overflow-hidden rounded-lg bg-slate-100 mb-2">
+                <div className="relative h-20 sm:h-28 w-full overflow-hidden rounded-lg bg-neutral-100 mb-2">
                   <Image
                     src={brand.logo}
                     alt={brand.name}
                     fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    className="object-cover transition-transform duration-300 group-hover:scale-105"
                     sizes="(max-width: 640px) 33vw, 16vw"
                   />
-                  <div className="absolute inset-0 bg-slate-950/20 group-hover:bg-slate-950/10 transition-colors" />
+                  <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors" />
                 </div>
-                <p className="text-xs font-bold text-slate-800 group-hover:text-blue-600 transition-colors line-clamp-1">
+                <p className="text-xs font-bold text-black group-hover:underline line-clamp-1">
                   {brand.name}
                 </p>
-                <p className="text-[10px] font-medium text-slate-400">{brand.itemCount}</p>
+                <p className="text-[10px] font-medium text-neutral-500">{brand.itemCount}</p>
               </Link>
             </motion.div>
           ))}
