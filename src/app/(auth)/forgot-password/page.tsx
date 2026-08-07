@@ -53,7 +53,7 @@ export default function ForgotPasswordPage() {
                 <p className="font-semibold text-lg">Email Sent!</p>
                 <p className="text-sm text-muted-foreground mt-1">
                   We sent a password reset link to <strong>{getValues("email")}</strong>.
-                  Check your inbox and spam folder.
+                  Please check your Inbox. If you don't see it, please check your Spam/Junk folder and mark it as Not Spam.
                 </p>
               </div>
               <Button asChild className="w-full">

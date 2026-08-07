@@ -128,7 +128,7 @@ function LoginFormContent() {
       const message = err instanceof Error ? err.message : "";
       if (message === "EMAIL_NOT_VERIFIED") {
         setUnverifiedEmail({ email: data.email, pass: data.password });
-        toast.error("Your email address is not verified yet. Please check your inbox or resend verification.");
+        toast.error("Your email address is not verified yet. Please check your Inbox. If you don't see it, please check your Spam/Junk folder and mark it as Not Spam. You can also resend verification.");
       } else if (message.includes("user-not-found") || message.includes("invalid-credential")) {
         toast.error("Invalid email or password.");
       } else if (message.includes("wrong-password")) {
@@ -144,7 +144,7 @@ function LoginFormContent() {
     setResending(true);
     try {
       await resendVerificationForEmail(unverifiedEmail.email, unverifiedEmail.pass);
-      toast.success("Verification email resent! Please check your inbox and spam folder.");
+      toast.success("Verification email resent! Please check your Inbox. If you don't see it, please check your Spam/Junk folder and mark it as Not Spam.");
     } catch (err: unknown) {
       const msg = err instanceof Error && err.message === "EMAIL_ALREADY_VERIFIED"
         ? "Email is already verified! You can log in now."

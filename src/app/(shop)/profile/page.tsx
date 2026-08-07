@@ -135,7 +135,7 @@ export default function ProfilePage() {
     setResending(true);
     try {
       await resendVerificationEmail();
-      toast.success("Verification link sent! Check your email inbox.");
+      toast.success("Verification link sent! Please check your Inbox. If you don't see it, please check your Spam/Junk folder and mark it as Not Spam.");
     } catch (err: unknown) {
       const msg = err instanceof Error && err.message.includes("already verified")
         ? "Your email is already verified!"
