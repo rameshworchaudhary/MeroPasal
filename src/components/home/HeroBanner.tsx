@@ -17,7 +17,8 @@ const FALLBACK_BANNERS = [
   {
     id: "dashain",
     title: "Maha Dashain Mega Dhamaka",
-    subtitle: "Celebrate Nepal's biggest festival with up to 70% OFF + Flat Rs. 1,000 Vouchers",
+    subtitle:
+      "Celebrate Nepal's biggest festival with up to 70% OFF + Flat Rs. 1,000 Vouchers",
     image: "/images/hero/Dashain.jpg",
     buttonText: "Shop Dashain Deals",
     linkValue: "/products?featured=true",
@@ -26,7 +27,8 @@ const FALLBACK_BANNERS = [
   {
     id: "electronics",
     title: "Nepal Electronics & Tech Expo",
-    subtitle: "Unbeatable deals on 5G Smartphones, Laptops, Smart TVs & more",
+    subtitle:
+      "Unbeatable deals on 5G Smartphones, Laptops, Smart TVs & more",
     image: "/images/hero/Electronic.jpg",
     buttonText: "Shop Now",
     linkValue: "/categories/electronics",
@@ -35,7 +37,8 @@ const FALLBACK_BANNERS = [
   {
     id: "tihar",
     title: "Tihar Lights & Celebration Sale",
-    subtitle: "Illuminate your home! Discounts on Decorative LED Lights, Dry Fruits & Appliances",
+    subtitle:
+      "Illuminate your home! Discounts on Decorative LED Lights, Dry Fruits & Appliances",
     image: "/images/hero/Tihar.jpg",
     buttonText: "Explore Tihar Specials",
     linkValue: "/categories/home",
@@ -44,7 +47,8 @@ const FALLBACK_BANNERS = [
   {
     id: "fashion",
     title: "Fashion Carnival & Trends",
-    subtitle: "Authentic Kurti Sets, Dhaka Topi, Sneakers and Premium Western Wear",
+    subtitle:
+      "Authentic Kurti Sets, Dhaka Topi, Sneakers and Premium Western Wear",
     image: "/images/hero/Fashion.jpg",
     buttonText: "Explore Fashion",
     linkValue: "/categories/fashion",
