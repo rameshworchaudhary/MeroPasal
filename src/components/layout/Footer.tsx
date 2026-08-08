@@ -110,7 +110,7 @@ export default function Footer() {
             {/* Social Links */}
             <div className="flex items-center gap-2 pt-2">
               <a
-                href="https://facebook.com"
+                href={SITE_CONFIG.links.facebook}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="h-9 w-9 rounded-lg bg-neutral-900 border border-neutral-800 flex items-center justify-center text-neutral-300 hover:bg-white hover:text-black transition-all"
@@ -119,7 +119,7 @@ export default function Footer() {
                 <Facebook className="h-4 w-4" />
               </a>
               <a
-                href="https://instagram.com"
+                href={SITE_CONFIG.links.instagram}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="h-9 w-9 rounded-lg bg-neutral-900 border border-neutral-800 flex items-center justify-center text-neutral-300 hover:bg-white hover:text-black transition-all"

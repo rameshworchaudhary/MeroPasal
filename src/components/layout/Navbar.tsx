@@ -110,58 +110,58 @@ export default function Navbar({ categories = [] }: NavbarProps) {
       <VoiceSearchModal isOpen={voiceModalOpen} onClose={() => setVoiceModalOpen(false)} />
       <ImageSearchModal isOpen={imageModalOpen} onClose={() => setImageModalOpen(false)} />
 
-      {/* Top Announcement Bar */}
-      <div className="bg-black border-b border-neutral-800 px-3 sm:px-6 py-2 text-center text-[10px] sm:text-[11px] font-semibold tracking-wider text-neutral-300">
+      {/* Top Announcement / Delivery Bar */}
+      <div className="bg-[#070b14] border-b border-slate-800/80 px-3 sm:px-6 py-2 text-center text-[10px] sm:text-xs font-semibold text-slate-300">
         <div className="container mx-auto flex items-center justify-between gap-2 flex-wrap">
           <div className="flex items-center gap-2 sm:gap-4 mx-auto sm:mx-0">
-            <span className="flex items-center gap-1.5 text-white">
-              <MapPin className="h-3.5 w-3.5 shrink-0" />
+            <span className="flex items-center gap-1.5 text-white font-medium">
+              <MapPin className="h-3.5 w-3.5 text-cyan-400 shrink-0" />
               <span>Nepal Express Delivery (All 77 Districts)</span>
             </span>
-            <span className="hidden md:inline text-neutral-600">•</span>
-            <span className="hidden md:flex items-center gap-1 text-white">
-              <Zap className="h-3.5 w-3.5 fill-white text-white" />
+            <span className="hidden md:inline text-slate-700">•</span>
+            <span className="hidden md:flex items-center gap-1 text-slate-300">
+              <Zap className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
               <span>Free Shipping on Orders &gt; Rs. 5,000</span>
             </span>
           </div>
 
-          <div className="hidden lg:flex items-center gap-4 text-neutral-400">
-            <Link href="/seller/register" className="hover:text-white flex items-center gap-1 transition-colors">
-              <Store className="h-3.5 w-3.5 text-white" /> Become a Seller
+          <div className="hidden lg:flex items-center gap-4 text-slate-400">
+            <Link href="/seller/register" className="hover:text-cyan-300 flex items-center gap-1 transition-colors">
+              <Store className="h-3.5 w-3.5 text-cyan-400" /> Become a Seller
             </Link>
-            <span className="text-neutral-700">|</span>
-            <span className="flex items-center gap-1 text-neutral-300">
-              <ShieldCheck className="h-3.5 w-3.5 text-white" /> 100% Genuine Guarantee
+            <span className="text-slate-800">|</span>
+            <span className="flex items-center gap-1 text-slate-300">
+              <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" /> 100% Genuine Guarantee
             </span>
-            <span className="text-neutral-700">|</span>
+            <span className="text-slate-800">|</span>
             <span className="text-white font-bold">Support: {SITE_CONFIG.contact.phone}</span>
           </div>
         </div>
       </div>
 
-      {/* Main Sticky Header */}
+      {/* Main Header - Deep Navy Gradient Theme matching IMAGE 2 */}
       <header
-        className={`sticky top-0 z-40 w-full border-b border-neutral-200 bg-white transition-shadow duration-300 ${
-          scrolled ? "shadow-sm" : ""
+        className={`sticky top-0 z-40 w-full border-b border-slate-800/90 bg-gradient-to-b from-[#0a101f] via-[#0d162a] to-[#0a101f] text-white backdrop-blur-xl transition-all duration-300 ${
+          scrolled ? "shadow-xl shadow-slate-950/40" : ""
         }`}
       >
         <div className="container mx-auto px-3 sm:px-6">
-          <div className="flex min-h-[4rem] sm:min-h-[4.5rem] items-center justify-between gap-3 sm:gap-6">
-            {/* Logo */}
-            <NexShopLogo size="md" />
+          <div className="flex min-h-[4rem] sm:min-h-[4.5rem] items-center justify-between gap-3 sm:gap-6 py-2">
+            {/* Logo - Styled matching IMAGE 2 */}
+            <NexShopLogo size="md" variant="dark" />
 
             {/* Mega Menu Trigger - Desktop */}
             <div className="hidden lg:block relative">
               <button
-                className="flex items-center gap-2 rounded-xl border border-neutral-300 bg-neutral-50 px-3.5 py-2 text-xs font-bold text-black transition-all hover:bg-black hover:text-white hover:border-black"
+                className="flex items-center gap-2 rounded-xl border border-slate-700/80 bg-slate-900/80 px-3.5 py-2 text-xs font-bold text-slate-200 transition-all hover:bg-slate-800 hover:text-white hover:border-cyan-500/50"
                 onMouseEnter={() => setMegaMenuOpen(true)}
                 onMouseLeave={() => setMegaMenuOpen(false)}
                 onClick={() => setMegaMenuOpen((v) => !v)}
               >
-                <Menu className="h-4 w-4" />
+                <Menu className="h-4 w-4 text-cyan-400" />
                 <span>Categories</span>
                 <ChevronDown
-                  className={`h-3.5 w-3.5 transition-transform ${megaMenuOpen ? "rotate-180" : ""}`}
+                  className={`h-3.5 w-3.5 text-slate-400 transition-transform ${megaMenuOpen ? "rotate-180" : ""}`}
                 />
               </button>
 
@@ -172,7 +172,7 @@ export default function Navbar({ categories = [] }: NavbarProps) {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -4 }}
                     transition={{ duration: 0.15 }}
-                    className="absolute left-0 top-[calc(100%+0.5rem)] z-50 w-80 rounded-xl border border-neutral-200 bg-white p-3 shadow-xl"
+                    className="absolute left-0 top-[calc(100%+0.5rem)] z-50 w-80 rounded-2xl border border-slate-800 bg-slate-950/95 p-3 shadow-2xl backdrop-blur-xl text-white"
                     onMouseEnter={() => setMegaMenuOpen(true)}
                     onMouseLeave={() => setMegaMenuOpen(false)}
                   >
@@ -181,17 +181,17 @@ export default function Navbar({ categories = [] }: NavbarProps) {
                         <Link
                           key={cat.id || cat.slug}
                           href={`/categories/${cat.slug}`}
-                          className="flex items-center gap-3 rounded-lg px-3 py-2 text-xs font-semibold text-neutral-800 hover:bg-black hover:text-white transition-colors"
+                          className="flex items-center gap-3 rounded-xl px-3 py-2 text-xs font-semibold text-slate-300 hover:bg-slate-800/80 hover:text-white transition-colors"
                           onClick={() => setMegaMenuOpen(false)}
                         >
                           <span className="text-base">{cat.icon || "🛍️"}</span>
                           <span>{cat.name}</span>
                         </Link>
                       ))}
-                      <div className="mt-2 border-t border-neutral-100 pt-2 px-2">
+                      <div className="mt-2 border-t border-slate-800 pt-2 px-2">
                         <Link
                           href="/categories"
-                          className="block text-center text-xs font-bold text-black hover:underline py-1"
+                          className="block text-center text-xs font-bold text-cyan-400 hover:underline py-1"
                           onClick={() => setMegaMenuOpen(false)}
                         >
                           Explore All Categories &rarr;
@@ -203,15 +203,15 @@ export default function Navbar({ categories = [] }: NavbarProps) {
               </AnimatePresence>
             </div>
 
-            {/* Search Bar - Desktop & Tablet */}
+            {/* Glassmorphic Search Bar - Desktop & Tablet */}
             <form onSubmit={handleSearchSubmit} className="hidden max-w-xl flex-1 md:flex">
               <div className="relative w-full flex items-center">
-                <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
+                <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-cyan-400/90" />
                 <Input
                   ref={searchInputRef}
                   type="search"
-                  placeholder="Search for Products, Brands and More"
-                  className="h-10 rounded-xl border border-neutral-300 bg-neutral-50 pl-10 pr-24 text-xs sm:text-sm text-black placeholder:text-neutral-400 focus-visible:border-black focus-visible:bg-white focus-visible:ring-0 shadow-2xs"
+                  placeholder="Search NexShop..."
+                  className="h-11 rounded-2xl border border-slate-700/80 bg-slate-900/70 pl-10 pr-24 text-xs sm:text-sm text-white placeholder:text-slate-400 focus-visible:border-cyan-400 focus-visible:ring-1 focus-visible:ring-cyan-400/50 shadow-inner backdrop-blur-md"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
@@ -220,7 +220,7 @@ export default function Navbar({ categories = [] }: NavbarProps) {
                     type="button"
                     onClick={() => setVoiceModalOpen(true)}
                     title="Voice Search"
-                    className="flex h-7 w-7 items-center justify-center rounded-md text-neutral-500 hover:bg-neutral-200 hover:text-black transition-colors"
+                    className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-300 hover:bg-slate-800 hover:text-cyan-300 transition-colors"
                   >
                     <Mic className="h-4 w-4" />
                   </button>
@@ -228,14 +228,14 @@ export default function Navbar({ categories = [] }: NavbarProps) {
                     type="button"
                     onClick={() => setImageModalOpen(true)}
                     title="Image Search"
-                    className="flex h-7 w-7 items-center justify-center rounded-md text-neutral-500 hover:bg-neutral-200 hover:text-black transition-colors"
+                    className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-300 hover:bg-slate-800 hover:text-cyan-300 transition-colors"
                   >
                     <Camera className="h-4 w-4" />
                   </button>
                   <Button
                     type="submit"
                     size="sm"
-                    className="h-7 rounded-lg bg-black px-3 text-[11px] font-bold text-white hover:bg-neutral-800"
+                    className="h-8 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 px-3.5 text-[11px] font-bold text-white hover:from-blue-500 hover:to-cyan-400 shadow-md shadow-blue-500/20"
                   >
                     Search
                   </Button>
@@ -248,9 +248,9 @@ export default function Navbar({ categories = [] }: NavbarProps) {
               {/* Become Seller Link */}
               <Link
                 href="/login?mode=seller"
-                className="hidden xl:flex items-center gap-1.5 rounded-xl border border-neutral-300 bg-neutral-100 px-3 py-1.5 text-xs font-bold text-black hover:bg-black hover:text-white transition-all"
+                className="hidden xl:flex items-center gap-1.5 rounded-xl border border-slate-700 bg-slate-900/80 px-3 py-1.5 text-xs font-bold text-slate-200 hover:bg-slate-800 hover:text-white hover:border-slate-600 transition-all"
               >
-                <Store className="h-3.5 w-3.5" />
+                <Store className="h-3.5 w-3.5 text-cyan-400" />
                 <span>Sell on NexShop</span>
               </Link>
 
@@ -261,27 +261,27 @@ export default function Navbar({ categories = [] }: NavbarProps) {
                     id="navbar-notifications-btn"
                     variant="ghost"
                     size="icon"
-                    className="relative rounded-xl text-neutral-800 hover:bg-neutral-100"
+                    className="relative rounded-xl text-slate-200 hover:bg-slate-800/80 hover:text-white"
                     suppressHydrationWarning
                   >
                     <Bell className="h-5 w-5" />
-                    <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-black" />
+                    <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-cyan-400 ring-2 ring-slate-950 animate-pulse" />
                     <span className="sr-only">Notifications</span>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
                   align="end"
-                  className="w-80 bg-white border border-neutral-200 text-black p-3 shadow-xl"
+                  className="w-80 bg-slate-950 border border-slate-800 text-white p-3 shadow-2xl backdrop-blur-xl"
                 >
-                  <DropdownMenuLabel className="font-bold text-xs uppercase text-neutral-500 mb-1 flex items-center justify-between">
+                  <DropdownMenuLabel className="font-bold text-xs uppercase text-slate-400 mb-1 flex items-center justify-between">
                     <span>Notifications</span>
-                    <span className="text-[10px] text-neutral-800 underline font-normal cursor-pointer">Mark all read</span>
+                    <span className="text-[10px] text-cyan-400 underline font-normal cursor-pointer">Mark all read</span>
                   </DropdownMenuLabel>
-                  <DropdownMenuSeparator className="bg-neutral-200" />
+                  <DropdownMenuSeparator className="bg-slate-800" />
                   <div className="space-y-2 py-1 text-xs">
-                    <div className="p-2.5 rounded-lg bg-neutral-100 border border-neutral-200">
-                      <p className="font-bold text-black text-xs">🎉 Welcome to NexShop Nepal!</p>
-                      <p className="text-neutral-600 text-[11px] mt-0.5">
+                    <div className="p-2.5 rounded-xl bg-slate-900 border border-slate-800">
+                      <p className="font-bold text-white text-xs">🎉 Welcome to NexShop Nepal!</p>
+                      <p className="text-slate-400 text-[11px] mt-0.5">
                         Enjoy free delivery across all 77 districts on orders over Rs. 5,000.
                       </p>
                     </div>
@@ -295,11 +295,11 @@ export default function Navbar({ categories = [] }: NavbarProps) {
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="relative rounded-xl text-neutral-800 hover:bg-neutral-100"
+                    className="relative rounded-xl text-slate-200 hover:bg-slate-800/80 hover:text-white"
                   >
                     <Heart className="h-5 w-5" />
                     {mounted && wishlistCount > 0 && (
-                      <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-black text-[10px] text-white flex items-center justify-center font-bold">
+                      <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-rose-500 text-[10px] text-white flex items-center justify-center font-bold">
                         {wishlistCount > 9 ? "9+" : wishlistCount}
                       </span>
                     )}
@@ -310,12 +310,12 @@ export default function Navbar({ categories = [] }: NavbarProps) {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="relative rounded-xl text-neutral-800 hover:bg-neutral-100"
+                  className="relative rounded-xl text-slate-200 hover:bg-slate-800/80 hover:text-white"
                   onClick={toggleCart}
                 >
                   <ShoppingCart className="h-5 w-5" />
                   {mounted && itemCount > 0 && (
-                    <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-black text-[10px] font-bold text-white shadow-xs">
+                    <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-cyan-500 text-[10px] font-bold text-slate-950 shadow-xs">
                       {itemCount > 9 ? "9+" : itemCount}
                     </span>
                   )}
@@ -327,7 +327,7 @@ export default function Navbar({ categories = [] }: NavbarProps) {
               {isAdmin && (
                 <Link
                   href="/admin"
-                  className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-black text-white text-xs font-bold transition-all shadow-xs"
+                  className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-600 text-white text-xs font-bold transition-all shadow-xs hover:bg-blue-500"
                 >
                   <ShieldCheck className="h-3.5 w-3.5" />
                   <span>Admin Panel</span>
@@ -338,41 +338,41 @@ export default function Navbar({ categories = [] }: NavbarProps) {
               {mounted && user ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button id="navbar-user-dropdown-btn" variant="ghost" size="icon" className="rounded-xl text-neutral-800 hover:bg-neutral-100" suppressHydrationWarning>
-                      <Avatar className="h-8 w-8 border border-neutral-300">
+                    <Button id="navbar-user-dropdown-btn" variant="ghost" size="icon" className="rounded-xl text-slate-200 hover:bg-slate-800/80" suppressHydrationWarning>
+                      <Avatar className="h-8 w-8 border border-slate-700">
                         <AvatarImage src={profile?.photoURL || ""} alt={profile?.displayName || ""} />
-                        <AvatarFallback className="bg-black text-xs font-bold text-white">
+                        <AvatarFallback className="bg-gradient-to-br from-blue-600 to-indigo-600 text-xs font-bold text-white">
                           {getInitials(profile?.displayName || user.email || "U")}
                         </AvatarFallback>
                       </Avatar>
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-56 bg-white border border-neutral-200 text-black shadow-xl">
+                  <DropdownMenuContent align="end" className="w-56 bg-slate-950 border border-slate-800 text-white shadow-2xl">
                     <DropdownMenuLabel>
-                      <p className="font-bold text-black truncate">{profile?.displayName || "User"}</p>
-                      <p className="text-xs text-neutral-500 truncate">{user.email}</p>
+                      <p className="font-bold text-white truncate">{profile?.displayName || "User"}</p>
+                      <p className="text-xs text-slate-400 truncate">{user.email}</p>
                     </DropdownMenuLabel>
-                    <DropdownMenuSeparator className="bg-neutral-200" />
+                    <DropdownMenuSeparator className="bg-slate-800" />
                     {isAdmin && (
                       <>
                         <DropdownMenuItem asChild>
-                          <Link href="/admin" className="flex items-center gap-2 cursor-pointer font-bold text-black">
+                          <Link href="/admin" className="flex items-center gap-2 cursor-pointer font-bold text-cyan-400">
                             <LayoutDashboard className="h-4 w-4" />
                             Admin Dashboard
                           </Link>
                         </DropdownMenuItem>
-                        <DropdownMenuSeparator className="bg-neutral-200" />
+                        <DropdownMenuSeparator className="bg-slate-800" />
                       </>
                     )}
                     {profile?.role === "seller" && (
                       <>
                         <DropdownMenuItem asChild>
-                          <Link href="/seller/dashboard" className="flex items-center gap-2 cursor-pointer font-bold text-black">
+                          <Link href="/seller/dashboard" className="flex items-center gap-2 cursor-pointer font-bold text-emerald-400">
                             <Store className="h-4 w-4" />
                             Seller Dashboard
                           </Link>
                         </DropdownMenuItem>
-                        <DropdownMenuSeparator className="bg-neutral-200" />
+                        <DropdownMenuSeparator className="bg-slate-800" />
                       </>
                     )}
                     <DropdownMenuItem asChild>
@@ -393,9 +393,9 @@ export default function Navbar({ categories = [] }: NavbarProps) {
                         Wishlist
                       </Link>
                     </DropdownMenuItem>
-                    <DropdownMenuSeparator className="bg-neutral-200" />
+                    <DropdownMenuSeparator className="bg-slate-800" />
                     <DropdownMenuItem
-                      className="text-neutral-800 hover:bg-neutral-100 cursor-pointer font-bold"
+                      className="text-rose-400 hover:bg-slate-900 cursor-pointer font-bold"
                       onClick={handleLogout}
                     >
                       <LogOut className="h-4 w-4 mr-2" />
@@ -405,10 +405,10 @@ export default function Navbar({ categories = [] }: NavbarProps) {
                 </DropdownMenu>
               ) : (
                 <div className="hidden sm:flex items-center gap-1.5">
-                  <Button variant="ghost" size="sm" className="text-neutral-800 hover:text-black hover:bg-neutral-100 font-semibold" asChild>
+                  <Button variant="ghost" size="sm" className="text-slate-200 hover:text-white hover:bg-slate-800/80 font-semibold" asChild>
                     <Link href="/login">Login</Link>
                   </Button>
-                  <Button size="sm" className="rounded-xl bg-black hover:bg-neutral-800 text-white font-bold px-4 shadow-2xs" asChild>
+                  <Button size="sm" className="rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white font-bold px-4 shadow-md shadow-blue-500/20" asChild>
                     <Link href="/register">Register</Link>
                   </Button>
                 </div>
@@ -418,7 +418,7 @@ export default function Navbar({ categories = [] }: NavbarProps) {
               <Button
                 variant="ghost"
                 size="icon"
-                className="rounded-xl text-black hover:bg-neutral-100 lg:hidden"
+                className="rounded-xl text-slate-200 hover:bg-slate-800/80 lg:hidden"
                 onClick={() => setMobileMenuOpen((v) => !v)}
               >
                 {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -426,14 +426,14 @@ export default function Navbar({ categories = [] }: NavbarProps) {
             </div>
           </div>
 
-          {/* Search Bar - Mobile */}
+          {/* Glass Search Bar - Mobile */}
           <div className="pb-3 md:hidden">
             <form onSubmit={handleSearchSubmit} className="relative w-full flex items-center">
-              <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
+              <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-cyan-400" />
               <Input
                 type="search"
                 placeholder="Search NexShop..."
-                className="h-10 rounded-xl border border-neutral-300 bg-neutral-50 pl-10 pr-20 text-xs text-black placeholder:text-neutral-400"
+                className="h-10 rounded-2xl border border-slate-700/80 bg-slate-900/80 pl-10 pr-20 text-xs text-white placeholder:text-slate-400 shadow-inner backdrop-blur-md focus-visible:border-cyan-400"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -441,14 +441,14 @@ export default function Navbar({ categories = [] }: NavbarProps) {
                 <button
                   type="button"
                   onClick={() => setVoiceModalOpen(true)}
-                  className="p-1 text-neutral-500 hover:text-black"
+                  className="p-1 text-slate-400 hover:text-cyan-300"
                 >
                   <Mic className="h-4 w-4" />
                 </button>
                 <button
                   type="button"
                   onClick={() => setImageModalOpen(true)}
-                  className="p-1 text-neutral-500 hover:text-black"
+                  className="p-1 text-slate-400 hover:text-cyan-300"
                 >
                   <Camera className="h-4 w-4" />
                 </button>

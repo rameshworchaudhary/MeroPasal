@@ -57,31 +57,34 @@ export default function CategoryBar({ categories = [] }: CategoryBarProps) {
           {CATEGORY_ITEMS.map((cat, idx) => {
             const href = cat.slug === "for-you" ? "/" : `/categories/${cat.slug}`;
             const isActive = (idx === 0 && pathname === "/") || pathname === href;
+            const isForYou = cat.slug === "for-you";
 
             return (
               <Link
                 key={cat.slug}
                 href={href}
-                className={`group flex flex-col items-center shrink-0 min-w-[62px] sm:min-w-[72px] transition-all relative pb-1.5 ${
-                  isActive ? "text-black font-bold" : "text-neutral-600 font-medium hover:text-black"
+                className={`group flex flex-col items-center shrink-0 min-w-[68px] sm:min-w-[78px] transition-all relative pb-2 ${
+                  isActive ? "text-slate-950 font-bold" : "text-slate-600 font-medium hover:text-slate-900"
                 }`}
               >
                 <div
-                  className={`flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-xl text-lg sm:text-xl transition-all duration-200 group-hover:scale-105 ${
-                    isActive
-                      ? "bg-black text-white shadow-xs"
-                      : "bg-neutral-100 text-neutral-800 group-hover:bg-neutral-200"
+                  className={`flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-2xl text-xl sm:text-2xl transition-all duration-200 group-hover:scale-105 shadow-xs ${
+                    isForYou
+                      ? "bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-amber-300 border border-slate-800 shadow-md"
+                      : isActive
+                      ? "bg-slate-900 text-white shadow-md"
+                      : "bg-white text-slate-800 border border-slate-200/90 hover:border-slate-300 hover:bg-slate-50"
                   }`}
                 >
-                  {cat.icon}
+                  {isForYou ? "✨" : cat.icon}
                 </div>
-                <span className="text-[11px] sm:text-xs mt-1.5 whitespace-nowrap tracking-tight">
+                <span className="text-[11px] sm:text-xs mt-2 whitespace-nowrap tracking-tight font-semibold">
                   {cat.name}
                 </span>
 
                 {/* Active Underline Indicator */}
                 {isActive && (
-                  <span className="absolute bottom-0 h-0.5 w-8 rounded-full bg-black" />
+                  <span className="absolute bottom-0 h-1 w-8 rounded-full bg-slate-950" />
                 )}
               </Link>
             );

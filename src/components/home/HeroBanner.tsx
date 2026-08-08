@@ -49,7 +49,7 @@ const FALLBACK_BANNERS = [
     title: " ",
     subtitle:
       " ",
-    image: "/images/hero/Ayurveda.jpg",
+    image: "/images/hero/ayurveda.jpg",
     buttonText: "Shop Now & Save",
     linkValue: "/products?featured=true",
     badge: "",
@@ -165,102 +165,137 @@ export default function HeroBanner({ banners }: HeroBannerProps) {
   return (
     <section className="max-w-[1400px] mx-auto px-3 sm:px-6 my-3 sm:my-4">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4">
-        {/* Main Hero Banner Slider */}
+        {/* Main Hero Banner Slider - 3D Stage matching IMAGE 2 */}
         <div
-          className="lg:col-span-9 relative overflow-hidden rounded-xl bg-black h-[220px] sm:h-[300px] lg:h-[360px] flex items-center shadow-sm group"
+          className="lg:col-span-9 relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#d5e4f5] via-[#e9f1f9] to-[#c5d7e8] h-[280px] sm:h-[340px] lg:h-[390px] flex items-center shadow-md border border-slate-300/80 group"
           onMouseEnter={() => setIsPaused(true)}
           onMouseLeave={() => setIsPaused(false)}
         >
+          {/* Subtle Stage Background Glow & Pedestal Effect */}
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-500/10 via-cyan-500/5 to-transparent" />
+
           <AnimatePresence mode="wait">
             <motion.div
               key={current}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
+              initial={{ opacity: 0, scale: 0.98 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 1.02 }}
               transition={{ duration: 0.3 }}
-              className="absolute inset-0 flex items-center"
+              className="absolute inset-0 flex items-center p-4 sm:p-8"
             >
-              <Image
-                src={bgImage}
-                alt={(currentSlide as Banner).title || "NexShop Banner"}
-                fill
-                className="object-cover object-center"
-                priority={current === 0}
-                unoptimized={isDirectImage}
-                onError={() => {
-                  setFailedImages((prev) => ({ ...prev, [slideId]: true }));
-                }}
-                sizes="(max-width: 1024px) 100vw, 75vw"
-                referrerPolicy="no-referrer"
-              />
+              {/* Grid content: Left Details + Right Floating 3D Product Stage */}
+              <div className="relative z-10 w-full h-full grid grid-cols-12 items-center">
+                {/* Left Text / Medal Details */}
+                <div className="col-span-7 sm:col-span-7 lg:col-span-6 flex flex-col justify-center space-y-2 sm:space-y-3 pr-2 text-white">
+                  {/* 3D Gold/Blue Medal Badge matching IMAGE 2 */}
+                  <div className="inline-flex items-center gap-2 self-start rounded-2xl bg-gradient-to-r from-blue-900/80 via-indigo-900/80 to-slate-900/90 border border-amber-400/40 p-2 shadow-lg shadow-amber-500/10 backdrop-blur-md">
+                    <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-xl bg-gradient-to-br from-amber-300 via-amber-400 to-amber-600 text-slate-950 font-black text-xs sm:text-sm shadow-inner shrink-0">
+                      🏆
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-[9px] sm:text-[10px] font-extrabold uppercase tracking-widest text-cyan-300">
+                        Mega Savings
+                      </span>
+                      <span className="text-xs sm:text-sm font-black text-amber-300 leading-tight">
+                        FLAT 50% Off
+                      </span>
+                    </div>
+                  </div>
 
-              {/* Black Gradient Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/70 to-transparent" />
+                  {/* Special Offer Pill Badge */}
+                  <div className="inline-flex items-center gap-1.5 self-start rounded-full bg-emerald-950/80 border border-emerald-500/40 px-3 py-1 text-[10px] sm:text-xs font-extrabold uppercase tracking-wider text-emerald-300 backdrop-blur-md">
+                    <Tag className="h-3 w-3 text-emerald-400" />
+                    <span>{badgeText}</span>
+                  </div>
 
-              {/* Slide Content */}
-              <div className="relative z-10 p-4 sm:p-8 max-w-[90%] sm:max-w-lg text-white">
-                <div className="inline-flex items-center gap-1.5 rounded-md bg-white/20 border border-white/30 px-2.5 py-0.5 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-white backdrop-blur-md mb-2">
-                  <Tag className="h-3 w-3" />
-                  <span>{badgeText}</span>
+                  {/* Product Title */}
+                  <h1 className="text-base sm:text-2xl lg:text-3xl font-black tracking-tight leading-tight text-slate-900 line-clamp-2">
+                    {(currentSlide as Banner).title && ((currentSlide as Banner).title?.trim()?.length ?? 0) > 0
+                      ? (currentSlide as Banner).title
+                      : "Adivasi Vishvambhari..."}
+                  </h1>
+
+                  {/* Subtitle */}
+                  <p className="text-[11px] sm:text-xs font-semibold leading-relaxed text-slate-600 line-clamp-2">
+                    {(currentSlide as Banner).subtitle && ((currentSlide as Banner).subtitle?.trim()?.length ?? 0) > 0
+                      ? (currentSlide as Banner).subtitle
+                      : "Save big on authentic recipes"}
+                  </p>
+
+                  {/* Glowing CTA Button */}
+                  <div className="pt-1">
+                    <Button
+                      size="sm"
+                      className="rounded-full bg-white text-[#0d5c58] border border-cyan-400/40 hover:bg-cyan-50 font-black px-5 py-2.5 h-9 sm:h-10 text-xs tracking-wider shadow-md transition-all hover:scale-105 active:scale-95 flex items-center gap-2"
+                      asChild
+                    >
+                      <Link href={resolveBannerHref(currentSlide)}>
+                        <span>SHOP NOW</span>
+                        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-r from-teal-600 to-cyan-600 text-white text-xs shadow-xs">
+                          →
+                        </span>
+                      </Link>
+                    </Button>
+                  </div>
                 </div>
 
-                <h1 className="text-lg sm:text-2xl lg:text-3xl font-extrabold tracking-tight font-serif leading-tight text-white">
-                  {(currentSlide as Banner).title}
-                </h1>
+                {/* Right Media Area: Floating Product on 3D Pedestal Stage */}
+                <div className="col-span-5 sm:col-span-5 lg:col-span-6 relative h-full flex items-center justify-center">
+                  {/* 3D Cylinder Pedestal Graphic */}
+                  <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-32 sm:w-48 lg:w-64 h-8 sm:h-12 rounded-[100%] bg-gradient-to-b from-slate-700/80 to-slate-900/90 border border-slate-600/50 shadow-2xl shadow-cyan-500/10 backdrop-blur-md" />
 
-                {(currentSlide as Banner).subtitle && (
-                  <p className="mt-1 text-[11px] sm:text-xs leading-relaxed text-neutral-300 line-clamp-2 max-w-md">
-                    {(currentSlide as Banner).subtitle}
-                  </p>
-                )}
-
-                <div className="mt-3 sm:mt-4 flex items-center gap-2">
-                  <Button
-                    size="sm"
-                    className="rounded-lg bg-white text-black hover:bg-neutral-200 px-4 py-1.5 h-8 text-xs font-bold shadow-xs transition-all"
-                    asChild
-                  >
-                    <Link href={resolveBannerHref(currentSlide)}>
-                      {(currentSlide as Banner).buttonText || "Shop Now"} <ArrowRight className="ml-1 h-3.5 w-3.5" />
-                    </Link>
-                  </Button>
+                  {/* Floating Product Image */}
+                  <div className="relative h-44 sm:h-56 lg:h-72 w-full max-w-[220px] sm:max-w-[280px] drop-shadow-2xl transition-transform duration-500 hover:scale-105 z-10">
+                    <Image
+                      src={bgImage}
+                      alt={(currentSlide as Banner).title || "NexShop Banner"}
+                      fill
+                      className="object-contain object-bottom filter drop-shadow-[0_12px_24px_rgba(0,0,0,0.6)]"
+                      priority={current === 0}
+                      unoptimized={isDirectImage}
+                      onError={() => {
+                        setFailedImages((prev) => ({ ...prev, [slideId]: true }));
+                      }}
+                      sizes="(max-width: 1024px) 50vw, 35vw"
+                      referrerPolicy="no-referrer"
+                    />
+                  </div>
                 </div>
               </div>
             </motion.div>
           </AnimatePresence>
 
-          {/* Slider Arrows */}
+          {/* Slider Controls */}
           {slides.length > 1 && (
-            <button
-              onClick={prev}
-              aria-label="Previous banner"
-              className="hidden sm:flex absolute left-3 top-1/2 z-20 h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-black/70 text-white border border-white/20 transition-all hover:bg-black hover:scale-105"
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </button>
+            <>
+              <button
+                onClick={prev}
+                aria-label="Previous banner"
+                className="hidden sm:flex absolute left-3 top-1/2 z-20 h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-slate-950/70 text-white border border-slate-700/80 backdrop-blur-md transition-all hover:bg-slate-900 hover:scale-110"
+              >
+                <ChevronLeft className="h-5 w-5 text-slate-200" />
+              </button>
+              <button
+                onClick={next}
+                aria-label="Next banner"
+                className="hidden sm:flex absolute right-3 top-1/2 z-20 h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-slate-950/70 text-white border border-slate-700/80 backdrop-blur-md transition-all hover:bg-slate-900 hover:scale-110"
+              >
+                <ChevronRight className="h-5 w-5 text-slate-200" />
+              </button>
+            </>
           )}
 
+          {/* Pagination Indicators matching IMAGE 2 */}
           {slides.length > 1 && (
-            <button
-              onClick={next}
-              aria-label="Next banner"
-              className="hidden sm:flex absolute right-3 top-1/2 z-20 h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-black/70 text-white border border-white/20 transition-all hover:bg-black hover:scale-105"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </button>
-          )}
-
-          {/* Pagination Indicators */}
-          {slides.length > 1 && (
-            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5">
+            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2">
               {slides.map((_, i) => (
                 <button
                   key={i}
                   onClick={() => setCurrent(i)}
                   aria-label={`Go to slide ${i + 1}`}
                   className={cn(
-                    "h-1.5 rounded-full transition-all duration-300",
-                    i === current ? "w-6 bg-white" : "w-1.5 bg-white/40 hover:bg-white/70"
+                    "h-2 rounded-full transition-all duration-300",
+                    i === current ? "w-7 bg-cyan-400 shadow-md shadow-cyan-400/50" : "w-2 bg-white/40 hover:bg-white/70"
                   )}
                 />
               ))}
@@ -269,38 +304,37 @@ export default function HeroBanner({ banners }: HeroBannerProps) {
         </div>
 
         {/* Side Banner Card: Sports Zone */}
-        <div className="lg:col-span-3 h-[140px] sm:h-[160px] lg:h-[360px]">
-          <div className="h-full rounded-xl border border-neutral-200 bg-white p-4 shadow-2xs relative overflow-hidden flex flex-row lg:flex-col justify-between items-center lg:items-start transition-all hover:border-black">
+        <div className="lg:col-span-3 h-[150px] sm:h-[170px] lg:h-[390px]">
+          <div className="h-full rounded-3xl border border-slate-200/90 bg-white p-4 shadow-sm relative overflow-hidden flex flex-row lg:flex-col justify-between items-center lg:items-start transition-all hover:border-slate-300 hover:shadow-md">
             <div className="flex-1 pr-2 lg:pr-0">
-              <span className="text-[9px] font-bold uppercase tracking-widest text-white bg-black px-2 py-0.5 rounded-md">
-                Sports Zone
+              <span className="text-[10px] font-black uppercase tracking-widest text-white bg-slate-950 px-2.5 py-1 rounded-lg">
+                SPORTS ZONE
               </span>
 
-              <h3 className="text-sm sm:text-base lg:text-lg font-extrabold text-black leading-tight mt-2">
+              <h3 className="text-base sm:text-lg font-black text-slate-950 leading-tight mt-2.5">
                 Gear Up For The Game
               </h3>
 
-              <p className="text-[11px] text-neutral-600 mt-0.5 font-medium line-clamp-1 lg:line-clamp-2">
-                Fitness, cricket, football & outdoor sports essentials
+              <p className="text-xs text-slate-500 mt-1 font-medium line-clamp-1 lg:line-clamp-2">
+                Cricket, football, fitness & outdoor essentials in Nepal
               </p>
 
-              <div className="mt-2 sm:mt-3">
+              <div className="mt-3 sm:mt-4">
                 <Button
                   size="sm"
-                  variant="outline"
-                  className="h-7 rounded-lg border-black bg-black text-white hover:bg-neutral-800 text-[11px] font-bold px-3"
+                  className="h-8 rounded-xl bg-slate-950 text-white hover:bg-slate-800 text-xs font-bold px-4 shadow-sm"
                   asChild
                 >
                   <Link href="/categories/sports">
-                    Explore Now <ChevronRight className="ml-1 h-3 w-3" />
+                    Explore Now <ChevronRight className="ml-1 h-3.5 w-3.5" />
                   </Link>
                 </Button>
               </div>
             </div>
 
-            {/* Sports Category Photo */}
+            {/* Sports Category Illustration / Photo */}
             <div className="shrink-0 flex justify-end lg:w-full lg:mt-3">
-              <div className="relative h-14 w-14 lg:h-20 lg:w-20 overflow-hidden rounded-lg border border-neutral-200">
+              <div className="relative h-16 w-16 lg:h-28 lg:w-full overflow-hidden rounded-2xl border border-slate-100 bg-slate-50">
                 <Image
                   src={
                     sportsImgFailed
@@ -309,9 +343,9 @@ export default function HeroBanner({ banners }: HeroBannerProps) {
                   }
                   alt="Sports Zone"
                   fill
-                  className="object-cover"
+                  className="object-cover transition-transform duration-300 hover:scale-105"
                   onError={() => setSportsImgFailed(true)}
-                  sizes="80px"
+                  sizes="(max-width: 1024px) 100px, 200px"
                   referrerPolicy="no-referrer"
                 />
               </div>

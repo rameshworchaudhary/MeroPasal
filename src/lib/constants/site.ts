@@ -6,8 +6,8 @@ export const SITE_CONFIG = {
   url: "https://nexshop.com.np",
   ogImage: "/images/og-image.jpg",
   links: {
-    facebook: "https://facebook.com/nexshop.np",
-    instagram: "https://instagram.com/nexshop.np",
+    facebook: "https://www.facebook.com/share/18zk7Z2Lth/",
+    instagram: "https://www.instagram.com/nexshoponlineshopping?igsh=c285ejB1c2xvdWNr",
     tiktok: "https://tiktok.com/@nexshop.np",
   },
   contact: {
