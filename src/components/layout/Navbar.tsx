@@ -258,9 +258,11 @@ export default function Navbar({ categories = [] }: NavbarProps) {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
+                    id="navbar-notifications-btn"
                     variant="ghost"
                     size="icon"
                     className="relative rounded-xl text-neutral-800 hover:bg-neutral-100"
+                    suppressHydrationWarning
                   >
                     <Bell className="h-5 w-5" />
                     <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-black" />
@@ -333,10 +335,10 @@ export default function Navbar({ categories = [] }: NavbarProps) {
               )}
 
               {/* User Menu */}
-              {user ? (
+              {mounted && user ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="rounded-xl text-neutral-800 hover:bg-neutral-100">
+                    <Button id="navbar-user-dropdown-btn" variant="ghost" size="icon" className="rounded-xl text-neutral-800 hover:bg-neutral-100" suppressHydrationWarning>
                       <Avatar className="h-8 w-8 border border-neutral-300">
                         <AvatarImage src={profile?.photoURL || ""} alt={profile?.displayName || ""} />
                         <AvatarFallback className="bg-black text-xs font-bold text-white">

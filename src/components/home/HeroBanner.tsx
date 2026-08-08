@@ -16,19 +16,49 @@ interface HeroBannerProps {
 const FALLBACK_BANNERS = [
   {
     id: "adivasi-hair-oil",
-    title: "Adivasi Vishvambhari Hair Oil - Festival Sale!",
+    title: " ",
     subtitle:
-      "Revitalize your hair with our authentic herbal formula. Limited Time Offer!",
+      " ",
     image: "/images/hero/Adivasi.jpg",
     buttonText: "Shop Now & Save",
     linkValue: "/products?featured=true",
-    badge: "SUPER OFFER",
+    badge: "",
+  },
+  {
+    id: "japanese-soothing-massage-gel",
+    title: " ",
+    subtitle:
+      " ",
+    image: "/images/hero/japan.jpg",
+    buttonText: "Shop Now & Save",
+    linkValue: "/products?featured=true",
+    badge: "",
+  },
+   {
+    id: "paras-product",
+    title: " ",
+    subtitle:
+      " ",
+    image: "/images/hero/paras.jpg",
+    buttonText: "Shop Now & Save",
+    linkValue: "/products?featured=true",
+    badge: "",
+  },
+   {
+    id: "Ayurveda-product",
+    title: " ",
+    subtitle:
+      " ",
+    image: "/images/hero/Ayurveda.jpg",
+    buttonText: "Shop Now & Save",
+    linkValue: "/products?featured=true",
+    badge: "",
   },
   {
     id: "dashain",
     title: "Maha Dashain Mega Dhamaka",
     subtitle:
-      "Celebrate Nepal's biggest festival with up to 70% OFF + Flat Rs. 1,000 Vouchers",
+      " ",
     image: "/images/hero/dashain.png",
     buttonText: "Shop Dashain Deals",
     linkValue: "/products?featured=true",
@@ -38,7 +68,7 @@ const FALLBACK_BANNERS = [
     id: "electronics",
     title: "Nepal Electronics & Tech Expo",
     subtitle:
-      "Unbeatable deals on 5G Smartphones, Laptops, Smart TVs & accessories",
+      " ",
     image:
       "https://images.unsplash.com/photo-1526738549149-8e07eca6c147?auto=format&fit=crop&w=1600&q=80",
     buttonText: "Shop Tech",
@@ -49,7 +79,7 @@ const FALLBACK_BANNERS = [
     id: "tihar",
     title: "Tihar Lights & Celebration Sale",
     subtitle:
-      "Illuminate your home! Discounts on Decorative LED Lights, Dry Fruits & Appliances",
+      " ",
     image: "/images/hero/Tihar.jpg",
     buttonText: "Explore Tihar Specials",
     linkValue: "/categories/home",
@@ -59,7 +89,7 @@ const FALLBACK_BANNERS = [
     id: "fashion",
     title: "Fashion Carnival & Trends",
     subtitle:
-      "Authentic Kurti Sets, Dhaka Topi, Sneakers and Premium Western Wear",
+      " ",
     image:
       "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1600&q=80",
     buttonText: "Explore Fashion",
@@ -274,8 +304,8 @@ export default function HeroBanner({ banners }: HeroBannerProps) {
                 <Image
                   src={
                     sportsImgFailed
-                      ? "https://images.unsplash.com/photo-1517649763962-0c623266010b?auto=format&fit=crop&w=600&q=80"
-                      : "https://images.unsplash.com/photo-1517649763962-0c623266010b?auto=format&fit=crop&w=600&q=80"
+                      ? "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=600&q=80"
+                      : "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=600&q=80"
                   }
                   alt="Sports Zone"
                   fill

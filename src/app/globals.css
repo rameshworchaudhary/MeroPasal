@@ -4,27 +4,26 @@
 
 @layer base {
   :root {
-    /* Premium Black & Dark Blue Theme */
-    --background: 222 47% 6%; /* #090d16 */
-    --foreground: 210 40% 98%; /* #f8fafc */
+    --background: 0 0% 100%;
+    --foreground: 222 47% 11%; /* #0f172a - crisp dark text */
 
-    --card: 222 47% 10%; /* #0f172a */
-    --card-foreground: 210 40% 98%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
 
-    --popover: 222 47% 9%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
 
-    --primary: 217 91% 60%; /* #3b82f6 vibrant blue */
+    --primary: 217 91% 60%; /* #3b82f6 */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 217 33% 17%; /* #1e293b dark slate blue */
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222 47% 11%;
 
-    --muted: 217 33% 14%;
-    --muted-foreground: 215 20% 65%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 44%;
 
-    --accent: 217 91% 60%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222 47% 11%;
 
     --destructive: 346 87% 53%;
     --destructive-foreground: 0 0% 100%;
@@ -35,8 +34,8 @@
     --warning: 38 92% 50%;
     --warning-foreground: 0 0% 100%;
 
-    --border: 217 33% 18%; /* #1e293b */
-    --input: 217 33% 18%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
     --ring: 217 91% 60%;
 
     --radius: 0.75rem;

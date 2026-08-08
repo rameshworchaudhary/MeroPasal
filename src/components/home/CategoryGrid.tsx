@@ -13,7 +13,7 @@ const CATEGORY_FALLBACK_IMAGES: Record<string, string> = {
   grocery: "https://images.unsplash.com/photo-1542838132-92c53300491e?w=500&q=80",
   home: "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=500&q=80",
   beauty: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=500&q=80",
-  sports: "https://images.unsplash.com/photo-1517649763962-0c623266ddc0?w=500&q=80",
+  sports: "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=500&q=80",
   books: "https://images.unsplash.com/photo-1495446815901-a7297e633e8d?w=500&q=80",
   toys: "https://images.unsplash.com/photo-1566576912321-d58ddd7a6088?w=500&q=80",
   automotive: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=500&q=80",

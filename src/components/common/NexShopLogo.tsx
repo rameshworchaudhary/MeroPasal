@@ -27,12 +27,12 @@ export default function NexShopLogo({
 
   const logoContent = (
     <div className={cn("inline-flex items-center gap-2 select-none", className)}>
-      <div className={cn("relative aspect-[460/120] w-auto shrink-0", heightMap[size])}>
+      <div className={cn("relative aspect-[500/130] w-auto shrink-0", heightMap[size])}>
         <Image
           src="/images/logo.svg"
           alt="NexShop Nepal - Sabai Kura, Ekai Thau Ma"
-          width={460}
-          height={120}
+          width={500}
+          height={130}
           className="h-full w-auto object-contain"
           priority
         />
