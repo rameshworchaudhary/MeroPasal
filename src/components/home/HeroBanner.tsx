@@ -45,7 +45,7 @@ const FALLBACK_BANNERS = [
     id: "Ayurveda-product",
     title: "Ayurveda Natural Collection",
     subtitle: "100% Pure & organic Ayurvedic formulations",
-    image: "/images/hero/Ayurveda.jpg",
+    image: "/images/hero/ayurveda.jpg",
     buttonText: "Shop Now",
     linkValue: "/products?q=ayurveda",
     badge: "HERBAL SALE",
@@ -127,7 +127,6 @@ export default function HeroBanner({ banners }: HeroBannerProps) {
   const [current, setCurrent] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [failedImages, setFailedImages] = useState<Record<string, boolean>>({});
-  const [sportsImgFailed, setSportsImgFailed] = useState(false);
 
   const next = useCallback(() => {
     setCurrent((prev) => (prev + 1) % slides.length);
@@ -144,69 +143,64 @@ export default function HeroBanner({ banners }: HeroBannerProps) {
   }, [next, isPaused, slides.length]);
 
   const currentSlide = slides[current] || slides[0];
-  const rawImage =
-    (currentSlide as Banner).image ||
-    (currentSlide as (typeof FALLBACK_BANNERS)[0]).image ||
-    DEFAULT_HERO_BACKUP;
 
-  const slideId = currentSlide.id || `slide-${current}`;
-  const isImageFailed = failedImages[slideId];
-  const bgImage = isImageFailed ? DEFAULT_HERO_BACKUP : rawImage;
+  const getSlideImage = (slide: Banner | (typeof FALLBACK_BANNERS)[0], idx: number) => {
+    const raw =
+      (slide as Banner).image ||
+      (slide as (typeof FALLBACK_BANNERS)[0]).image ||
+      DEFAULT_HERO_BACKUP;
+    const slideId = slide.id || `slide-${idx}`;
+    return failedImages[slideId] ? DEFAULT_HERO_BACKUP : raw;
+  };
 
-  // Determine if image should bypass Next optimization for instant blob/data preview
+  const currentImage = getSlideImage(currentSlide, current);
   const isDirectImage =
-    bgImage.startsWith("data:") ||
-    bgImage.startsWith("blob:") ||
-    isImageFailed;
+    currentImage.startsWith("data:") ||
+    currentImage.startsWith("blob:") ||
+    failedImages[currentSlide.id || `slide-${current}`];
 
-  const badgeText =
-    (currentSlide as (typeof FALLBACK_BANNERS)[0]).badge || "SPECIAL OFFER";
+  // For Desktop multi-card carousel (3 cards view)
+  const desktopCardsCount = Math.min(3, slides.length);
+  const desktopSlides = Array.from({ length: desktopCardsCount }, (_, i) => {
+    const slideIdx = (current + i) % slides.length;
+    return {
+      slide: slides[slideIdx],
+      originalIndex: slideIdx,
+    };
+  });
 
   return (
-    <section className="max-w-[1400px] mx-auto px-3 sm:px-6 my-2 sm:my-4">
-      {/* Full Width Hero Banner Slider Container - Responsive aspect ratio for 14"+ laptops and mobile */}
-      <div
-        className="relative w-full overflow-hidden rounded-2xl sm:rounded-3xl bg-slate-950 aspect-[16/9] sm:aspect-[2.2/1] md:aspect-[2.5/1] lg:aspect-[2.7/1] max-h-[460px] min-h-[200px] sm:min-h-[280px] flex items-center shadow-xl border border-slate-800/80 group"
-        onMouseEnter={() => setIsPaused(true)}
-        onMouseLeave={() => setIsPaused(false)}
-      >
+    <section
+      className="max-w-[1400px] mx-auto px-3 sm:px-6 my-2 sm:my-4 relative group"
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
+    >
+      {/* ================= MOBILE VIEW (< md) ================= */}
+      <div className="block md:hidden relative w-full overflow-hidden rounded-2xl bg-slate-950 aspect-[16/9] shadow-lg border border-slate-800/80">
         <AnimatePresence mode="wait">
           <motion.div
             key={current}
             initial={{ opacity: 0, scale: 0.99 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 1.01 }}
-            transition={{ duration: 0.35 }}
-            className="absolute inset-0 w-full h-full overflow-hidden rounded-2xl sm:rounded-3xl"
+            transition={{ duration: 0.3 }}
+            className="absolute inset-0 w-full h-full"
           >
-            {/* Entire Hero Image is a Clickable Link to Related Products */}
             <Link
               href={resolveBannerHref(currentSlide)}
-              className="relative block w-full h-full cursor-pointer group"
+              className="relative block w-full h-full cursor-pointer"
               aria-label={(currentSlide as Banner).title || "Promotional Banner"}
             >
-              {/* Subtle Ambient Background Blur for ultra-wide / edge filling */}
               <Image
-                src={bgImage}
-                alt=""
-                fill
-                className="object-cover filter blur-lg opacity-30 scale-105 pointer-events-none"
-                aria-hidden="true"
-                unoptimized={isDirectImage}
-                sizes="100vw"
-                referrerPolicy="no-referrer"
-              />
-
-              {/* Main Pristine Banner Image - Full Cover, No HTML Overlays */}
-              <Image
-                src={bgImage}
+                src={currentImage}
                 alt={(currentSlide as Banner).title || "NexShop Hero Banner"}
                 fill
-                className="object-cover object-center w-full h-full transition-transform duration-700 group-hover:scale-[1.015]"
+                className="object-cover object-center w-full h-full"
                 priority={current === 0}
                 unoptimized={isDirectImage}
                 onError={() => {
-                  setFailedImages((prev) => ({ ...prev, [slideId]: true }));
+                  const sId = currentSlide.id || `slide-${current}`;
+                  setFailedImages((prev) => ({ ...prev, [sId]: true }));
                 }}
                 sizes="100vw"
                 referrerPolicy="no-referrer"
@@ -214,44 +208,110 @@ export default function HeroBanner({ banners }: HeroBannerProps) {
             </Link>
           </motion.div>
         </AnimatePresence>
-
-        {/* Slider Controls */}
-        {slides.length > 1 && (
-          <>
-            <button
-              onClick={prev}
-              aria-label="Previous banner"
-              className="hidden sm:flex absolute left-4 top-1/2 z-20 h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-slate-950/70 text-white border border-slate-700/80 backdrop-blur-md transition-all hover:bg-slate-900 hover:scale-110 shadow-lg"
-            >
-              <ChevronLeft className="h-6 w-6 text-slate-100" />
-            </button>
-            <button
-              onClick={next}
-              aria-label="Next banner"
-              className="hidden sm:flex absolute right-4 top-1/2 z-20 h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-slate-950/70 text-white border border-slate-700/80 backdrop-blur-md transition-all hover:bg-slate-900 hover:scale-110 shadow-lg"
-            >
-              <ChevronRight className="h-6 w-6 text-slate-100" />
-            </button>
-          </>
-        )}
-
-        {/* Pagination Indicators */}
-        {slides.length > 1 && (
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 bg-slate-950/40 px-3 py-1.5 rounded-full backdrop-blur-sm border border-white/10">
-            {slides.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => setCurrent(i)}
-                aria-label={`Go to slide ${i + 1}`}
-                className={cn(
-                  "h-2 rounded-full transition-all duration-300",
-                  i === current ? "w-8 bg-cyan-400 shadow-md shadow-cyan-400/50" : "w-2 bg-white/50 hover:bg-white/80"
-                )}
-              />
-            ))}
-          </div>
-        )}
       </div>
+
+      {/* ================= DESKTOP / LAPTOP / TABLET VIEW (>= md) ================= */}
+      {/* Multi-card Carousel Grid matching Flipkart Desktop Design */}
+      <div className="hidden md:block w-full">
+        <div
+          className={cn(
+            "grid gap-3.5 lg:gap-5 w-full items-center",
+            desktopCardsCount === 1 && "grid-cols-1 max-w-4xl mx-auto",
+            desktopCardsCount === 2 && "grid-cols-2 max-w-5xl mx-auto",
+            desktopCardsCount >= 3 && "grid-cols-3"
+          )}
+        >
+          {desktopSlides.map(({ slide, originalIndex }, idx) => {
+            const imgUrl = getSlideImage(slide, originalIndex);
+            const isDirect =
+              imgUrl.startsWith("data:") ||
+              imgUrl.startsWith("blob:") ||
+              failedImages[slide.id || `slide-${originalIndex}`];
+
+            return (
+              <motion.div
+                key={`${slide.id || originalIndex}-${current}-${idx}`}
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.35, delay: idx * 0.05 }}
+                className="relative w-full overflow-hidden rounded-2xl lg:rounded-3xl bg-slate-950 border border-slate-800 shadow-lg hover:shadow-2xl transition-all duration-300 group/card aspect-[16/10]"
+              >
+                <Link
+                  href={resolveBannerHref(slide)}
+                  className="relative block w-full h-full cursor-pointer"
+                  aria-label={(slide as Banner).title || "Promotional Banner"}
+                >
+                  {/* Subtle Background Fill Blur */}
+                  <Image
+                    src={imgUrl}
+                    alt=""
+                    fill
+                    className="object-cover filter blur-md opacity-25 scale-105 pointer-events-none"
+                    aria-hidden="true"
+                    unoptimized={isDirect}
+                    referrerPolicy="no-referrer"
+                  />
+
+                  {/* Main Banner Graphic Card */}
+                  <Image
+                    src={imgUrl}
+                    alt={(slide as Banner).title || "NexShop Banner"}
+                    fill
+                    className="object-cover object-center w-full h-full transition-transform duration-500 group-hover/card:scale-[1.02]"
+                    priority={idx === 0 && current === 0}
+                    unoptimized={isDirect}
+                    onError={() => {
+                      const sId = slide.id || `slide-${originalIndex}`;
+                      setFailedImages((prev) => ({ ...prev, [sId]: true }));
+                    }}
+                    sizes="(max-width: 1200px) 33vw, 450px"
+                    referrerPolicy="no-referrer"
+                  />
+                </Link>
+              </motion.div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* ================= CONTROLS & PAGINATION ================= */}
+      {slides.length > 1 && (
+        <>
+          <button
+            onClick={prev}
+            aria-label="Previous banner"
+            className="hidden sm:flex absolute -left-2 sm:left-1 lg:left-2 top-1/2 z-20 h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-slate-950/80 text-white border border-slate-700/80 backdrop-blur-md transition-all hover:bg-slate-900 hover:scale-110 shadow-xl"
+          >
+            <ChevronLeft className="h-6 w-6 text-slate-100" />
+          </button>
+          <button
+            onClick={next}
+            aria-label="Next banner"
+            className="hidden sm:flex absolute -right-2 sm:right-1 lg:right-2 top-1/2 z-20 h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-slate-950/80 text-white border border-slate-700/80 backdrop-blur-md transition-all hover:bg-slate-900 hover:scale-110 shadow-xl"
+          >
+            <ChevronRight className="h-6 w-6 text-slate-100" />
+          </button>
+        </>
+      )}
+
+      {/* Pagination Indicators (Flipkart-style dots centered below) */}
+      {slides.length > 1 && (
+        <div className="flex items-center justify-center gap-2 mt-3">
+          {slides.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setCurrent(i)}
+              aria-label={`Go to slide ${i + 1}`}
+              className={cn(
+                "h-2 rounded-full transition-all duration-300",
+                i === current
+                  ? "w-7 bg-blue-600 shadow-md shadow-blue-500/30 dark:bg-cyan-400 dark:shadow-cyan-400/50"
+                  : "w-2 bg-slate-300 dark:bg-slate-700 hover:bg-slate-400 dark:hover:bg-slate-600"
+              )}
+            />
+          ))}
+        </div>
+      )}
     </section>
   );
 }

@@ -1,6 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  allowedDevOrigins: ["*.asia-east1.run.app", "localhost:3000"],
   images: {
     remotePatterns: [
       {
@@ -18,9 +17,15 @@ const nextConfig = {
         hostname: "images.unsplash.com",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "picsum.photos",
+        pathname: "/**",
+      },
     ],
   },
 };
 
 module.exports = nextConfig;
+
 
