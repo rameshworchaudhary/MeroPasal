@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
@@ -15,27 +15,31 @@ const FALLBACK_PROMOS = [
     id: "p1",
     title: "Maha Dashain Dhamaka",
     subtitle: "Up to 70% off festival electronics & fashion",
-    image: "/images/hero/maha-dashain.jpg",
+    image: "/images/hero/Fashain.jpg",
+    backupImage: "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&w=800&q=80",
     linkValue: "/products?featured=true",
   },
   {
     id: "p2",
     title: "Electronics & Tech Expo",
     subtitle: "Smartphones, Laptops, Earbuds & Smartwatches",
-    image: "/images/hero/electronics.jpg",
+    image: "https://images.unsplash.com/photo-1526738549149-8e07eca6c147?auto=format&fit=crop&w=800&q=80",
+    backupImage: "https://images.unsplash.com/photo-1526738549149-8e07eca6c147?auto=format&fit=crop&w=800&q=80",
     linkValue: "/categories/electronics",
   },
   {
     id: "p3",
     title: "Fashion & Trends",
     subtitle: "Authentic festival apparel, footwear & accessories",
-    image: "/images/hero/fashion.jpg",
+    image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=800&q=80",
+    backupImage: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=800&q=80",
     linkValue: "/categories/fashion",
   },
 ];
 
 export default function PromoSection({ banners }: PromoSectionProps) {
   const promos = banners.length >= 2 ? banners : FALLBACK_PROMOS;
+  const [failedPromoImages, setFailedPromoImages] = useState<Record<string, boolean>>({});
 
   return (
     <section className="max-w-[1400px] mx-auto px-3 sm:px-6 my-4 sm:my-6">
@@ -53,8 +57,12 @@ export default function PromoSection({ banners }: PromoSectionProps) {
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {promos.slice(0, 3).map((promo, index) => {
             const href = (promo as Banner).linkValue || (promo as (typeof FALLBACK_PROMOS)[0]).linkValue || "/products";
-            const image = (promo as Banner).image || (promo as (typeof FALLBACK_PROMOS)[0]).image;
+            const rawImage = (promo as Banner).image || (promo as (typeof FALLBACK_PROMOS)[0]).image;
+            const backupImage = (promo as (typeof FALLBACK_PROMOS)[0]).backupImage || "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&w=800&q=80";
             const subtitle = (promo as Banner).subtitle || (promo as (typeof FALLBACK_PROMOS)[0]).subtitle;
+
+            const isFailed = failedPromoImages[promo.id];
+            const displayImage = isFailed ? backupImage : rawImage;
 
             return (
               <motion.div
@@ -65,20 +73,18 @@ export default function PromoSection({ banners }: PromoSectionProps) {
               >
                 <Link href={href}>
                   <div className="group relative h-36 sm:h-48 cursor-pointer overflow-hidden rounded-xl border border-neutral-200 bg-black shadow-2xs">
-                    {image ? (
-                      <>
-                        <Image
-                          src={image}
-                          alt={promo.title}
-                          fill
-                          className="object-cover transition-transform duration-300 group-hover:scale-105"
-                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
-                      </>
-                    ) : (
-                      <div className="absolute inset-0 bg-black" />
-                    )}
+                    <Image
+                      src={displayImage}
+                      alt={promo.title}
+                      fill
+                      className="object-cover transition-transform duration-300 group-hover:scale-105"
+                      onError={() => {
+                        setFailedPromoImages((prev) => ({ ...prev, [promo.id]: true }));
+                      }}
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      referrerPolicy="no-referrer"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
                     <div className="absolute inset-x-0 bottom-0 p-4 text-white">
                       <p className="mb-0.5 text-[9px] font-bold uppercase tracking-widest text-neutral-300">
                         NexShop Edit

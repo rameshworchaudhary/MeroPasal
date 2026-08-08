@@ -20,6 +20,7 @@ import { db } from "@/lib/firebase/config";
 import { isValidNepaliPhone } from "@/lib/utils";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import NexShopLogo from "@/components/common/NexShopLogo";
 
 const customerSchema = z.object({
   displayName: z.string().min(2, "Name must be at least 2 characters"),
@@ -135,9 +136,7 @@ function RegisterContent() {
       <Card className="shadow-xl border-0">
         <CardHeader className="text-center pb-2">
           <div className="flex justify-center mb-3">
-            <div className="h-12 w-12 rounded-full bg-primary flex items-center justify-center">
-              <span className="text-white font-bold text-xl">N</span>
-            </div>
+            <NexShopLogo size="md" href="/" />
           </div>
           <CardTitle className="text-2xl">Create Account</CardTitle>
           <CardDescription>Join NexShop today</CardDescription>

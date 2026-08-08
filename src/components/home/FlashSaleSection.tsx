@@ -40,38 +40,38 @@ export default function FlashSaleSection({ products }: FlashSaleSectionProps) {
 
   return (
     <section className="max-w-[1400px] mx-auto px-3 sm:px-6 my-4 sm:my-6">
-      <div className="rounded-xl border border-neutral-900 bg-black p-4 sm:p-6 text-white shadow-sm">
+      <div className="rounded-xl border border-neutral-200 bg-white p-4 sm:p-6 text-neutral-900 shadow-sm">
         {/* Header with Live Countdown */}
-        <div className="mb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-neutral-800 pb-4">
+        <div className="mb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-neutral-200 pb-4">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white text-black shrink-0">
-              <Zap className="h-5 w-5 fill-black text-black" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-500 text-white shrink-0 shadow-xs">
+              <Zap className="h-5 w-5 fill-white text-white" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="rounded-md bg-white/20 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-white border border-white/30">
+                <span className="rounded-md bg-red-100 text-red-700 px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wider border border-red-200">
                   FLASH SALE
                 </span>
-                <span className="flex items-center gap-1 text-xs text-neutral-300 font-semibold">
-                  <Flame className="h-3.5 w-3.5 fill-white text-white" /> Up to 60% OFF
+                <span className="flex items-center gap-1 text-xs text-red-600 font-bold">
+                  <Flame className="h-3.5 w-3.5 fill-red-600 text-red-600" /> Up to 60% OFF
                 </span>
               </div>
-              <h2 className="font-serif text-xl sm:text-2xl font-bold tracking-tight text-white mt-0.5">
+              <h2 className="font-serif text-xl sm:text-2xl font-extrabold tracking-tight text-neutral-900 mt-0.5">
                 Today&apos;s Mega Flash Deals
               </h2>
             </div>
           </div>
 
           {/* Countdown Clock */}
-          <div className="flex items-center gap-2.5 bg-neutral-900 border border-neutral-800 rounded-lg px-3.5 py-2">
-            <Clock className="h-4 w-4 text-white shrink-0" />
-            <span className="text-xs font-semibold text-neutral-300 mr-1">Ends In:</span>
-            <div className="flex items-center gap-1 font-mono text-xs font-bold text-white">
-              <span className="rounded bg-white px-2 py-1 text-black">{String(timeLeft.hours).padStart(2, "0")}h</span>
-              <span className="text-white">:</span>
-              <span className="rounded bg-white px-2 py-1 text-black">{String(timeLeft.minutes).padStart(2, "0")}m</span>
-              <span className="text-white">:</span>
-              <span className="rounded bg-white px-2 py-1 text-black">{String(timeLeft.seconds).padStart(2, "0")}s</span>
+          <div className="flex items-center gap-2.5 bg-neutral-100 border border-neutral-200 rounded-lg px-3.5 py-2">
+            <Clock className="h-4 w-4 text-neutral-700 shrink-0" />
+            <span className="text-xs font-bold text-neutral-700 mr-1">Ends In:</span>
+            <div className="flex items-center gap-1 font-mono text-xs font-bold">
+              <span className="rounded bg-neutral-900 px-2 py-1 text-white">{String(timeLeft.hours).padStart(2, "0")}h</span>
+              <span className="text-neutral-900 font-bold">:</span>
+              <span className="rounded bg-neutral-900 px-2 py-1 text-white">{String(timeLeft.minutes).padStart(2, "0")}m</span>
+              <span className="text-neutral-900 font-bold">:</span>
+              <span className="rounded bg-neutral-900 px-2 py-1 text-white">{String(timeLeft.seconds).padStart(2, "0")}s</span>
             </div>
           </div>
         </div>
@@ -94,13 +94,13 @@ export default function FlashSaleSection({ products }: FlashSaleSectionProps) {
 
                 {/* Stock progress bar */}
                 <div className="mt-2 px-1">
-                  <div className="flex items-center justify-between text-[10px] font-bold text-neutral-300 mb-1">
-                    <span>🔥 {soldPercent}% Sold</span>
-                    <span className="text-neutral-400">{itemsLeft} left</span>
+                  <div className="flex items-center justify-between text-[10px] font-bold text-neutral-700 mb-1">
+                    <span className="text-red-600 font-extrabold">🔥 {soldPercent}% Sold</span>
+                    <span className="text-neutral-500 font-semibold">{itemsLeft} left</span>
                   </div>
-                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-neutral-800">
+                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-neutral-200">
                     <div
-                      className="h-full rounded-full bg-white transition-all duration-500"
+                      className="h-full rounded-full bg-red-600 transition-all duration-500"
                       style={{ width: `${soldPercent}%` }}
                     />
                   </div>
@@ -111,11 +111,11 @@ export default function FlashSaleSection({ products }: FlashSaleSectionProps) {
         </div>
 
         {/* Bottom Link */}
-        <div className="mt-3 pt-3 border-t border-neutral-800 flex items-center justify-between">
-          <p className="text-xs text-neutral-400">Limited promotional stock available in Nepal</p>
+        <div className="mt-4 pt-3 border-t border-neutral-200 flex items-center justify-between">
+          <p className="text-xs text-neutral-500 font-medium">Limited promotional stock available in Nepal</p>
           <Link
             href="/products?featured=true"
-            className="inline-flex items-center gap-1.5 text-xs font-bold text-white hover:underline transition-colors"
+            className="inline-flex items-center gap-1.5 text-xs font-bold text-neutral-900 hover:text-red-600 hover:underline transition-colors"
           >
             All Flash Deals <ArrowRight className="h-4 w-4" />
           </Link>

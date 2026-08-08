@@ -13,6 +13,7 @@ import {
   Store,
 } from "lucide-react";
 import { SITE_CONFIG } from "@/lib/constants/site";
+import NexShopLogo from "@/components/common/NexShopLogo";
 
 const footerLinks = {
   shopping: [
@@ -78,14 +79,8 @@ export default function Footer() {
         <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-6 gap-8">
           {/* Brand Column */}
           <div className="xs:col-span-2 lg:col-span-2 space-y-4">
-            <div className="flex items-center gap-2.5">
-              <div className="h-10 w-10 rounded-xl bg-white text-black flex items-center justify-center font-black text-xl font-serif">
-                N
-              </div>
-              <div>
-                <p className="font-extrabold text-white text-2xl leading-none font-serif">NexShop</p>
-                <p className="text-[11px] text-neutral-400 font-semibold mt-0.5">Sabai kura, ekai thau ma 🇳🇵</p>
-              </div>
+            <div className="bg-white/5 p-2 rounded-xl inline-block border border-white/10">
+              <NexShopLogo size="lg" />
             </div>
             <p className="text-xs sm:text-sm text-neutral-400 leading-relaxed max-w-sm">
               Nepal&apos;s world-class online marketplace connecting millions of shoppers with verified local sellers across all 77 districts.

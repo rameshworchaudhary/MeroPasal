@@ -16,6 +16,7 @@ import { Separator } from "@/components/ui/separator";
 import { loginWithEmail, loginWithGoogle, getUserProfile, resendVerificationForEmail } from "@/lib/firebase/auth";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import NexShopLogo from "@/components/common/NexShopLogo";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -188,9 +189,7 @@ function LoginFormContent() {
       <Card className="shadow-2xl border border-slate-800 bg-slate-900/90 text-slate-100 backdrop-blur-xl">
         <CardHeader className="text-center pb-2">
           <div className="flex justify-center mb-3">
-            <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center shadow-lg shadow-blue-500/20 border border-blue-400/30">
-              <span className="text-white font-serif font-bold text-xl">N</span>
-            </div>
+            <NexShopLogo size="md" href="/" />
           </div>
           <CardTitle className="text-2xl font-bold tracking-tight text-white">Welcome Back</CardTitle>
           <CardDescription className="text-slate-400">

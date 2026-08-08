@@ -15,6 +15,8 @@ import { getInitials, cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
+import NexShopLogo from "@/components/common/NexShopLogo";
+
 const NAV_ITEMS = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { href: "/admin/products", label: "Products", icon: Package },
@@ -23,7 +25,6 @@ const NAV_ITEMS = [
   { href: "/admin/customers", label: "Customers", icon: Users },
   { href: "/admin/sellers", label: "Sellers", icon: Store },
   { href: "/admin/coupons", label: "Coupons", icon: Tag },
-  { href: "/admin/banners", label: "Banners", icon: ImageIcon },
   { href: "/admin/shipping", label: "Shipping Zones", icon: Truck },
   { href: "/admin/analytics", label: "Analytics", icon: BarChart3 },
 ];
@@ -50,20 +51,8 @@ export default function AdminSidebar() {
   const SidebarInner = () => (
     <div className="flex flex-col h-full overflow-hidden">
       {/* Logo */}
-      <div className="p-5 border-b border-gray-800 flex-shrink-0">
-        <Link
-          href="/admin"
-          className="flex items-center gap-2"
-          onClick={() => setMobileOpen(false)}
-        >
-          <div className="h-9 w-9 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
-            <span className="text-white font-bold text-sm">N</span>
-          </div>
-          <div>
-            <p className="font-bold text-white text-base leading-none">NexShop</p>
-            <p className="text-xs text-gray-500 leading-none mt-1">Admin Panel</p>
-          </div>
-        </Link>
+      <div className="p-4 border-b border-gray-800 flex-shrink-0 bg-white/5 rounded-t-xl m-2">
+        <NexShopLogo href="/admin" size="sm" />
       </div>
 
       {/* Nav items */}

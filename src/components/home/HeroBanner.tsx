@@ -15,11 +15,21 @@ interface HeroBannerProps {
 
 const FALLBACK_BANNERS = [
   {
+    id: "adivasi-hair-oil",
+    title: "Adivasi Vishvambhari Hair Oil - Festival Sale!",
+    subtitle:
+      "Revitalize your hair with our authentic herbal formula. Limited Time Offer!",
+    image: "/images/hero/Adivasi.jpg",
+    buttonText: "Shop Now & Save",
+    linkValue: "/products?featured=true",
+    badge: "SUPER OFFER",
+  },
+  {
     id: "dashain",
     title: "Maha Dashain Mega Dhamaka",
     subtitle:
       "Celebrate Nepal's biggest festival with up to 70% OFF + Flat Rs. 1,000 Vouchers",
-    image: "/images/hero/dashain.jpg",
+    image: "/images/hero/dashain.png",
     buttonText: "Shop Dashain Deals",
     linkValue: "/products?featured=true",
     badge: "DASHAIN SALE 2083",
@@ -29,7 +39,8 @@ const FALLBACK_BANNERS = [
     title: "Nepal Electronics & Tech Expo",
     subtitle:
       "Unbeatable deals on 5G Smartphones, Laptops, Smart TVs & accessories",
-    image: "/images/hero/Electronic.jpg",
+    image:
+      "https://images.unsplash.com/photo-1526738549149-8e07eca6c147?auto=format&fit=crop&w=1600&q=80",
     buttonText: "Shop Tech",
     linkValue: "/categories/electronics",
     badge: "TECH EXPO",
@@ -49,12 +60,16 @@ const FALLBACK_BANNERS = [
     title: "Fashion Carnival & Trends",
     subtitle:
       "Authentic Kurti Sets, Dhaka Topi, Sneakers and Premium Western Wear",
-    image: "/images/hero/Fashion.jpg",
+    image:
+      "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1600&q=80",
     buttonText: "Explore Fashion",
     linkValue: "/categories/fashion",
     badge: "FASHION CARNIVAL",
   },
 ];
+
+const DEFAULT_HERO_BACKUP =
+  "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&w=1600&q=80";
 
 function resolveBannerHref(slide: Banner | (typeof FALLBACK_BANNERS)[0]): string {
   if (!("linkType" in slide)) {
@@ -81,6 +96,8 @@ export default function HeroBanner({ banners }: HeroBannerProps) {
   const slides = banners.length > 0 ? banners : FALLBACK_BANNERS;
   const [current, setCurrent] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+  const [failedImages, setFailedImages] = useState<Record<string, boolean>>({});
+  const [sportsImgFailed, setSportsImgFailed] = useState(false);
 
   const next = useCallback(() => {
     setCurrent((prev) => (prev + 1) % slides.length);
@@ -96,10 +113,21 @@ export default function HeroBanner({ banners }: HeroBannerProps) {
     return () => clearInterval(interval);
   }, [next, isPaused, slides.length]);
 
-  const currentSlide = slides[current];
-  const bgImage =
+  const currentSlide = slides[current] || slides[0];
+  const rawImage =
     (currentSlide as Banner).image ||
-    (currentSlide as (typeof FALLBACK_BANNERS)[0]).image;
+    (currentSlide as (typeof FALLBACK_BANNERS)[0]).image ||
+    DEFAULT_HERO_BACKUP;
+
+  const slideId = currentSlide.id || `slide-${current}`;
+  const isImageFailed = failedImages[slideId];
+  const bgImage = isImageFailed ? DEFAULT_HERO_BACKUP : rawImage;
+
+  // Determine if image should bypass Next optimization for instant blob/data preview
+  const isDirectImage =
+    bgImage.startsWith("data:") ||
+    bgImage.startsWith("blob:") ||
+    isImageFailed;
 
   const badgeText =
     (currentSlide as (typeof FALLBACK_BANNERS)[0]).badge || "SPECIAL OFFER";
@@ -128,6 +156,10 @@ export default function HeroBanner({ banners }: HeroBannerProps) {
                 fill
                 className="object-cover object-center"
                 priority={current === 0}
+                unoptimized={isDirectImage}
+                onError={() => {
+                  setFailedImages((prev) => ({ ...prev, [slideId]: true }));
+                }}
                 sizes="(max-width: 1024px) 100vw, 75vw"
                 referrerPolicy="no-referrer"
               />
@@ -240,11 +272,17 @@ export default function HeroBanner({ banners }: HeroBannerProps) {
             <div className="shrink-0 flex justify-end lg:w-full lg:mt-3">
               <div className="relative h-14 w-14 lg:h-20 lg:w-20 overflow-hidden rounded-lg border border-neutral-200">
                 <Image
-                  src="/images/hero/sports-zone.jpg"
+                  src={
+                    sportsImgFailed
+                      ? "https://images.unsplash.com/photo-1517649763962-0c623266010b?auto=format&fit=crop&w=600&q=80"
+                      : "https://images.unsplash.com/photo-1517649763962-0c623266010b?auto=format&fit=crop&w=600&q=80"
+                  }
                   alt="Sports Zone"
                   fill
                   className="object-cover"
+                  onError={() => setSportsImgFailed(true)}
                   sizes="80px"
+                  referrerPolicy="no-referrer"
                 />
               </div>
             </div>

@@ -23,6 +23,7 @@ import {
   ShieldCheck,
   Zap,
 } from "lucide-react";
+import NexShopLogo from "@/components/common/NexShopLogo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -147,26 +148,7 @@ export default function Navbar({ categories = [] }: NavbarProps) {
         <div className="container mx-auto px-3 sm:px-6">
           <div className="flex min-h-[4rem] sm:min-h-[4.5rem] items-center justify-between gap-3 sm:gap-6">
             {/* Logo */}
-            <Link href="/" className="group flex-shrink-0" aria-label="NexShop Home">
-              <div className="flex items-center gap-2.5">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-black text-white font-serif text-xl font-bold">
-                  N
-                </div>
-                <div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-xl sm:text-2xl font-extrabold tracking-tight text-black font-serif">
-                      NexShop
-                    </span>
-                    <span className="rounded-md bg-black px-1.5 py-0.5 text-[9px] font-bold text-white uppercase">
-                      NEPAL
-                    </span>
-                  </div>
-                  <p className="text-[10px] font-medium text-neutral-500 tracking-wide font-sans">
-                    Sabai kura, ekai thau ma
-                  </p>
-                </div>
-              </div>
-            </Link>
+            <NexShopLogo size="md" />
 
             {/* Mega Menu Trigger - Desktop */}
             <div className="hidden lg:block relative">
