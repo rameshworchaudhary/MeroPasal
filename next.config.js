@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: "standalone",
+  allowedDevOrigins: ["*.asia-east1.run.app", "localhost:3000"],
   images: {
     remotePatterns: [
       {
@@ -23,3 +23,4 @@ const nextConfig = {
 };
 
 module.exports = nextConfig;
+

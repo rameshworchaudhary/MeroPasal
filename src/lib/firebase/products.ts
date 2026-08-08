@@ -247,13 +247,46 @@ export async function getProducts(
   // 6. Search Filter
   if (filters.search) {
     const searchLower = filters.search.toLowerCase().trim();
-    allProducts = allProducts.filter(
-      (p) =>
-        p.name.toLowerCase().includes(searchLower) ||
-        p.description?.toLowerCase().includes(searchLower) ||
-        p.tags?.some((tag) => tag.toLowerCase().includes(searchLower)) ||
-        (p.brand && p.brand.toLowerCase().includes(searchLower))
-    );
+    const searchWords = searchLower.split(/\s+/).filter((w) => w.length > 1);
+
+    const matchedProducts = allProducts.filter((p) => {
+      const pName = p.name.toLowerCase();
+      const pDesc = (p.description || "").toLowerCase();
+      const pBrand = (p.brand || "").toLowerCase();
+      const pCategory = (p.categoryName || "").toLowerCase();
+      const pSubCategory = (p.subCategoryName || "").toLowerCase();
+      const pTags = (p.tags || []).map((t) => t.toLowerCase());
+
+      // Direct full query match
+      if (
+        pName.includes(searchLower) ||
+        pDesc.includes(searchLower) ||
+        pBrand.includes(searchLower) ||
+        pCategory.includes(searchLower) ||
+        pSubCategory.includes(searchLower) ||
+        pTags.some((tag) => tag.includes(searchLower))
+      ) {
+        return true;
+      }
+
+      // Keyword component match
+      return searchWords.some(
+        (word) =>
+          pName.includes(word) ||
+          pDesc.includes(word) ||
+          pBrand.includes(word) ||
+          pCategory.includes(word) ||
+          pSubCategory.includes(word) ||
+          pTags.some((tag) => tag.includes(word))
+      );
+    });
+
+    if (matchedProducts.length > 0) {
+      allProducts = matchedProducts;
+    } else {
+      // If no search matches found, return empty array so user knows no relevant product matches
+      allProducts = [];
+    }
   }
 
   // 7. Sorting
