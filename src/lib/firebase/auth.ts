@@ -18,6 +18,7 @@ import {
 } from "firebase/firestore";
 import { auth, db } from "./config";
 import type { UserProfile } from "@/lib/types/user";
+import { validateEmailClient } from "@/lib/emailValidation";
 
 /**
  * Register a new user with email/password and create their Firestore profile.
@@ -29,6 +30,32 @@ export async function registerWithEmail(
   displayName: string,
   phone?: string
 ): Promise<User> {
+  // 1. Client-side validation check
+  const clientVal = validateEmailClient(email);
+  if (!clientVal.valid) {
+    throw new Error(clientVal.error || "Please enter a valid email address.");
+  }
+
+  // 2. Server API validation check (validates format, disposable provider, and domain)
+  try {
+    const res = await fetch("/api/auth/validate-email", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    });
+    const data = await res.json();
+    if (!res.ok || !data.valid) {
+      throw new Error(data.error || "Please enter a valid email address.");
+    }
+  } catch (err: any) {
+    if (
+      err.message === "Temporary or disposable email addresses are not allowed." ||
+      err.message === "Please enter a valid email address."
+    ) {
+      throw err;
+    }
+  }
+
   const credential = await createUserWithEmailAndPassword(auth, email, password);
   await updateProfile(credential.user, { displayName });
   await createUserProfileDocument(credential.user, { displayName, phone });

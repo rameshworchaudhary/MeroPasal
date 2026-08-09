@@ -20,15 +20,34 @@ function mapZoneDoc(docSnap: QueryDocumentSnapshot<DocumentData>): ShippingZone 
   return { id: docSnap.id, ...docSnap.data() } as ShippingZone;
 }
 
+let shippingZonesCache: { data: ShippingZone[]; timestamp: number } | null = null;
+const SHIPPING_CACHE_TTL = 120000; // 2 minutes
+
+export function clearShippingCache() {
+  shippingZonesCache = null;
+}
+
 export async function getAllShippingZones(): Promise<ShippingZone[]> {
-  const snapshot = await getDocs(collection(db, COLLECTIONS.SHIPPING_ZONES));
-  return snapshot.docs.map(mapZoneDoc);
+  if (
+    shippingZonesCache &&
+    Date.now() - shippingZonesCache.timestamp < SHIPPING_CACHE_TTL
+  ) {
+    return shippingZonesCache.data;
+  }
+  try {
+    const snapshot = await getDocs(collection(db, COLLECTIONS.SHIPPING_ZONES));
+    const result = snapshot.docs.map(mapZoneDoc);
+    shippingZonesCache = { data: result, timestamp: Date.now() };
+    return result;
+  } catch (err) {
+    console.error("Error fetching shipping zones:", err);
+    return shippingZonesCache ? shippingZonesCache.data : [];
+  }
 }
 
 export async function getActiveShippingZones(): Promise<ShippingZone[]> {
-  const q = query(collection(db, COLLECTIONS.SHIPPING_ZONES), where("isActive", "==", true));
-  const snapshot = await getDocs(q);
-  return snapshot.docs.map(mapZoneDoc);
+  const allZones = await getAllShippingZones();
+  return allZones.filter((z) => z.isActive !== false);
 }
 
 export async function calculateShippingCharge(
@@ -68,6 +87,7 @@ export async function calculateShippingCharge(
 }
 
 export async function createShippingZone(input: ShippingZoneFormInput): Promise<string> {
+  clearShippingCache();
   const docRef = await addDoc(collection(db, COLLECTIONS.SHIPPING_ZONES), {
     ...input,
     createdAt: serverTimestamp(),
@@ -77,11 +97,13 @@ export async function createShippingZone(input: ShippingZoneFormInput): Promise<
 }
 
 export async function updateShippingZone(id: string, input: Partial<ShippingZoneFormInput>): Promise<void> {
+  clearShippingCache();
   const ref = doc(db, COLLECTIONS.SHIPPING_ZONES, id);
   await updateDoc(ref, { ...input, updatedAt: serverTimestamp() });
 }
 
 export async function deleteShippingZone(id: string): Promise<void> {
+  clearShippingCache();
   await deleteDoc(doc(db, COLLECTIONS.SHIPPING_ZONES, id));
 }
 

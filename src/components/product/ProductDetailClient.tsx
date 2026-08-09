@@ -63,12 +63,13 @@ export default function ProductDetailClient({
     ? product.images
     : [product.thumbnailImage || "/images/placeholder.jpg"];
 
+  const userId = user?.uid;
   useEffect(() => {
     incrementProductViewCount(product.id).catch(() => {});
-    if (user) {
-      recordRecentlyViewed(user.uid, product.id).catch(() => {});
+    if (userId) {
+      recordRecentlyViewed(userId, product.id).catch(() => {});
     }
-  }, [product.id, user]);
+  }, [product.id, userId]);
 
   const handleAddToCart = () => {
     if (isOutOfStock) return;

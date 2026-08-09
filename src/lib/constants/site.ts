@@ -12,7 +12,7 @@ export const SITE_CONFIG = {
   },
   contact: {
     email: "nexshoponlinepvtltd@gmail.com",
-    phone: "+977 9864832320",
+    phone: "+977 9822205241",
     address: "Kathmandu & Pokhara, Nepal",
   },
 };

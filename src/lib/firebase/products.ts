@@ -30,7 +30,18 @@ function mapProductDoc(docSnap: QueryDocumentSnapshot<DocumentData>): Product {
   } as Product;
 }
 
+let activeProductsCache: { data: Product[]; timestamp: number } | null = null;
+const PRODUCT_CACHE_TTL = 30000; // 30 seconds
+
+export function clearProductCache() {
+  activeProductsCache = null;
+}
+
 export async function getProductById(id: string): Promise<Product | null> {
+  if (activeProductsCache && Date.now() - activeProductsCache.timestamp < PRODUCT_CACHE_TTL) {
+    const found = activeProductsCache.data.find((p) => p.id === id);
+    if (found) return found;
+  }
   try {
     const ref = doc(db, COLLECTIONS.PRODUCTS, id);
     const snap = await getDoc(ref);
@@ -49,6 +60,10 @@ export async function getProductById(id: string): Promise<Product | null> {
 }
 
 export async function getProductBySlug(slug: string): Promise<Product | null> {
+  if (activeProductsCache && Date.now() - activeProductsCache.timestamp < PRODUCT_CACHE_TTL) {
+    const found = activeProductsCache.data.find((p) => p.slug === slug);
+    if (found) return found;
+  }
   try {
     const q = query(
       collection(db, COLLECTIONS.PRODUCTS),
@@ -317,13 +332,22 @@ export async function getProducts(
 }
 
 export async function getAllActiveProducts(): Promise<Product[]> {
+  if (
+    activeProductsCache &&
+    Date.now() - activeProductsCache.timestamp < PRODUCT_CACHE_TTL
+  ) {
+    return activeProductsCache.data;
+  }
+
   try {
     const q = query(collection(db, COLLECTIONS.PRODUCTS), where("isActive", "==", true));
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(mapProductDoc);
+    const result = snapshot.docs.map(mapProductDoc);
+    activeProductsCache = { data: result, timestamp: Date.now() };
+    return result;
   } catch (err) {
     console.error("Error fetching active products:", err);
-    return [];
+    return activeProductsCache ? activeProductsCache.data : [];
   }
 }
 
@@ -415,16 +439,9 @@ export async function getTrendingProducts(count = 100, activeProducts?: Product[
 export async function getSimilarProducts(product: Product, count = 12): Promise<Product[]> {
   try {
     if (!product?.categoryId) return [];
-    const q = query(
-      collection(db, COLLECTIONS.PRODUCTS),
-      where("isActive", "==", true),
-      where("categoryId", "==", product.categoryId),
-      fbLimit(count + 1)
-    );
-    const snapshot = await getDocs(q);
-    return snapshot.docs
-      .map(mapProductDoc)
-      .filter((p) => p.id !== product.id)
+    const allActive = await getAllActiveProducts();
+    return allActive
+      .filter((p) => p.categoryId === product.categoryId && p.id !== product.id)
       .slice(0, count);
   } catch (err) {
     console.error("Error fetching similar products:", err);
@@ -474,6 +491,7 @@ function removeUndefinedFields<T extends Record<string, any>>(obj: T): T {
 }
 
 export async function createProduct(input: ProductFormInput): Promise<string> {
+  clearProductCache();
   let sellerName = input.sellerName;
 
   if (input.sellerId && !sellerName) {
@@ -525,6 +543,7 @@ export async function createProduct(input: ProductFormInput): Promise<string> {
 }
 
 export async function updateProduct(id: string, input: Partial<ProductFormInput>): Promise<void> {
+  clearProductCache();
   const ref = doc(db, COLLECTIONS.PRODUCTS, id);
   const oldSnap = await getDoc(ref);
   const oldSellerId = oldSnap.exists() ? oldSnap.data()?.sellerId : undefined;
@@ -562,6 +581,7 @@ export async function updateProduct(id: string, input: Partial<ProductFormInput>
 }
 
 export async function deleteProduct(id: string): Promise<void> {
+  clearProductCache();
   const ref = doc(db, COLLECTIONS.PRODUCTS, id);
   const snap = await getDoc(ref);
   if (snap.exists()) {

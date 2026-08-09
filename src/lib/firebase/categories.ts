@@ -27,7 +27,23 @@ function mapCategoryDoc(docSnap: QueryDocumentSnapshot<DocumentData>): Category 
   } as Category;
 }
 
+let activeCategoriesCache: { data: Category[]; timestamp: number } | null = null;
+let allCategoriesCache: { data: Category[]; timestamp: number } | null = null;
+const CATEGORY_CACHE_TTL = 60000; // 60 seconds
+
+export function clearCategoryCache() {
+  activeCategoriesCache = null;
+  allCategoriesCache = null;
+}
+
 export async function getActiveCategories(): Promise<Category[]> {
+  if (
+    activeCategoriesCache &&
+    Date.now() - activeCategoriesCache.timestamp < CATEGORY_CACHE_TTL
+  ) {
+    return activeCategoriesCache.data;
+  }
+
   try {
     const q = query(
       collection(db, COLLECTIONS.CATEGORIES),
@@ -35,21 +51,32 @@ export async function getActiveCategories(): Promise<Category[]> {
       orderBy("displayOrder", "asc")
     );
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(mapCategoryDoc);
+    const result = snapshot.docs.map(mapCategoryDoc);
+    activeCategoriesCache = { data: result, timestamp: Date.now() };
+    return result;
   } catch (err) {
     console.error("Error fetching active categories:", err);
-    return [];
+    return activeCategoriesCache ? activeCategoriesCache.data : [];
   }
 }
 
 export async function getAllCategories(): Promise<Category[]> {
+  if (
+    allCategoriesCache &&
+    Date.now() - allCategoriesCache.timestamp < CATEGORY_CACHE_TTL
+  ) {
+    return allCategoriesCache.data;
+  }
+
   try {
     const q = query(collection(db, COLLECTIONS.CATEGORIES), orderBy("displayOrder", "asc"));
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(mapCategoryDoc);
+    const result = snapshot.docs.map(mapCategoryDoc);
+    allCategoriesCache = { data: result, timestamp: Date.now() };
+    return result;
   } catch (err) {
     console.error("Error fetching all categories:", err);
-    return [];
+    return allCategoriesCache ? allCategoriesCache.data : [];
   }
 }
 
@@ -158,6 +185,7 @@ export async function getCategoryById(id: string): Promise<Category | null> {
 }
 
 export async function createCategory(input: CategoryFormInput): Promise<string> {
+  clearCategoryCache();
   const docRef = await addDoc(collection(db, COLLECTIONS.CATEGORIES), {
     ...input,
     productCount: 0,
@@ -168,6 +196,7 @@ export async function createCategory(input: CategoryFormInput): Promise<string> 
 }
 
 export async function updateCategory(id: string, input: Partial<CategoryFormInput>): Promise<void> {
+  clearCategoryCache();
   const ref = doc(db, COLLECTIONS.CATEGORIES, id);
   await updateDoc(ref, {
     ...input,
@@ -176,5 +205,6 @@ export async function updateCategory(id: string, input: Partial<CategoryFormInpu
 }
 
 export async function deleteCategory(id: string): Promise<void> {
+  clearCategoryCache();
   await deleteDoc(doc(db, COLLECTIONS.CATEGORIES, id));
 }

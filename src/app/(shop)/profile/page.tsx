@@ -20,7 +20,6 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger,
 } from "@/components/ui/dialog";
 import AddressForm, { type AddressFormData } from "@/components/checkout/AddressForm";
-import ImageUploader from "@/components/common/ImageUploader";
 import { useAuth } from "@/hooks/useAuth";
 import { useAuthStore } from "@/store/authStore";
 import {
@@ -370,18 +369,6 @@ export default function ProfilePage() {
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit(onProfileSubmit)} className="space-y-6 max-w-lg">
-                {/* Avatar Upload */}
-                <div className="space-y-2">
-                  <Label className="text-slate-200">Profile Picture</Label>
-                  <ImageUploader
-                    value={watch("photoURL")}
-                    onChange={(url) => setValue("photoURL", url)}
-                    folder="users/avatars"
-                    label=""
-                    description="Upload a photo for your profile avatar"
-                  />
-                </div>
-
                 <div className="space-y-1.5">
                   <Label htmlFor="displayName" className="text-slate-200">Full Name</Label>
                   <Input id="displayName" className="bg-slate-950 border-slate-800 text-slate-100" {...register("displayName")} />

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ChevronRight, PackageOpen } from "lucide-react";
+import { Suspense, cache } from "react";
 import ProductGrid from "@/components/product/ProductGrid";
 import ProductFilters from "@/components/product/ProductFilters";
 import { getCategoryBySlug, getActiveCategories } from "@/lib/firebase/categories";
@@ -20,9 +21,13 @@ interface CategoryPageProps {
   }>;
 }
 
+const getCachedCategoryBySlug = cache(async (slug: string) => {
+  return await getCategoryBySlug(slug);
+});
+
 export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const category = await getCategoryBySlug(slug);
+  const category = await getCachedCategoryBySlug(slug);
   if (!category) return { title: "Category Not Found" };
   return {
     title: `${category.name} - NexShop`,
@@ -36,7 +41,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
   const { slug } = await params;
   const sp = await searchParams;
 
-  const category = await getCategoryBySlug(slug);
+  const category = await getCachedCategoryBySlug(slug);
 
   if (!category) {
     return (

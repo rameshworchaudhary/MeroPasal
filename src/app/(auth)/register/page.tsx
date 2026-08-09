@@ -18,13 +18,24 @@ import { registerWithEmail, loginWithGoogle, logout } from "@/lib/firebase/auth"
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase/config";
 import { isValidNepaliPhone } from "@/lib/utils";
+import { validateEmailClient } from "@/lib/emailValidation";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import NexShopLogo from "@/components/common/NexShopLogo";
 
+const emailSchema = z.string().superRefine((val, ctx) => {
+  const res = validateEmailClient(val);
+  if (!res.valid) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: res.error || "Please enter a valid email address.",
+    });
+  }
+});
+
 const customerSchema = z.object({
   displayName: z.string().min(2, "Name must be at least 2 characters"),
-  email: z.string().email("Please enter a valid email"),
+  email: emailSchema,
   phone: z.string().optional().refine((v) => !v || isValidNepaliPhone(v), "Enter valid Nepali phone (98XXXXXXXX)"),
   password: z.string().min(8, "Password must be at least 8 characters"),
   confirmPassword: z.string(),
@@ -35,7 +46,7 @@ const customerSchema = z.object({
 
 const sellerSchema = z.object({
   displayName: z.string().min(2, "Your full name is required"),
-  email: z.string().email("Please enter a valid email"),
+  email: emailSchema,
   phone: z.string().refine(isValidNepaliPhone, "Enter valid Nepali phone (98XXXXXXXX)"),
   password: z.string().min(8, "Password must be at least 8 characters"),
   confirmPassword: z.string(),
@@ -70,10 +81,20 @@ function RegisterContent() {
       toast.success("Account created! A verification link has been sent to your email. Please verify your email before logging in.");
       router.push("/login?mode=customer&registered=customer");
     } catch (err: unknown) {
-      const msg = err instanceof Error && err.message.includes("email-already-in-use")
-        ? "An account with this email already exists"
-        : "Registration failed. Please try again.";
-      toast.error(msg);
+      const errMsg = err instanceof Error ? err.message : "Registration failed. Please try again.";
+      if (
+        errMsg === "Temporary or disposable email addresses are not allowed." ||
+        errMsg === "Please enter a valid email address."
+      ) {
+        customerForm.setError("email", { type: "manual", message: errMsg });
+        toast.error(errMsg);
+      } else if (errMsg.includes("email-already-in-use")) {
+        const msg = "An account with this email already exists";
+        customerForm.setError("email", { type: "manual", message: msg });
+        toast.error(msg);
+      } else {
+        toast.error(errMsg || "Registration failed. Please try again.");
+      }
     }
   };
 
@@ -106,10 +127,20 @@ function RegisterContent() {
       toast.success("Seller account registered! A verification link has been sent to your email. Please verify your email and sign in to your seller account.");
       router.push("/login?mode=seller&registered=seller");
     } catch (err: unknown) {
-      const msg = err instanceof Error && err.message.includes("email-already-in-use")
-        ? "An account with this email already exists"
-        : "Registration failed. Please try again.";
-      toast.error(msg);
+      const errMsg = err instanceof Error ? err.message : "Registration failed. Please try again.";
+      if (
+        errMsg === "Temporary or disposable email addresses are not allowed." ||
+        errMsg === "Please enter a valid email address."
+      ) {
+        sellerForm.setError("email", { type: "manual", message: errMsg });
+        toast.error(errMsg);
+      } else if (errMsg.includes("email-already-in-use")) {
+        const msg = "An account with this email already exists";
+        sellerForm.setError("email", { type: "manual", message: msg });
+        toast.error(msg);
+      } else {
+        toast.error(errMsg || "Registration failed. Please try again.");
+      }
     }
   };
 

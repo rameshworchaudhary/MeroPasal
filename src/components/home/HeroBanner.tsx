@@ -174,6 +174,8 @@ export default function HeroBanner({ banners }: HeroBannerProps) {
                       src={imgUrl}
                       alt={(slide as Banner).title || "NexShop Hero Banner"}
                       className="w-full h-auto max-w-full rounded-2xl lg:rounded-3xl block object-contain mx-auto transition-transform duration-300 hover:scale-[1.02]"
+                      loading={gridPos === 0 ? "eager" : "lazy"}
+                      fetchPriority={gridPos === 0 ? "high" : "auto"}
                       onError={() => {
                         const sId = slide.id || `slide-${slideIndex}`;
                         setFailedImages((prev) => ({ ...prev, [sId]: true }));
