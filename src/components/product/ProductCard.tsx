@@ -66,10 +66,9 @@ export default function ProductCard({
 
   const showActions = isHovered || isTouchActive;
 
-  const handleCardClick = (e: React.MouseEvent) => {
-    if (!showActions) {
-      e.preventDefault();
-      e.stopPropagation();
+  const handleCardClick = () => {
+    // Enable touch actions state if on touch device without preventing link navigation
+    if (!isTouchActive) {
       setIsTouchActive(true);
     }
   };

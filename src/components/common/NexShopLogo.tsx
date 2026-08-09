@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
@@ -18,74 +17,110 @@ export default function NexShopLogo({
   className,
   size = "md",
   showText = true,
-  variant = "light",
+  variant = "dark",
 }: NexShopLogoProps) {
-  // Height configurations
-  const heightMap = {
-    sm: "h-7 sm:h-8",
-    md: "h-9 sm:h-10 lg:h-11",
-    lg: "h-11 sm:h-12 lg:h-14",
-  };
-
   const isDark = variant === "dark";
 
+  // Height configurations
   const logoContent = (
-    <div className={cn("inline-flex items-center gap-2 select-none", className)}>
-      {isDark ? (
-        <div className="flex items-center gap-2.5">
-          {/* Circular Badge Logo with Gradient Ring */}
-          <div className="relative flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full bg-slate-900 p-[2px] shadow-md ring-2 ring-indigo-500/30">
-            <div className="h-full w-full rounded-full bg-slate-950 flex items-center justify-center">
-              <svg viewBox="0 0 100 100" className="h-full w-full p-1.5">
-                <defs>
-                  <linearGradient id="ringGradDark" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#FF007F" />
-                    <stop offset="50%" stopColor="#FF5500" />
-                    <stop offset="100%" stopColor="#00A2FF" />
-                  </linearGradient>
-                  <linearGradient id="shopTextDark" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stopColor="#FF33A0" />
-                    <stop offset="100%" stopColor="#38BDF8" />
-                  </linearGradient>
-                </defs>
-                <circle cx="50" cy="50" r="45" fill="none" stroke="url(#ringGradDark)" strokeWidth="6" />
-                <path d="M 28 32 C 28 27 32 24 37 27 L 54 48 L 54 30 C 54 25 61 24 62 29 L 62 62 C 62 67 57 70 52 67 L 35 45 L 35 63 C 35 68 28 68 28 63 Z" fill="#FFFFFF" />
-                <path d="M 32 68 C 42 70 55 64 66 48 C 68 45 72 48 70 52 C 58 72 42 76 29 71 C 27 70 29 67 32 68 Z" fill="#38BDF8" />
-                <g transform="translate(51, 16)">
-                  <path d="M 8 7 C 8 2 16 2 16 7" fill="none" stroke="#FF7700" strokeWidth="2.5" strokeLinecap="round" />
-                  <path d="M 4 8 C 4 6 6 5 8 5 L 16 5 C 18 5 20 6 20 8 L 22 22 C 22 24 20 26 18 26 L 6 26 C 4 26 2 24 2 22 Z" fill="#FF7700" />
-                </g>
-              </svg>
-            </div>
-          </div>
-
-          {showText && (
-            <div className="flex flex-col">
-              <div className="flex items-baseline font-black tracking-tight text-lg sm:text-2xl leading-none">
-                <span className="text-white drop-shadow-xs">Nex</span>
-                <span className="bg-gradient-to-r from-pink-500 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
-                  Shop
-                </span>
-              </div>
-              <div className="flex items-center gap-1.5 text-[8px] font-black uppercase tracking-widest text-slate-300 mt-0.5">
-                <span className="h-[1px] w-2 bg-slate-600"></span>
-                <span>SABAI KURA, EKAI THAU MA</span>
-                <span className="h-[1px] w-2 bg-slate-600"></span>
-                <span className="rounded-full bg-blue-600 px-1.5 py-0.2 text-[7px] text-white">NEPAL</span>
-              </div>
-            </div>
+    <div className={cn("inline-flex items-center gap-2.5 select-none", className)}>
+      {/* Circular Emblem Badge matching IMAGE 1 */}
+      <div className="relative shrink-0 flex items-center justify-center">
+        <svg
+          viewBox="0 0 100 100"
+          className={cn(
+            "drop-shadow-md transition-transform duration-200 group-hover:scale-105",
+            size === "sm" ? "h-8 w-8" : size === "md" ? "h-10 w-10 sm:h-12 sm:w-12" : "h-14 w-14"
           )}
-        </div>
-      ) : (
-        <div className={cn("relative aspect-[500/130] w-auto shrink-0", heightMap[size])}>
-          <Image
-            src="/images/logo.svg"
-            alt="NexShop Nepal - Sabai Kura, Ekai Thau Ma"
-            width={500}
-            height={130}
-            className="h-full w-auto object-contain"
-            priority
+        >
+          <defs>
+            {/* Multi-color Gradient Ring matching Image 1 */}
+            <linearGradient id="rainbowRingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#e6007e" />
+              <stop offset="20%" stopColor="#ff3300" />
+              <stop offset="40%" stopColor="#ffaa00" />
+              <stop offset="65%" stopColor="#00bfff" />
+              <stop offset="85%" stopColor="#0055ff" />
+              <stop offset="100%" stopColor="#8a00e6" />
+            </linearGradient>
+
+            {/* Swoosh Cyan/Blue Gradient */}
+            <linearGradient id="swooshGrad" x1="0%" y1="0%" x2="100%" y2="50%">
+              <stop offset="0%" stopColor="#0072ff" />
+              <stop offset="100%" stopColor="#00c6ff" />
+            </linearGradient>
+
+            {/* Shopping Bag Orange Gradient */}
+            <linearGradient id="bagGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#ffa000" />
+              <stop offset="100%" stopColor="#ff7700" />
+            </linearGradient>
+          </defs>
+
+          {/* White Outer Circle Base */}
+          <circle cx="50" cy="50" r="47" fill="#FFFFFF" />
+
+          {/* Rainbow Gradient Border Ring */}
+          <circle
+            cx="50"
+            cy="50"
+            r="44"
+            fill="none"
+            stroke="url(#rainbowRingGrad)"
+            strokeWidth="5"
           />
+
+          {/* Dark Navy Stylized 'N' */}
+          <path
+            d="M 27 34 C 27 28 32 25 38 29 L 55 50 L 55 33 C 55 28 62 28 62 33 L 62 65 C 62 70 57 73 51 69 L 34 47 L 34 65 C 34 70 27 70 27 65 Z"
+            fill="#0b1329"
+          />
+
+          {/* Dynamic Blue/Cyan Swoosh Underline */}
+          <path
+            d="M 32 71 C 42 73 56 66 68 49 C 70 46 74 49 71 53 C 58 74 42 78 28 73 C 26 72 28 69 32 71 Z"
+            fill="url(#swooshGrad)"
+          />
+
+          {/* Orange Shopping Bag Graphic */}
+          <g transform="translate(51, 19)">
+            {/* Bag Handle */}
+            <path
+              d="M 7 8 C 7 3 15 3 15 8"
+              fill="none"
+              stroke="#ff7700"
+              strokeWidth="2.8"
+              strokeLinecap="round"
+            />
+            {/* Bag Body */}
+            <path
+              d="M 3 9 C 3 7 5 6 7 6 L 15 6 C 17 6 19 7 19 9 L 21 24 C 21 26 19 28 17 28 L 5 28 C 3 28 1 26 1 24 Z"
+              fill="url(#bagGrad)"
+            />
+            {/* Bag Eyelet Dots */}
+            <circle cx="7" cy="11" r="1.5" fill="#FFFFFF" />
+            <circle cx="15" cy="11" r="1.5" fill="#FFFFFF" />
+          </g>
+        </svg>
+      </div>
+
+      {/* Typography and Tagline */}
+      {showText && (
+        <div className="flex flex-col">
+          <div className="flex items-baseline font-black tracking-tight text-lg sm:text-2xl leading-none">
+            <span className={isDark ? "text-white" : "text-slate-900"}>Nex</span>
+            <span className="bg-gradient-to-r from-pink-500 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
+              Shop
+            </span>
+          </div>
+          <div className="flex items-center gap-1 sm:gap-1.5 text-[8px] sm:text-[9px] font-black uppercase tracking-widest text-slate-300 mt-1">
+            <span className="h-[1px] w-2 bg-slate-600 hidden sm:inline-block" />
+            <span className={isDark ? "text-slate-300" : "text-slate-700"}>SABAI KURA, EKAI THAU MA</span>
+            <span className="h-[1px] w-2 bg-slate-600 hidden sm:inline-block" />
+            <span className="rounded-full bg-blue-600 px-1.5 py-0.2 text-[7px] sm:text-[8px] font-extrabold text-white">
+              NEPAL
+            </span>
+          </div>
         </div>
       )}
     </div>
@@ -101,4 +136,3 @@ export default function NexShopLogo({
 
   return logoContent;
 }
-

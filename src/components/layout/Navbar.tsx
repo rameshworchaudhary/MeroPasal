@@ -126,10 +126,6 @@ export default function Navbar({ categories = [] }: NavbarProps) {
           </div>
 
           <div className="hidden lg:flex items-center gap-4 text-slate-400">
-            <Link href="/seller/register" className="hover:text-cyan-300 flex items-center gap-1 transition-colors">
-              <Store className="h-3.5 w-3.5 text-cyan-400" /> Become a Seller
-            </Link>
-            <span className="text-slate-800">|</span>
             <span className="flex items-center gap-1 text-slate-300">
               <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" /> 100% Genuine Guarantee
             </span>
@@ -245,14 +241,6 @@ export default function Navbar({ categories = [] }: NavbarProps) {
 
             {/* Right Actions */}
             <div className="flex items-center gap-1.5 sm:gap-2">
-              {/* Become Seller Link */}
-              <Link
-                href="/login?mode=seller"
-                className="hidden xl:flex items-center gap-1.5 rounded-xl border border-slate-700 bg-slate-900/80 px-3 py-1.5 text-xs font-bold text-slate-200 hover:bg-slate-800 hover:text-white hover:border-slate-600 transition-all"
-              >
-                <Store className="h-3.5 w-3.5 text-cyan-400" />
-                <span>Sell on NexShop</span>
-              </Link>
 
               {/* Notifications */}
               <DropdownMenu>

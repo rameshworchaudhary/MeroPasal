@@ -1,74 +1,83 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 130" width="100%" height="100%">
   <defs>
-    <!-- Circle Gradient Ring -->
-    <linearGradient id="ringGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#FF007F" />
-      <stop offset="35%" stop-color="#FF5500" />
-      <stop offset="70%" stop-color="#00A2FF" />
-      <stop offset="100%" stop-color="#0051FF" />
+    <!-- Multi-color Gradient Ring -->
+    <linearGradient id="rainbowRingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e6007e" />
+      <stop offset="20%" stop-color="#ff3300" />
+      <stop offset="40%" stop-color="#ffaa00" />
+      <stop offset="65%" stop-color="#00bfff" />
+      <stop offset="85%" stop-color="#0055ff" />
+      <stop offset="100%" stop-color="#8a00e6" />
+    </linearGradient>
+
+    <!-- Swoosh Cyan/Blue Gradient -->
+    <linearGradient id="swooshGrad" x1="0%" y1="0%" x2="100%" y2="50%">
+      <stop offset="0%" stop-color="#0072ff" />
+      <stop offset="100%" stop-color="#00c6ff" />
+    </linearGradient>
+
+    <!-- Shopping Bag Orange Gradient -->
+    <linearGradient id="bagGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffa000" />
+      <stop offset="100%" stop-color="#ff7700" />
     </linearGradient>
 
     <!-- Shop Text Gradient -->
-    <linearGradient id="shopTextGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#FF007F" />
-      <stop offset="60%" stop-color="#A100FF" />
-      <stop offset="100%" stop-color="#0066FF" />
-    </linearGradient>
-
-    <!-- Swoosh Ribbon Gradient -->
-    <linearGradient id="swooshGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#0088FF" />
-      <stop offset="100%" stop-color="#00A2FF" />
+    <linearGradient id="shopTextGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ec4899" />
+      <stop offset="50%" stop-color="#c084fc" />
+      <stop offset="100%" stop-color="#38bdf8" />
     </linearGradient>
 
     <!-- Soft Drop Shadow for Badge -->
     <filter id="badgeShadow" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.08" />
+      <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#000000" flood-opacity="0.12" />
     </filter>
   </defs>
 
   <!-- WHITE CIRCLE EMBLEM BADGE WITH SHADOW -->
   <g transform="translate(15, 15)">
-    <!-- White Circle Background with Shadow -->
-    <circle cx="50" cy="50" r="46" fill="#FFFFFF" filter="url(#badgeShadow)" />
+    <!-- White Circle Background -->
+    <circle cx="50" cy="50" r="47" fill="#FFFFFF" filter="url(#badgeShadow)" />
     
-    <!-- Multi-color Gradient Border Ring -->
-    <circle cx="50" cy="50" r="46" fill="none" stroke="url(#ringGradient)" stroke-width="5" />
+    <!-- Multi-color Rainbow Border Ring -->
+    <circle cx="50" cy="50" r="44" fill="none" stroke="url(#rainbowRingGrad)" stroke-width="5" />
 
     <!-- STYLIZED EMBLEM GRAPHIC -->
-    <!-- Dark Navy 'N' Left Stem & Body -->
-    <path d="M 28 32 C 28 27 32 24 37 27 L 54 48 L 54 30 C 54 25 61 24 62 29 L 62 62 C 62 67 57 70 52 67 L 35 45 L 35 63 C 35 68 28 68 28 63 Z" fill="#0F172A" />
+    <!-- Dark Navy 'N' -->
+    <path d="M 27 34 C 27 28 32 25 38 29 L 55 50 L 55 33 C 55 28 62 28 62 33 L 62 65 C 62 70 57 73 51 69 L 34 47 L 34 65 C 34 70 27 70 27 65 Z" fill="#0b1329" />
 
     <!-- Blue Swoosh Ribbon at Bottom of Emblem -->
-    <path d="M 32 68 C 42 70 55 64 66 48 C 68 45 72 48 70 52 C 58 72 42 76 29 71 C 27 70 29 67 32 68 Z" fill="url(#swooshGradient)" />
+    <path d="M 32 71 C 42 73 56 66 68 49 C 70 46 74 49 71 53 C 58 74 42 78 28 73 C 26 72 28 69 32 71 Z" fill="url(#swooshGrad)" />
 
     <!-- ORANGE SHOPPING BAG AT TOP RIGHT -->
-    <g transform="translate(51, 16)">
+    <g transform="translate(51, 19)">
       <!-- Bag Handle -->
-      <path d="M 8 7 C 8 2 16 2 16 7" fill="none" stroke="#FF7700" stroke-width="2.5" stroke-linecap="round" />
+      <path d="M 7 8 C 7 3 15 3 15 8" fill="none" stroke="#ff7700" stroke-width="2.8" stroke-linecap="round" />
       <!-- Bag Body -->
-      <path d="M 4 8 C 4 6 6 5 8 5 L 16 5 C 18 5 20 6 20 8 L 22 22 C 22 24 20 26 18 26 L 6 26 C 4 26 2 24 2 22 Z" fill="#FF7700" />
-      <!-- Bag Heart / Smile Detail -->
-      <path d="M 9 13 Q 12 16 15 13" fill="none" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" />
+      <path d="M 3 9 C 3 7 5 6 7 6 L 15 6 C 17 6 19 7 19 9 L 21 24 C 21 26 19 28 17 28 L 5 28 C 3 28 1 26 1 24 Z" fill="url(#bagGrad)" />
+      <!-- Bag Eyelet Dots -->
+      <circle cx="7" cy="11" r="1.5" fill="#FFFFFF" />
+      <circle cx="15" cy="11" r="1.5" fill="#FFFFFF" />
     </g>
   </g>
 
   <!-- BRAND NAME: NexShop -->
-  <text x="135" y="70" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif" font-size="58" font-weight="900" fill="#0F172A" letter-spacing="-1.5">Nex</text>
+  <text x="135" y="70" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif" font-size="58" font-weight="900" fill="#FFFFFF" letter-spacing="-1.5">Nex</text>
   
-  <text x="245" y="70" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif" font-size="58" font-weight="900" fill="url(#shopTextGradient)" letter-spacing="-1.5">Shop</text>
+  <text x="245" y="70" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif" font-size="58" font-weight="900" fill="url(#shopTextGrad)" letter-spacing="-1.5">Shop</text>
 
   <!-- TAGLINE & NEPAL PILL -->
   <!-- Left Dash -->
-  <line x1="136" y1="96" x2="158" y2="96" stroke="#0F172A" stroke-width="2" stroke-linecap="round" />
+  <line x1="136" y1="96" x2="158" y2="96" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" />
   
   <!-- Tagline Text -->
-  <text x="166" y="100" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="800" fill="#0F172A" letter-spacing="1.5">SABAI KURA, EKAI THAU MA</text>
+  <text x="166" y="100" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="800" fill="#cbd5e1" letter-spacing="1.5">SABAI KURA, EKAI THAU MA</text>
   
   <!-- Right Dash -->
-  <line x1="348" y1="96" x2="368" y2="96" stroke="#0F172A" stroke-width="2" stroke-linecap="round" />
+  <line x1="348" y1="96" x2="368" y2="96" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" />
 
   <!-- Blue Pill Capsule with NEPAL -->
-  <rect x="376" y="85" width="66" height="22" rx="11" fill="#1877F2" />
+  <rect x="376" y="85" width="66" height="22" rx="11" fill="#2563eb" />
   <text x="409" y="100" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10.5" font-weight="900" fill="#FFFFFF" letter-spacing="1.2" text-anchor="middle">NEPAL</text>
 </svg>

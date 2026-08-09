@@ -414,6 +414,7 @@ export async function getTrendingProducts(count = 100, activeProducts?: Product[
 
 export async function getSimilarProducts(product: Product, count = 12): Promise<Product[]> {
   try {
+    if (!product?.categoryId) return [];
     const q = query(
       collection(db, COLLECTIONS.PRODUCTS),
       where("isActive", "==", true),

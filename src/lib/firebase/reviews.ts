@@ -31,11 +31,15 @@ export async function getReviewsByProduct(productId: string): Promise<Review[]> 
   try {
     const q = query(
       collection(db, COLLECTIONS.REVIEWS),
-      where("productId", "==", productId),
-      orderBy("createdAt", "desc")
+      where("productId", "==", productId)
     );
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(mapReviewDoc);
+    const reviews = snapshot.docs.map(mapReviewDoc);
+    return reviews.sort((a, b) => {
+      const timeA = new Date(a.createdAt || 0).getTime();
+      const timeB = new Date(b.createdAt || 0).getTime();
+      return timeB - timeA;
+    });
   } catch (err) {
     console.error("Error fetching reviews by product:", err);
     return [];
