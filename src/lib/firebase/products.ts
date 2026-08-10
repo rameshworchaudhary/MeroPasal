@@ -31,7 +31,7 @@ function mapProductDoc(docSnap: QueryDocumentSnapshot<DocumentData>): Product {
 }
 
 let activeProductsCache: { data: Product[]; timestamp: number } | null = null;
-const PRODUCT_CACHE_TTL = 30000; // 30 seconds
+const PRODUCT_CACHE_TTL = 60000; // 60 seconds TTL
 
 export function clearProductCache() {
   activeProductsCache = null;
@@ -223,10 +223,16 @@ export function isProductInCategory(product: Product, categoryIdOrSlug?: string,
 
 export async function getProducts(
   filters: ProductFilters = {},
-  pageSize = 48,
-  lastDoc?: QueryDocumentSnapshot<DocumentData>
-): Promise<{ products: Product[]; lastDoc: QueryDocumentSnapshot<DocumentData> | null }> {
-  // Always query active products
+  pageSize = 24,
+  page = 1
+): Promise<{
+  products: Product[];
+  total: number;
+  page: number;
+  hasMore: boolean;
+  lastDoc?: any;
+}> {
+  // Always query active products with 60s caching
   let allProducts = await getAllActiveProducts();
 
   // 1. Strict Category & Subcategory Filter
@@ -272,7 +278,6 @@ export async function getProducts(
       const pSubCategory = (p.subCategoryName || "").toLowerCase();
       const pTags = (p.tags || []).map((t) => t.toLowerCase());
 
-      // Direct full query match
       if (
         pName.includes(searchLower) ||
         pDesc.includes(searchLower) ||
@@ -284,7 +289,6 @@ export async function getProducts(
         return true;
       }
 
-      // Keyword component match
       return searchWords.some(
         (word) =>
           pName.includes(word) ||
@@ -299,7 +303,6 @@ export async function getProducts(
     if (matchedProducts.length > 0) {
       allProducts = matchedProducts;
     } else {
-      // If no search matches found, return empty array so user knows no relevant product matches
       allProducts = [];
     }
   }
@@ -328,7 +331,17 @@ export async function getProducts(
       break;
   }
 
-  return { products: allProducts.slice(0, pageSize), lastDoc: null };
+  const total = allProducts.length;
+  const startIndex = (page - 1) * pageSize;
+  const paginatedProducts = allProducts.slice(startIndex, startIndex + pageSize);
+  const hasMore = startIndex + pageSize < total;
+
+  return {
+    products: paginatedProducts,
+    total,
+    page,
+    hasMore,
+  };
 }
 
 export async function getAllActiveProducts(): Promise<Product[]> {
@@ -351,7 +364,7 @@ export async function getAllActiveProducts(): Promise<Product[]> {
   }
 }
 
-export async function getHomepageSections(count = 100): Promise<{
+export async function getHomepageSections(count = 16): Promise<{
   featured: Product[];
   trending: Product[];
   newArrivals: Product[];
@@ -398,7 +411,7 @@ export async function getHomepageSections(count = 100): Promise<{
   }
 }
 
-export async function getFeaturedProducts(count = 100, activeProducts?: Product[]): Promise<Product[]> {
+export async function getFeaturedProducts(count = 16, activeProducts?: Product[]): Promise<Product[]> {
   try {
     const allActive = activeProducts || (await getAllActiveProducts());
     const sorted = [...allActive].sort((a, b) => {
@@ -417,7 +430,7 @@ export async function getFeaturedProducts(count = 100, activeProducts?: Product[
   }
 }
 
-export async function getTrendingProducts(count = 100, activeProducts?: Product[]): Promise<Product[]> {
+export async function getTrendingProducts(count = 16, activeProducts?: Product[]): Promise<Product[]> {
   try {
     const allActive = activeProducts || (await getAllActiveProducts());
     const sorted = [...allActive].sort((a, b) => {
@@ -436,12 +449,28 @@ export async function getTrendingProducts(count = 100, activeProducts?: Product[
   }
 }
 
-export async function getSimilarProducts(product: Product, count = 12): Promise<Product[]> {
+export async function getSimilarProducts(product: Product, count = 8): Promise<Product[]> {
   try {
     if (!product?.categoryId) return [];
+    // Fast targeted Firestore query by categoryId!
+    const q = query(
+      collection(db, COLLECTIONS.PRODUCTS),
+      where("categoryId", "==", product.categoryId),
+      where("isActive", "==", true),
+      fbLimit(count + 2)
+    );
+    const snapshot = await getDocs(q);
+    if (!snapshot.empty) {
+      const docs = snapshot.docs.map(mapProductDoc).filter((p) => p.id !== product.id);
+      if (docs.length > 0) {
+        return docs.slice(0, count);
+      }
+    }
+
+    // Fallback if categoryId didn't match directly
     const allActive = await getAllActiveProducts();
     return allActive
-      .filter((p) => p.categoryId === product.categoryId && p.id !== product.id)
+      .filter((p) => isProductInCategory(p, product.categoryId) && p.id !== product.id)
       .slice(0, count);
   } catch (err) {
     console.error("Error fetching similar products:", err);

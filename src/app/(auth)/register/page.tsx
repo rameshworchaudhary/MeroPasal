@@ -71,8 +71,14 @@ function RegisterContent() {
   const [showPassword, setShowPassword] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
 
-  const customerForm = useForm<CustomerFormData>({ resolver: zodResolver(customerSchema) });
-  const sellerForm = useForm<SellerFormData>({ resolver: zodResolver(sellerSchema) });
+  const customerForm = useForm<CustomerFormData>({
+    resolver: zodResolver(customerSchema),
+    mode: "onChange",
+  });
+  const sellerForm = useForm<SellerFormData>({
+    resolver: zodResolver(sellerSchema),
+    mode: "onChange",
+  });
 
   const onCustomerSubmit = async (data: CustomerFormData) => {
     try {

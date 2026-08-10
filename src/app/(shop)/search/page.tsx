@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
 import { Search } from "lucide-react";
-import ProductGrid from "@/components/product/ProductGrid";
+import ProductGridInfinite from "@/components/product/ProductGridInfinite";
 import { getProducts } from "@/lib/firebase/products";
 
 interface SearchPageProps {
@@ -19,28 +18,30 @@ export async function generateMetadata({ searchParams }: SearchPageProps): Promi
 export default async function SearchPage({ searchParams }: SearchPageProps) {
   const { q, sortBy } = await searchParams;
 
-  const { products } = await getProducts({
+  const filters = {
     search: q,
     sortBy: (sortBy as "newest" | "price-asc" | "price-desc" | "rating" | "popular") || "newest",
-  }, 24);
+  };
+
+  const { products, total, hasMore } = await getProducts(filters, 20, 1);
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8 sm:py-12">
       <div className="mb-6">
         <div className="flex items-center gap-3 mb-2">
-          <Search className="h-5 w-5 text-muted-foreground" />
-          <h1 className="text-2xl font-bold">
+          <Search className="h-5 w-5 text-neutral-700" />
+          <h1 className="text-2xl sm:text-3xl font-bold font-serif text-neutral-900">
             {q ? `Results for "${q}"` : "Search Products"}
           </h1>
         </div>
-        <p className="text-sm text-muted-foreground">
-          {products.length} {products.length === 1 ? "product" : "products"} found
+        <p className="text-sm text-neutral-600">
+          {total} {total === 1 ? "product" : "products"} found
           {q && ` for "${q}"`}
         </p>
       </div>
 
       {/* Sort options */}
-      <div className="flex gap-2 mb-6 overflow-x-auto scrollbar-hide pb-1">
+      <div className="flex gap-2 mb-8 overflow-x-auto scrollbar-hide pb-1">
         {[
           { label: "Newest", value: "newest" },
           { label: "Popular", value: "popular" },
@@ -51,10 +52,10 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           <a
             key={opt.value}
             href={`/search?q=${encodeURIComponent(q || "")}&sortBy=${opt.value}`}
-            className={`whitespace-nowrap text-xs px-4 py-1.5 rounded-full border transition-colors ${
+            className={`whitespace-nowrap text-xs px-4 py-2 rounded-full border font-medium transition-colors ${
               (sortBy || "newest") === opt.value
-                ? "bg-primary text-white border-primary"
-                : "hover:border-primary hover:text-primary"
+                ? "bg-black text-white border-black"
+                : "border-neutral-200 text-neutral-700 hover:border-black hover:text-black"
             }`}
           >
             {opt.label}
@@ -62,8 +63,11 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         ))}
       </div>
 
-      <ProductGrid
-        products={products}
+      <ProductGridInfinite
+        initialProducts={products}
+        initialHasMore={hasMore}
+        initialTotal={total}
+        filters={filters}
         emptyMessage={q ? `No products found for "${q}"` : "Enter a search term to find products"}
       />
     </div>

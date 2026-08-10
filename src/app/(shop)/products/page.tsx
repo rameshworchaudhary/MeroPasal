@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { SlidersHorizontal } from "lucide-react";
+import ProductGridInfinite from "@/components/product/ProductGridInfinite";
 import ProductGrid from "@/components/product/ProductGrid";
 import ProductFilters from "@/components/product/ProductFilters";
 import { getProducts } from "@/lib/firebase/products";
@@ -53,17 +54,16 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
     inStock: params.inStock === "true",
   };
 
-  const [{ products }, categories] = await Promise.all([
-    getProducts(filters, 24),
+  const [{ products, total, hasMore }, categories] = await Promise.all([
+    getProducts(filters, 20, 1),
     getActiveCategories(),
   ]);
 
-  // Extract unique brands from results for filter
+  // Extract unique brands from initial results for filter
   const brands = [...new Set(products.map((p) => p.brand).filter(Boolean) as string[])].sort();
   const maxPrice = Math.max(...products.map((p) => p.comparePrice || p.price || 0), 50000);
 
   const currentSort = params.sortBy || "newest";
-  const totalProducts = products.length;
 
   return (
     <div className="container mx-auto px-3.5 py-6 sm:px-6 sm:py-10 lg:py-14">
@@ -74,7 +74,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
           {params.q ? `Search results for "${params.q}"` : "All Products"}
         </h1>
         <p className="mt-1.5 text-xs sm:text-sm text-[#777166]">
-          {totalProducts} {totalProducts === 1 ? "product" : "products"} found
+          {total} {total === 1 ? "product" : "products"} available
         </p>
       </div>
 
@@ -116,8 +116,11 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
           </div>
 
           <Suspense fallback={<ProductGrid products={[]} loading={true} />}>
-            <ProductGrid
-              products={products}
+            <ProductGridInfinite
+              initialProducts={products}
+              initialHasMore={hasMore}
+              initialTotal={total}
+              filters={filters}
               emptyMessage={
                 params.q
                   ? `No products found for "${params.q}"`
