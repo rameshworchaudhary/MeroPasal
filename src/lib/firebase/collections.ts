@@ -8,4 +8,5 @@ export const COLLECTIONS = {
   BANNERS: "banners",
   SHIPPING_ZONES: "shippingZones",
   CARTS: "carts",
+  PRICE_ALERTS: "price_alerts",
 } as const;

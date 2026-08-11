@@ -59,12 +59,19 @@ export async function GET(req: NextRequest) {
       sellerName: p.sellerName,
     }));
 
-    return NextResponse.json({
-      products: leanProducts,
-      total,
-      page,
-      hasMore,
-    });
+    return NextResponse.json(
+      {
+        products: leanProducts,
+        total,
+        page,
+        hasMore,
+      },
+      {
+        headers: {
+          "Cache-Control": "public, s-maxage=60, stale-while-revalidate=120",
+        },
+      }
+    );
   } catch (error) {
     console.error("Error in GET /api/products:", error);
     return NextResponse.json(

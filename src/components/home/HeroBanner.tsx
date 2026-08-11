@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -166,16 +167,17 @@ export default function HeroBanner({ banners }: HeroBannerProps) {
                 >
                   <Link
                     href={resolveBannerHref(slide)}
-                    className="block w-full cursor-pointer overflow-hidden"
+                    className="relative block w-full aspect-[16/9] cursor-pointer overflow-hidden rounded-2xl lg:rounded-3xl bg-slate-100"
                     aria-label={(slide as Banner).title || "Promotional Banner"}
                   >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
+                    <Image
                       src={imgUrl}
                       alt={(slide as Banner).title || "NexShop Hero Banner"}
-                      className="w-full h-auto max-w-full rounded-2xl lg:rounded-3xl block object-contain mx-auto transition-transform duration-300 hover:scale-[1.02]"
-                      loading={gridPos === 0 ? "eager" : "lazy"}
-                      fetchPriority={gridPos === 0 ? "high" : "auto"}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 33vw"
+                      className="object-contain rounded-2xl lg:rounded-3xl transition-transform duration-300 hover:scale-[1.02]"
+                      priority={gridPos === 0}
+                      quality={85}
                       onError={() => {
                         const sId = slide.id || `slide-${slideIndex}`;
                         setFailedImages((prev) => ({ ...prev, [sId]: true }));

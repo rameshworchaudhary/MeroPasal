@@ -57,9 +57,9 @@ export default function ProductGrid({
       {products.map((product, index) => (
         <motion.div
           key={product.id}
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: index * 0.04, duration: 0.3 }}
+          transition={{ delay: Math.min(index * 0.02, 0.2), duration: 0.2 }}
           className="h-full"
         >
           <ProductCard product={product} />

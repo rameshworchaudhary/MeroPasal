@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   ShoppingCart, Heart, Star, ChevronRight, Share2, Shield,
   Truck, RotateCcw, Minus, Plus, CheckCircle, AlertCircle,
-  ThumbsUp, User, ZoomIn,
+  ThumbsUp, User, ZoomIn, Bell,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -26,6 +26,7 @@ import {
 import { incrementProductViewCount } from "@/lib/firebase/products";
 import { recordRecentlyViewed } from "@/lib/firebase/users";
 import { markReviewHelpful } from "@/lib/firebase/reviews";
+import { createPriceAlert } from "@/lib/firebase/priceAlerts";
 import type { Product } from "@/lib/types/product";
 import type { Review, ReviewSummary } from "@/lib/types/review";
 import { toast } from "sonner";
@@ -50,6 +51,42 @@ export default function ProductDetailClient({
   const { addItem, isInCart } = useCart();
   const { isInWishlist, toggleItem: toggleWishlist } = useWishlist();
   const { user } = useAuth();
+
+  const [showPriceAlertForm, setShowPriceAlertForm] = useState(false);
+  const [priceAlertEmail, setPriceAlertEmail] = useState(user?.email || "");
+  const [isSubmittingAlert, setIsSubmittingAlert] = useState(false);
+  const [isAlertSet, setIsAlertSet] = useState(false);
+
+  useEffect(() => {
+    if (user?.email && !priceAlertEmail) {
+      setPriceAlertEmail(user.email);
+    }
+  }, [user?.email, priceAlertEmail]);
+
+  const handleCreatePriceAlert = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!priceAlertEmail || !priceAlertEmail.includes("@")) {
+      toast.error("Please enter a valid email address.");
+      return;
+    }
+    setIsSubmittingAlert(true);
+    try {
+      await createPriceAlert({
+        productId: product.id,
+        productName: product.name,
+        currentPrice: product.price,
+        email: priceAlertEmail,
+        userId: user?.uid || null,
+      });
+      setIsAlertSet(true);
+      toast.success("Price drop alert saved successfully!");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Failed to set price drop alert.";
+      toast.error(message);
+    } finally {
+      setIsSubmittingAlert(false);
+    }
+  };
 
   const discount = typeof product.discountPercentage === "number" && product.discountPercentage > 0
     ? product.discountPercentage
@@ -281,6 +318,72 @@ export default function ProductDetailClient({
               )}
             </div>
             <p className="text-xs text-[#777166]">Inclusive of all taxes</p>
+          </div>
+
+          {/* Price Drop Alert Card */}
+          <div className="rounded-xl border border-[#ded6ca] bg-[#fcfaf6] p-4 transition-all shadow-xs">
+            <div className="flex items-center justify-between gap-3 flex-wrap">
+              <div className="flex items-center gap-2.5">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#f1ebe1] text-[#8b6b35]">
+                  <Bell className="h-4 w-4" />
+                </div>
+                <div>
+                  <p className="text-xs font-semibold text-[#292722]">Notify me when price drops</p>
+                  <p className="text-[11px] text-[#777166]">Track price alerts for this product</p>
+                </div>
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setShowPriceAlertForm((prev) => !prev)}
+                className="rounded-full border-[#b99558] text-xs text-[#8b6b35] hover:bg-[#f1ebe1] h-8 px-3.5"
+              >
+                {isAlertSet ? (
+                  <span className="flex items-center gap-1 font-semibold text-[#596d55]">
+                    <CheckCircle className="h-3.5 w-3.5" /> Alert Set
+                  </span>
+                ) : (
+                  showPriceAlertForm ? "Close" : "Set Alert"
+                )}
+              </Button>
+            </div>
+
+            {showPriceAlertForm && !isAlertSet && (
+              <motion.form
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                onSubmit={handleCreatePriceAlert}
+                className="mt-3 border-t border-[#e2dacd] pt-3 space-y-2"
+              >
+                <p className="text-xs text-[#514c43]">Enter your email to receive an alert if the price drops below {formatCurrency(product.price)}:</p>
+                <div className="flex gap-2">
+                  <input
+                    type="email"
+                    required
+                    placeholder="your.email@example.com"
+                    value={priceAlertEmail}
+                    onChange={(e) => setPriceAlertEmail(e.target.value)}
+                    className="flex-1 rounded-lg border border-[#cfc5b7] bg-white px-3 py-2 text-xs text-[#292722] focus:border-[#8b6b35] focus:outline-none"
+                  />
+                  <Button
+                    type="submit"
+                    size="sm"
+                    disabled={isSubmittingAlert}
+                    className="rounded-lg bg-[#8b6b35] text-xs text-white hover:bg-[#72572b]"
+                  >
+                    {isSubmittingAlert ? "Saving..." : "Notify Me"}
+                  </Button>
+                </div>
+              </motion.form>
+            )}
+
+            {isAlertSet && (
+              <p className="mt-2.5 text-xs font-medium text-[#596d55]">
+                ✓ Active alert set for <span className="font-semibold">{priceAlertEmail}</span>
+              </p>
+            )}
           </div>
 
           {/* Stock status */}
