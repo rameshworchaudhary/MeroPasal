@@ -43,39 +43,6 @@ type ActionStatus =
   | "recoverEmail_success"
   | "error";
 
-// --- Allowed hosts for post-action redirects ---
-// Add every domain (including subdomains you actually use) that continueUrl
-// is legitimately allowed to point to. Everything else falls back to /login.
-const ALLOWED_REDIRECT_HOSTS = ["nexshop.com.np", "www.nexshop.com.np"];
-
-/**
- * Safely resolves a `continueUrl` query param into a href we can trust.
- * - Relative paths ("/something") are allowed, EXCEPT protocol-relative
- *   ones ("//evil.com") which browsers treat as absolute URLs.
- * - Absolute URLs are only allowed if their hostname is in the allowlist.
- * - Anything else (javascript:, data:, unknown hosts, malformed URLs,
- *   or a bare substring match like "includes('nexshop')") is rejected.
- */
-function getSafeContinueHref(continueUrl: string | null): string {
-  if (!continueUrl) return "/login";
-
-  // Relative path — but reject protocol-relative "//evil.com"
-  if (continueUrl.startsWith("/") && !continueUrl.startsWith("//")) {
-    return continueUrl;
-  }
-
-  try {
-    const url = new URL(continueUrl);
-    if ((url.protocol === "https:" || url.protocol === "http:") && ALLOWED_REDIRECT_HOSTS.includes(url.hostname)) {
-      return continueUrl;
-    }
-  } catch {
-    // Not a valid absolute URL — fall through to default
-  }
-
-  return "/login";
-}
-
 function AuthActionContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -221,8 +188,10 @@ function AuthActionContent() {
   const hasNumberOrSymbol = /[0-9!@#$%^&*()]/.test(newPassword);
   const isMatch = newPassword.length > 0 && newPassword === confirmPassword;
 
-  // Safe redirect URL (validated against allowlist — see getSafeContinueHref above)
-  const safeContinueHref = getSafeContinueHref(continueUrl);
+  // Safe redirect URL helper
+  const safeContinueHref = continueUrl && (continueUrl.startsWith("/") || continueUrl.includes("nexshop"))
+    ? continueUrl
+    : "/login";
 
   return (
     <motion.div

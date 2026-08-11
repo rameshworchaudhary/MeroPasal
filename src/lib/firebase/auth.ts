@@ -21,6 +21,19 @@ import type { UserProfile } from "@/lib/types/user";
 import { validateEmailClient } from "@/lib/emailValidation";
 
 /**
+ * Helper to get ActionCodeSettings pointing to custom action handler.
+ */
+function getActionCodeSettings(): { url: string; handleCodeInApp: boolean } {
+  const baseUrl =
+    process.env.NEXT_PUBLIC_APP_URL ||
+    (typeof window !== "undefined" ? window.location.origin : "https://nexshoponline.com.np");
+  return {
+    url: `${baseUrl}/auth/action`,
+    handleCodeInApp: true,
+  };
+}
+
+/**
  * Register a new user with email/password and create their Firestore profile.
  * Sends email verification after registration.
  */
@@ -62,10 +75,7 @@ export async function registerWithEmail(
 
   // Send verification email
   try {
-    await sendEmailVerification(credential.user, {
-      url: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/login`,
-      handleCodeInApp: false,
-    });
+    await sendEmailVerification(credential.user, getActionCodeSettings());
   } catch {
     // Don't block registration if email fails
     console.warn("Could not send verification email");
@@ -131,10 +141,10 @@ export async function logout(): Promise<void> {
 }
 
 /**
- * Send a password reset email.
+ * Send a password reset email using custom action link.
  */
 export async function resetPassword(email: string): Promise<void> {
-  await sendPasswordResetEmail(auth, email);
+  await sendPasswordResetEmail(auth, email, getActionCodeSettings());
 }
 
 /**
@@ -144,10 +154,7 @@ export async function resendVerificationEmail(): Promise<void> {
   const user = auth.currentUser;
   if (!user) throw new Error("No user logged in");
   if (user.emailVerified) throw new Error("Email already verified");
-  await sendEmailVerification(user, {
-    url: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/login`,
-    handleCodeInApp: false,
-  });
+  await sendEmailVerification(user, getActionCodeSettings());
 }
 
 /**
@@ -159,10 +166,7 @@ export async function resendVerificationForEmail(email: string, password: string
     await firebaseSignOut(auth);
     throw new Error("EMAIL_ALREADY_VERIFIED");
   }
-  await sendEmailVerification(credential.user, {
-    url: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/login`,
-    handleCodeInApp: false,
-  });
+  await sendEmailVerification(credential.user, getActionCodeSettings());
   await firebaseSignOut(auth);
 }
 
