@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import Link from "next/link";
 import { SlidersHorizontal } from "lucide-react";
 import ProductGridInfinite from "@/components/product/ProductGridInfinite";
 import ProductGrid from "@/components/product/ProductGrid";
@@ -100,7 +101,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
             </div>
             <div className="flex w-full sm:w-auto gap-2 overflow-x-auto scrollbar-hide py-1">
               {SORT_OPTIONS.map((opt) => (
-                <a
+                <Link
                   key={opt.value}
                   href={`?${new URLSearchParams({ ...Object.fromEntries(Object.entries(params).filter(([, v]) => v !== undefined) as [string, string][]), sortBy: opt.value }).toString()}`}
                   className={`whitespace-nowrap min-h-[36px] flex items-center rounded-full border px-3.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.08em] transition-colors ${
@@ -110,7 +111,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                   }`}
                 >
                   {opt.label}
-                </a>
+                </Link>
               ))}
             </div>
           </div>
