@@ -5,5 +5,6 @@ export const dynamic = "force-dynamic";
 
 export default async function AdminCategoriesPage() {
   const categories = await getAllCategories();
-  return <AdminCategoriesClient initialCategories={categories} />;
+  const serializedCategories = JSON.parse(JSON.stringify(categories));
+  return <AdminCategoriesClient initialCategories={serializedCategories} />;
 }

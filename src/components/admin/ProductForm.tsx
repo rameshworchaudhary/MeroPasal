@@ -28,23 +28,28 @@ import { toast } from "sonner";
 
 const specSchema = z.object({ key: z.string(), value: z.string() });
 
+const optionalNumber = z.preprocess(
+  (val) => (val === "" || val === null || val === undefined || isNaN(Number(val)) ? undefined : Number(val)),
+  z.number().optional()
+);
+
 const productSchema = z.object({
-  name: z.string().min(3, "Name must be at least 3 characters"),
-  slug: z.string().min(3, "Slug is required"),
-  description: z.string().min(20, "Description must be at least 20 characters"),
-  shortDescription: z.string().min(10, "Short description is required").max(200),
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  slug: z.string().optional(),
+  description: z.string().min(5, "Description must be at least 5 characters"),
+  shortDescription: z.string().min(3, "Short description is required").max(300),
   categoryId: z.string().min(1, "Category is required"),
   subCategoryId: z.string().optional(),
   brand: z.string().optional(),
   price: z.coerce.number().positive("Price must be positive"),
-  comparePrice: z.coerce.number().optional(),
-  costPrice: z.coerce.number().optional(),
-  sku: z.string().min(2, "SKU is required"),
+  comparePrice: optionalNumber,
+  costPrice: optionalNumber,
+  sku: z.string().optional(),
   stock: z.coerce.number().min(0, "Stock cannot be negative"),
   lowStockThreshold: z.coerce.number().min(0).default(5),
   unit: z.string().optional(),
-  weight: z.coerce.number().optional(),
-  discountPercentage: z.coerce.number().min(0).max(100).optional(),
+  weight: optionalNumber,
+  discountPercentage: optionalNumber,
   freeDelivery: z.boolean().default(false),
   tagsInput: z.string().optional(),
   specifications: z.array(specSchema),
@@ -164,9 +169,12 @@ export default function ProductForm({ categories, initialData }: ProductFormProp
         isSellerProduct = false;
       }
 
+      const effectiveSlug = data.slug?.trim() || slugify(data.name);
+      const effectiveSku = data.sku?.trim() || `SKU-${Date.now().toString(36).toUpperCase()}`;
+
       const payload: ProductFormInput = {
         name: data.name,
-        slug: data.slug,
+        slug: effectiveSlug,
         description: data.description,
         shortDescription: data.shortDescription,
         categoryId: data.categoryId,
@@ -179,7 +187,7 @@ export default function ProductForm({ categories, initialData }: ProductFormProp
         price: data.price,
         comparePrice: data.comparePrice,
         costPrice: data.costPrice,
-        sku: data.sku,
+        sku: effectiveSku,
         stock: data.stock,
         lowStockThreshold: data.lowStockThreshold,
         unit: data.unit,

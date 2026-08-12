@@ -5,5 +5,6 @@ export const dynamic = "force-dynamic";
 
 export default async function AdminShippingPage() {
   const zones = await getAllShippingZones();
-  return <AdminShippingClient initialZones={zones} />;
+  const serializedZones = JSON.parse(JSON.stringify(zones));
+  return <AdminShippingClient initialZones={serializedZones} />;
 }

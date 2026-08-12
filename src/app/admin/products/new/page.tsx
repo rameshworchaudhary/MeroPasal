@@ -7,6 +7,7 @@ export const dynamic = "force-dynamic";
 
 export default async function NewProductPage() {
   const categories = await getAllCategories();
+  const serializedCategories = JSON.parse(JSON.stringify(categories));
 
   return (
     <div className="space-y-6">
@@ -20,7 +21,7 @@ export default async function NewProductPage() {
         </div>
       </div>
 
-      <ProductForm categories={categories} />
+      <ProductForm categories={serializedCategories} />
     </div>
   );
 }

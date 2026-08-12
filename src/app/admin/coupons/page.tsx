@@ -5,5 +5,6 @@ export const dynamic = "force-dynamic";
 
 export default async function AdminCouponsPage() {
   const coupons = await getAllCoupons();
-  return <AdminCouponsClient initialCoupons={coupons} />;
+  const serializedCoupons = JSON.parse(JSON.stringify(coupons));
+  return <AdminCouponsClient initialCoupons={serializedCoupons} />;
 }

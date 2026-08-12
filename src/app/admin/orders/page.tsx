@@ -10,5 +10,6 @@ interface AdminOrdersPageProps {
 export default async function AdminOrdersPage({ searchParams }: AdminOrdersPageProps) {
   const { status } = await searchParams;
   const orders = await getAllOrders();
-  return <AdminOrdersClient initialOrders={orders} initialStatusFilter={status} />;
+  const serializedOrders = JSON.parse(JSON.stringify(orders));
+  return <AdminOrdersClient initialOrders={serializedOrders} initialStatusFilter={status} />;
 }

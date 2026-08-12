@@ -5,5 +5,6 @@ export const dynamic = "force-dynamic";
 
 export default async function AdminCustomersPage() {
   const customers = await getAllCustomers();
-  return <AdminCustomersClient initialCustomers={customers} />;
+  const serializedCustomers = JSON.parse(JSON.stringify(customers));
+  return <AdminCustomersClient initialCustomers={serializedCustomers} />;
 }

@@ -40,12 +40,13 @@ import { useCart } from "@/hooks/useCart";
 import { useWishlist } from "@/hooks/useWishlist";
 import { logout } from "@/lib/firebase/auth";
 import { getInitials } from "@/lib/utils";
-import { useDebounce } from "@/hooks/useDebounce";
 import { SITE_CONFIG } from "@/lib/constants/site";
 import { toast } from "sonner";
+import dynamic from "next/dynamic";
 import type { Category } from "@/lib/types/category";
-import VoiceSearchModal from "@/components/common/VoiceSearchModal";
-import ImageSearchModal from "@/components/common/ImageSearchModal";
+
+const VoiceSearchModal = dynamic(() => import("@/components/common/VoiceSearchModal"), { ssr: false });
+const ImageSearchModal = dynamic(() => import("@/components/common/ImageSearchModal"), { ssr: false });
 
 interface NavbarProps {
   categories?: Category[];
@@ -66,13 +67,11 @@ export default function Navbar({ categories = [] }: NavbarProps) {
   // AI Modal States
   const [voiceModalOpen, setVoiceModalOpen] = useState(false);
   const [imageModalOpen, setImageModalOpen] = useState(false);
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setMounted(true);
   }, []);
-
-  const searchInputRef = useRef<HTMLInputElement>(null);
-  const debouncedSearch = useDebounce(searchQuery, 400);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 10);
@@ -80,17 +79,10 @@ export default function Navbar({ categories = [] }: NavbarProps) {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  useEffect(() => {
-    if (debouncedSearch.trim().length >= 2) {
-      router.push(`/search?q=${encodeURIComponent(debouncedSearch.trim())}`);
-    }
-  }, [debouncedSearch, router]);
-
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
       router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
-      setSearchQuery("");
     }
   };
 
@@ -560,6 +552,21 @@ export default function Navbar({ categories = [] }: NavbarProps) {
         <div
           className="fixed inset-0 z-40 bg-black/50 lg:hidden"
           onClick={() => setMobileMenuOpen(false)}
+        />
+      )}
+
+      {/* Dynamic Voice & Image Search Modals */}
+      {voiceModalOpen && (
+        <VoiceSearchModal
+          isOpen={voiceModalOpen}
+          onClose={() => setVoiceModalOpen(false)}
+        />
+      )}
+
+      {imageModalOpen && (
+        <ImageSearchModal
+          isOpen={imageModalOpen}
+          onClose={() => setImageModalOpen(false)}
         />
       )}
     </>

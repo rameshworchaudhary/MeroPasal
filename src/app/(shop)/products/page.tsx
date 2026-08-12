@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   description: "Browse all products on NexShop",
 };
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 interface ProductsPageProps {
   searchParams: Promise<{

@@ -1,14 +1,14 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
 import { Heart, ShoppingCart, Star, Eye, Zap } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { useCart } from "@/hooks/useCart";
-import { useWishlist } from "@/hooks/useWishlist";
+import { useCartStore } from "@/store/cartStore";
+import { useWishlistStore } from "@/store/wishlistStore";
+import { useIsInCart } from "@/hooks/useCart";
+import { useIsInWishlist } from "@/hooks/useWishlist";
 import { formatCurrency } from "@/lib/utils";
 import type { Product } from "@/lib/types/product";
 import { toast } from "sonner";
@@ -27,47 +27,25 @@ export default function ProductCard({
 }: ProductCardProps) {
   const [imageError, setImageError] = useState(false);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
-  const [mounted, setMounted] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [isTouchActive, setIsTouchActive] = useState(false);
-  const cardRef = useRef<HTMLDivElement>(null);
 
-  const { addItem, isInCart } = useCart();
-  const { isInWishlist, toggleItem: toggleWishlist } = useWishlist();
+  // Granular Zustand subscriptions - only re-renders if this specific product's inCart/inWishlist status changes
+  const addItem = useCartStore((state) => state.addItem);
+  const toggleWishlist = useWishlistStore((state) => state.toggleItem);
+  const inCart = useIsInCart(product.id);
+  const inWishlist = useIsInWishlist(product.id);
+
   const router = useRouter();
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  // Click outside listener for mobile touch devices
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent | TouchEvent) => {
-      if (cardRef.current && !cardRef.current.contains(event.target as Node)) {
-        setIsTouchActive(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    document.addEventListener("touchstart", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-      document.removeEventListener("touchstart", handleClickOutside);
-    };
-  }, []);
 
   const discount = typeof product.discountPercentage === "number" && product.discountPercentage > 0
     ? product.discountPercentage
     : 0;
 
-  const inCart = mounted ? isInCart(product.id) : false;
-  const inWishlist = mounted ? isInWishlist(product.id) : false;
   const isOutOfStock = product.stock <= 0;
-
   const showActions = isHovered || isTouchActive;
 
   const handleCardClick = () => {
-    // Enable touch actions state if on touch device without preventing link navigation
     if (!isTouchActive) {
       setIsTouchActive(true);
     }
@@ -141,14 +119,14 @@ export default function ProductCard({
   };
 
   return (
-    <motion.div
-      ref={cardRef}
+    <div
       onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      whileHover={{ y: -3 }}
-      transition={{ duration: 0.2 }}
+      onMouseLeave={() => {
+        setIsHovered(false);
+        setIsTouchActive(false);
+      }}
       className={cn(
-        "group relative flex h-full flex-col justify-between overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-xs transition-all duration-200 hover:border-slate-300 hover:shadow-md",
+        "group relative flex h-full flex-col justify-between overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-xs transition-all duration-200 hover:-translate-y-1 hover:border-slate-300 hover:shadow-md",
         isTouchActive && "border-blue-400 ring-2 ring-blue-500/10 shadow-md",
         className
       )}
@@ -286,45 +264,44 @@ export default function ProductCard({
             </div>
 
             {/* Quick add buttons - Only shown when interacted with (hover / tap / click) */}
-            <AnimatePresence>
-              {showQuickAdd && !isOutOfStock && showActions && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0, marginTop: 0 }}
-                  animate={{ height: "auto", opacity: 1, marginTop: 10 }}
-                  exit={{ height: 0, opacity: 0, marginTop: 0 }}
-                  transition={{ duration: 0.2, ease: "easeInOut" }}
-                  className="overflow-hidden pt-2 border-t border-slate-100 flex items-center gap-1.5"
+            {showQuickAdd && !isOutOfStock && (
+              <div
+                className={cn(
+                  "overflow-hidden transition-all duration-200 ease-in-out flex items-center gap-1.5",
+                  showActions
+                    ? "max-h-20 opacity-100 mt-2.5 pt-2 border-t border-slate-100"
+                    : "max-h-0 opacity-0 mt-0 pt-0 border-t-0 pointer-events-none"
+                )}
+              >
+                <button
+                  onClick={handleAddToCart}
+                  disabled={isAddingToCart || inCart}
+                  className={cn(
+                    "flex min-h-[36px] flex-1 items-center justify-center gap-1.5 rounded-xl py-2 px-2 text-[10px] font-black uppercase tracking-wider transition-all shadow-xs active:scale-95",
+                    inCart
+                      ? "bg-slate-800 text-white"
+                      : "bg-slate-950 text-white hover:bg-slate-800"
+                  )}
                 >
-                  <button
-                    onClick={handleAddToCart}
-                    disabled={isAddingToCart || inCart}
-                    className={cn(
-                      "flex min-h-[36px] flex-1 items-center justify-center gap-1.5 rounded-xl py-2 px-2 text-[10px] font-black uppercase tracking-wider transition-all shadow-xs active:scale-95",
-                      inCart
-                        ? "bg-slate-800 text-white"
-                        : "bg-slate-950 text-white hover:bg-slate-800"
-                    )}
-                  >
-                    {product.variants && product.variants.length > 0 ? (
-                      <><Zap className="h-3.5 w-3.5 text-cyan-400" /> Options</>
-                    ) : inCart ? (
-                      <><ShoppingCart className="h-3.5 w-3.5 fill-current text-cyan-400" /> Added</>
-                    ) : (
-                      <><ShoppingCart className="h-3.5 w-3.5" /> Add to Cart</>
-                    )}
-                  </button>
-                  <button
-                    onClick={handleBuyNow}
-                    className="flex min-h-[36px] flex-1 items-center justify-center gap-1.5 rounded-xl py-2 px-2 text-[10px] font-black uppercase tracking-wider transition-all shadow-xs active:scale-95 bg-gradient-to-r from-blue-600 to-cyan-500 text-white hover:from-blue-500 hover:to-cyan-400"
-                  >
-                    Buy Now
-                  </button>
-                </motion.div>
-              )}
-            </AnimatePresence>
+                  {product.variants && product.variants.length > 0 ? (
+                    <><Zap className="h-3.5 w-3.5 text-cyan-400" /> Options</>
+                  ) : inCart ? (
+                    <><ShoppingCart className="h-3.5 w-3.5 fill-current text-cyan-400" /> Added</>
+                  ) : (
+                    <><ShoppingCart className="h-3.5 w-3.5" /> Add to Cart</>
+                  )}
+                </button>
+                <button
+                  onClick={handleBuyNow}
+                  className="flex min-h-[36px] flex-1 items-center justify-center gap-1.5 rounded-xl py-2 px-2 text-[10px] font-black uppercase tracking-wider transition-all shadow-xs active:scale-95 bg-gradient-to-r from-blue-600 to-cyan-500 text-white hover:from-blue-500 hover:to-cyan-400"
+                >
+                  Buy Now
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </Link>
-    </motion.div>
+    </div>
   );
 }

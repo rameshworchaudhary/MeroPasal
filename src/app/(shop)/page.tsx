@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   description: SITE_CONFIG.description,
 };
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export default async function HomePage() {
   // Fetch all homepage data in parallel
@@ -29,7 +29,7 @@ export default async function HomePage() {
       getActiveBannersByPosition("hero"),
       getActiveBannersByPosition("secondary"),
       getActiveCategories(),
-      getHomepageSections(100),
+      getHomepageSections(12),
     ]);
 
   const hero = heroBanners.status === "fulfilled" ? heroBanners.value : [];

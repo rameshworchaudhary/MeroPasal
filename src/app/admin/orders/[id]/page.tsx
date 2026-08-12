@@ -12,5 +12,6 @@ export default async function AdminOrderDetailPage({ params }: AdminOrderDetailP
   const { id } = await params;
   const order = await getOrderById(id);
   if (!order) notFound();
-  return <AdminOrderDetailClient order={order} />;
+  const serializedOrder = JSON.parse(JSON.stringify(order));
+  return <AdminOrderDetailClient order={serializedOrder} />;
 }

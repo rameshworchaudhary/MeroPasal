@@ -3,6 +3,10 @@
 import { useCartStore } from "@/store/cartStore";
 import type { CartItem } from "@/lib/types/cart";
 
+export function useIsInCart(productId: string) {
+  return useCartStore((state) => state.items.some((i) => i.productId === productId));
+}
+
 export function useCart() {
   const store = useCartStore();
 

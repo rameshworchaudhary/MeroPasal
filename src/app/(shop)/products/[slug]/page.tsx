@@ -33,6 +33,7 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
 }
 
 export const dynamic = "force-dynamic";
+export const dynamicParams = true;
 
 async function SimilarProductsSection({ product }: { product: Product }) {
   const similar = await getSimilarProducts(product, 8);

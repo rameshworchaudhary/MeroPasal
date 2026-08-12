@@ -11,7 +11,7 @@ interface FlashSaleSectionProps {
   products: Product[];
 }
 
-export default function FlashSaleSection({ products }: FlashSaleSectionProps) {
+function CountdownTimer() {
   const [timeLeft, setTimeLeft] = useState({
     hours: 14,
     minutes: 25,
@@ -36,6 +36,22 @@ export default function FlashSaleSection({ products }: FlashSaleSectionProps) {
     return () => clearInterval(timer);
   }, []);
 
+  return (
+    <div className="flex items-center gap-2.5 bg-neutral-100 border border-neutral-200 rounded-lg px-3.5 py-2">
+      <Clock className="h-4 w-4 text-neutral-700 shrink-0" />
+      <span className="text-xs font-bold text-neutral-700 mr-1">Ends In:</span>
+      <div className="flex items-center gap-1 font-mono text-xs font-bold">
+        <span className="rounded bg-neutral-900 px-2 py-1 text-white">{String(timeLeft.hours).padStart(2, "0")}h</span>
+        <span className="text-neutral-900 font-bold">:</span>
+        <span className="rounded bg-neutral-900 px-2 py-1 text-white">{String(timeLeft.minutes).padStart(2, "0")}m</span>
+        <span className="text-neutral-900 font-bold">:</span>
+        <span className="rounded bg-neutral-900 px-2 py-1 text-white">{String(timeLeft.seconds).padStart(2, "0")}s</span>
+      </div>
+    </div>
+  );
+}
+
+export default function FlashSaleSection({ products }: FlashSaleSectionProps) {
   if (!products || products.length === 0) return null;
 
   return (
@@ -63,17 +79,7 @@ export default function FlashSaleSection({ products }: FlashSaleSectionProps) {
           </div>
 
           {/* Countdown Clock */}
-          <div className="flex items-center gap-2.5 bg-neutral-100 border border-neutral-200 rounded-lg px-3.5 py-2">
-            <Clock className="h-4 w-4 text-neutral-700 shrink-0" />
-            <span className="text-xs font-bold text-neutral-700 mr-1">Ends In:</span>
-            <div className="flex items-center gap-1 font-mono text-xs font-bold">
-              <span className="rounded bg-neutral-900 px-2 py-1 text-white">{String(timeLeft.hours).padStart(2, "0")}h</span>
-              <span className="text-neutral-900 font-bold">:</span>
-              <span className="rounded bg-neutral-900 px-2 py-1 text-white">{String(timeLeft.minutes).padStart(2, "0")}m</span>
-              <span className="text-neutral-900 font-bold">:</span>
-              <span className="rounded bg-neutral-900 px-2 py-1 text-white">{String(timeLeft.seconds).padStart(2, "0")}s</span>
-            </div>
-          </div>
+          <CountdownTimer />
         </div>
 
         {/* Deals Grid */}

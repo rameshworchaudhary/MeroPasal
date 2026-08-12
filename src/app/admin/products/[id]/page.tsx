@@ -20,6 +20,9 @@ export default async function EditProductPage({ params }: EditProductPageProps) 
 
   if (!product) notFound();
 
+  const serializedCategories = JSON.parse(JSON.stringify(categories));
+  const serializedProduct = JSON.parse(JSON.stringify(product));
+
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
@@ -32,7 +35,7 @@ export default async function EditProductPage({ params }: EditProductPageProps) 
         </div>
       </div>
 
-      <ProductForm categories={categories} initialData={product} />
+      <ProductForm categories={serializedCategories} initialData={serializedProduct} />
     </div>
   );
 }

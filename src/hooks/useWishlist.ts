@@ -5,6 +5,10 @@ import { toggleWishlistItem } from "@/lib/firebase/users";
 import { useAuth } from "./useAuth";
 import type { WishlistItem } from "@/lib/types/cart";
 
+export function useIsInWishlist(productId: string) {
+  return useWishlistStore((state) => state.items.some((i) => i.productId === productId));
+}
+
 export function useWishlist() {
   const store = useWishlistStore();
   const { user } = useAuth();

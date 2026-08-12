@@ -17,7 +17,13 @@ import { COLLECTIONS } from "./collections";
 import type { ShippingZone, ShippingZoneFormInput } from "@/lib/types/nepal-address";
 
 function mapZoneDoc(docSnap: QueryDocumentSnapshot<DocumentData>): ShippingZone {
-  return { id: docSnap.id, ...docSnap.data() } as ShippingZone;
+  const data = docSnap.data();
+  return {
+    id: docSnap.id,
+    ...data,
+    createdAt: data.createdAt?.toDate?.()?.toISOString() || (typeof data.createdAt === "string" ? data.createdAt : new Date().toISOString()),
+    updatedAt: data.updatedAt?.toDate?.()?.toISOString() || (typeof data.updatedAt === "string" ? data.updatedAt : new Date().toISOString()),
+  } as unknown as ShippingZone;
 }
 
 let shippingZonesCache: { data: ShippingZone[]; timestamp: number } | null = null;

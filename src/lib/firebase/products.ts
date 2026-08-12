@@ -1,3 +1,4 @@
+import { cache } from "react";
 import {
   collection,
   doc,
@@ -20,13 +21,25 @@ import { db } from "./config";
 import { COLLECTIONS } from "./collections";
 import type { Product, ProductFormInput, ProductFilters } from "@/lib/types/product";
 
-function mapProductDoc(docSnap: QueryDocumentSnapshot<DocumentData>): Product {
-  const data = docSnap.data();
+function mapProductDoc(docSnap: QueryDocumentSnapshot<DocumentData> | DocumentData): Product {
+  const data = typeof (docSnap as QueryDocumentSnapshot<DocumentData>).data === "function" 
+    ? (docSnap as QueryDocumentSnapshot<DocumentData>).data() 
+    : (docSnap as DocumentData);
+  const id = docSnap.id || data.id || "";
+
+  const createdAtStr = data.createdAt?.toDate?.()?.toISOString() 
+    || (typeof data.createdAt === "string" ? data.createdAt : undefined)
+    || new Date().toISOString();
+
+  const updatedAtStr = data.updatedAt?.toDate?.()?.toISOString() 
+    || (typeof data.updatedAt === "string" ? data.updatedAt : undefined)
+    || new Date().toISOString();
+
   return {
-    id: docSnap.id,
+    id,
     ...data,
-    createdAt: data.createdAt?.toDate?.()?.toISOString() || new Date().toISOString(),
-    updatedAt: data.updatedAt?.toDate?.()?.toISOString() || new Date().toISOString(),
+    createdAt: createdAtStr,
+    updatedAt: updatedAtStr,
   } as Product;
 }
 
@@ -37,47 +50,95 @@ export function clearProductCache() {
   activeProductsCache = null;
 }
 
-export async function getProductById(id: string): Promise<Product | null> {
-  if (activeProductsCache && Date.now() - activeProductsCache.timestamp < PRODUCT_CACHE_TTL) {
-    const found = activeProductsCache.data.find((p) => p.id === id);
-    if (found) return found;
-  }
+export const getProductById = cache(async function getProductById(id: string): Promise<Product | null> {
+  if (!id) return null;
   try {
     const ref = doc(db, COLLECTIONS.PRODUCTS, id);
     const snap = await getDoc(ref);
-    if (!snap.exists()) return null;
-    const data = snap.data();
-    return {
-      id: snap.id,
-      ...data,
-      createdAt: data.createdAt?.toDate?.()?.toISOString() || new Date().toISOString(),
-      updatedAt: data.updatedAt?.toDate?.()?.toISOString() || new Date().toISOString(),
-    } as Product;
+    if (snap.exists()) return mapProductDoc(snap);
+
+    // Fallback if id was actually a slug
+    const q = query(
+      collection(db, COLLECTIONS.PRODUCTS),
+      where("slug", "==", id),
+      fbLimit(1)
+    );
+    const snapshot = await getDocs(q);
+    if (!snapshot.empty) return mapProductDoc(snapshot.docs[0]);
+
+    return null;
   } catch (err) {
     console.error("Error fetching product by id:", err);
     return null;
   }
-}
+});
 
-export async function getProductBySlug(slug: string): Promise<Product | null> {
-  if (activeProductsCache && Date.now() - activeProductsCache.timestamp < PRODUCT_CACHE_TTL) {
-    const found = activeProductsCache.data.find((p) => p.slug === slug);
-    if (found) return found;
-  }
+export const getProductBySlug = cache(async function getProductBySlug(rawSlug: string): Promise<Product | null> {
+  if (!rawSlug) return null;
+  const decodedSlug = decodeURIComponent(rawSlug).trim();
+  const lowerSlug = decodedSlug.toLowerCase();
+
+  // 1. Check in all active products first
+  const allActive = await getAllActiveProducts();
+  const matchInActive = allActive.find(
+    (p) =>
+      p.slug === decodedSlug ||
+      p.slug === rawSlug ||
+      p.slug?.toLowerCase() === lowerSlug ||
+      p.id === decodedSlug ||
+      p.id === rawSlug
+  );
+  if (matchInActive) return matchInActive;
+
+  // 2. Direct Firestore query by slug
   try {
     const q = query(
       collection(db, COLLECTIONS.PRODUCTS),
-      where("slug", "==", slug),
+      where("slug", "==", decodedSlug),
       fbLimit(1)
     );
     const snapshot = await getDocs(q);
-    if (snapshot.empty) return null;
-    return mapProductDoc(snapshot.docs[0]);
+    if (!snapshot.empty) return mapProductDoc(snapshot.docs[0]);
+
+    if (rawSlug !== decodedSlug) {
+      const qRaw = query(
+        collection(db, COLLECTIONS.PRODUCTS),
+        where("slug", "==", rawSlug),
+        fbLimit(1)
+      );
+      const snapRaw = await getDocs(qRaw);
+      if (!snapRaw.empty) return mapProductDoc(snapRaw.docs[0]);
+    }
+
+    // 3. Document ID check
+    const ref = doc(db, COLLECTIONS.PRODUCTS, decodedSlug);
+    const snap = await getDoc(ref);
+    if (snap.exists()) return mapProductDoc(snap);
+
+    if (rawSlug !== decodedSlug) {
+      const refRaw = doc(db, COLLECTIONS.PRODUCTS, rawSlug);
+      const snapRaw = await getDoc(refRaw);
+      if (snapRaw.exists()) return mapProductDoc(snapRaw);
+    }
+
+    // 4. Fallback search across admin products (e.g. if inactive/draft/archived)
+    const allAdmin = await getAllProductsForAdmin();
+    const matchInAdmin = allAdmin.find(
+      (p) =>
+        p.slug === decodedSlug ||
+        p.slug === rawSlug ||
+        p.slug?.toLowerCase() === lowerSlug ||
+        p.id === decodedSlug ||
+        p.id === rawSlug
+    );
+    if (matchInAdmin) return matchInAdmin;
+
+    return null;
   } catch (err) {
     console.error("Error fetching product by slug:", err);
     return null;
   }
-}
+});
 
 export function isProductInCategory(product: Product, categoryIdOrSlug?: string, subCategoryId?: string): boolean {
   if (!product) return false;
@@ -344,7 +405,7 @@ export async function getProducts(
   };
 }
 
-export async function getAllActiveProducts(): Promise<Product[]> {
+export const getAllActiveProducts = cache(async function getAllActiveProducts(): Promise<Product[]> {
   if (
     activeProductsCache &&
     Date.now() - activeProductsCache.timestamp < PRODUCT_CACHE_TTL
@@ -355,16 +416,18 @@ export async function getAllActiveProducts(): Promise<Product[]> {
   try {
     const q = query(collection(db, COLLECTIONS.PRODUCTS), where("isActive", "==", true));
     const snapshot = await getDocs(q);
-    const result = snapshot.docs.map(mapProductDoc);
+    const result = snapshot.docs
+      .map(mapProductDoc)
+      .filter((p) => p.isActive && (p.status === "active" || !p.status));
     activeProductsCache = { data: result, timestamp: Date.now() };
     return result;
   } catch (err) {
     console.error("Error fetching active products:", err);
     return activeProductsCache ? activeProductsCache.data : [];
   }
-}
+});
 
-export async function getHomepageSections(count = 16): Promise<{
+export const getHomepageSections = cache(async function getHomepageSections(count = 12): Promise<{
   featured: Product[];
   trending: Product[];
   newArrivals: Product[];
@@ -409,7 +472,7 @@ export async function getHomepageSections(count = 16): Promise<{
     console.error("Error fetching homepage product sections:", err);
     return { featured: [], trending: [], newArrivals: [] };
   }
-}
+});
 
 export async function getFeaturedProducts(count = 16, activeProducts?: Product[]): Promise<Product[]> {
   try {
@@ -449,19 +512,20 @@ export async function getTrendingProducts(count = 16, activeProducts?: Product[]
   }
 }
 
-export async function getSimilarProducts(product: Product, count = 8): Promise<Product[]> {
+export const getSimilarProducts = cache(async function getSimilarProducts(product: Product, count = 8): Promise<Product[]> {
   try {
     if (!product?.categoryId) return [];
-    // Fast targeted Firestore query by categoryId!
+    // Single-field query by categoryId (requires no composite index)
     const q = query(
       collection(db, COLLECTIONS.PRODUCTS),
       where("categoryId", "==", product.categoryId),
-      where("isActive", "==", true),
-      fbLimit(count + 2)
+      fbLimit(count + 5)
     );
     const snapshot = await getDocs(q);
     if (!snapshot.empty) {
-      const docs = snapshot.docs.map(mapProductDoc).filter((p) => p.id !== product.id);
+      const docs = snapshot.docs
+        .map(mapProductDoc)
+        .filter((p) => p.isActive !== false && p.id !== product.id);
       if (docs.length > 0) {
         return docs.slice(0, count);
       }
@@ -476,7 +540,7 @@ export async function getSimilarProducts(product: Product, count = 8): Promise<P
     console.error("Error fetching similar products:", err);
     return [];
   }
-}
+});
 
 export async function getNewArrivals(count = 100, activeProducts?: Product[]): Promise<Product[]> {
   try {

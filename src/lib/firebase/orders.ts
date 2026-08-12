@@ -19,13 +19,25 @@ import type { Order, CreateOrderInput, OrderStatus, PaymentStatus } from "@/lib/
 import { generateOrderId } from "@/lib/utils";
 import { decrementStockAndIncrementSold } from "./products";
 
-function mapOrderDoc(docSnap: QueryDocumentSnapshot<DocumentData>): Order {
-  const data = docSnap.data();
+function mapOrderDoc(docSnap: QueryDocumentSnapshot<DocumentData> | DocumentData): Order {
+  const data = typeof (docSnap as QueryDocumentSnapshot<DocumentData>).data === "function" 
+    ? (docSnap as QueryDocumentSnapshot<DocumentData>).data() 
+    : (docSnap as DocumentData);
+  const id = docSnap.id || data.id || "";
+
+  const createdAtStr = data.createdAt?.toDate?.()?.toISOString() 
+    || (typeof data.createdAt === "string" ? data.createdAt : undefined)
+    || new Date().toISOString();
+
+  const updatedAtStr = data.updatedAt?.toDate?.()?.toISOString() 
+    || (typeof data.updatedAt === "string" ? data.updatedAt : undefined)
+    || new Date().toISOString();
+
   return {
-    id: docSnap.id,
+    id,
     ...data,
-    createdAt: data.createdAt?.toDate?.()?.toISOString() || new Date().toISOString(),
-    updatedAt: data.updatedAt?.toDate?.()?.toISOString() || new Date().toISOString(),
+    createdAt: createdAtStr,
+    updatedAt: updatedAtStr,
   } as Order;
 }
 
@@ -78,13 +90,7 @@ export async function getOrderById(id: string): Promise<Order | null> {
   const ref = doc(db, COLLECTIONS.ORDERS, id);
   const snap = await getDoc(ref);
   if (!snap.exists()) return null;
-  const data = snap.data();
-  return {
-    id: snap.id,
-    ...data,
-    createdAt: data.createdAt?.toDate?.()?.toISOString() || new Date().toISOString(),
-    updatedAt: data.updatedAt?.toDate?.()?.toISOString() || new Date().toISOString(),
-  } as Order;
+  return mapOrderDoc(snap);
 }
 
 export async function getOrderByOrderNumber(orderNumber: string): Promise<Order | null> {

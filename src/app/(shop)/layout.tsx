@@ -5,8 +5,6 @@ import MobileBottomNav from "@/components/layout/MobileBottomNav";
 import FloatingActions from "@/components/layout/FloatingActions";
 import { getActiveCategories } from "@/lib/firebase/categories";
 
-export const dynamic = "force-dynamic";
-
 export default async function ShopLayout({
   children,
 }: {

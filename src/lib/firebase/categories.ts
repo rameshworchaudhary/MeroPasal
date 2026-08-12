@@ -1,3 +1,4 @@
+import { cache } from "react";
 import {
   collection,
   doc,
@@ -17,13 +18,25 @@ import { db } from "./config";
 import { COLLECTIONS } from "./collections";
 import type { Category, CategoryFormInput } from "@/lib/types/category";
 
-function mapCategoryDoc(docSnap: QueryDocumentSnapshot<DocumentData>): Category {
-  const data = docSnap.data();
+function mapCategoryDoc(docSnap: QueryDocumentSnapshot<DocumentData> | DocumentData): Category {
+  const data = typeof (docSnap as QueryDocumentSnapshot<DocumentData>).data === "function" 
+    ? (docSnap as QueryDocumentSnapshot<DocumentData>).data() 
+    : (docSnap as DocumentData);
+  const id = docSnap.id || data.id || "";
+
+  const createdAtStr = data.createdAt?.toDate?.()?.toISOString() 
+    || (typeof data.createdAt === "string" ? data.createdAt : undefined)
+    || new Date().toISOString();
+
+  const updatedAtStr = data.updatedAt?.toDate?.()?.toISOString() 
+    || (typeof data.updatedAt === "string" ? data.updatedAt : undefined)
+    || new Date().toISOString();
+
   return {
-    id: docSnap.id,
+    id,
     ...data,
-    createdAt: data.createdAt?.toDate?.()?.toISOString() || new Date().toISOString(),
-    updatedAt: data.updatedAt?.toDate?.()?.toISOString() || new Date().toISOString(),
+    createdAt: createdAtStr,
+    updatedAt: updatedAtStr,
   } as Category;
 }
 
@@ -36,7 +49,7 @@ export function clearCategoryCache() {
   allCategoriesCache = null;
 }
 
-export async function getActiveCategories(): Promise<Category[]> {
+export const getActiveCategories = cache(async function getActiveCategories(): Promise<Category[]> {
   if (
     activeCategoriesCache &&
     Date.now() - activeCategoriesCache.timestamp < CATEGORY_CACHE_TTL
@@ -58,9 +71,9 @@ export async function getActiveCategories(): Promise<Category[]> {
     console.error("Error fetching active categories:", err);
     return activeCategoriesCache ? activeCategoriesCache.data : [];
   }
-}
+});
 
-export async function getAllCategories(): Promise<Category[]> {
+export const getAllCategories = cache(async function getAllCategories(): Promise<Category[]> {
   if (
     allCategoriesCache &&
     Date.now() - allCategoriesCache.timestamp < CATEGORY_CACHE_TTL
@@ -78,9 +91,9 @@ export async function getAllCategories(): Promise<Category[]> {
     console.error("Error fetching all categories:", err);
     return allCategoriesCache ? allCategoriesCache.data : [];
   }
-}
+});
 
-export async function getCategoryBySlug(slug: string): Promise<Category | null> {
+export const getCategoryBySlug = cache(async function getCategoryBySlug(slug: string): Promise<Category | null> {
   try {
     // 1. Try exact match
     let q = query(collection(db, COLLECTIONS.CATEGORIES), where("slug", "==", slug));
@@ -164,25 +177,19 @@ export async function getCategoryBySlug(slug: string): Promise<Category | null> 
     console.error("Error fetching category by slug:", err);
     return null;
   }
-}
+});
 
-export async function getCategoryById(id: string): Promise<Category | null> {
+export const getCategoryById = cache(async function getCategoryById(id: string): Promise<Category | null> {
   try {
     const ref = doc(db, COLLECTIONS.CATEGORIES, id);
     const snap = await getDoc(ref);
     if (!snap.exists()) return null;
-    const data = snap.data();
-    return {
-      id: snap.id,
-      ...data,
-      createdAt: data.createdAt?.toDate?.()?.toISOString() || new Date().toISOString(),
-      updatedAt: data.updatedAt?.toDate?.()?.toISOString() || new Date().toISOString(),
-    } as Category;
+    return mapCategoryDoc(snap);
   } catch (err) {
     console.error("Error fetching category by id:", err);
     return null;
   }
-}
+});
 
 export async function createCategory(input: CategoryFormInput): Promise<string> {
   clearCategoryCache();
