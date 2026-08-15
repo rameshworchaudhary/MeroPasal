@@ -1,4 +1,4 @@
-# MeroPasal — Nepal Ko Aafnai Online Pasal 🇳🇵
+#NexShop - Nepal's modern e-commerce platform.
 
 A complete, production-ready Nepal-focused e-commerce platform built with Next.js 15, TypeScript, Firebase, and integrated eSewa/Khalti payments.
 
