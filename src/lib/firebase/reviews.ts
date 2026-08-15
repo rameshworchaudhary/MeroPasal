@@ -10,6 +10,7 @@ import {
   orderBy,
   serverTimestamp,
   increment,
+  limit as fbLimit,
   type QueryDocumentSnapshot,
   type DocumentData,
 } from "firebase/firestore";
@@ -125,9 +126,13 @@ export async function markReviewHelpful(reviewId: string): Promise<void> {
   await updateDoc(ref, { helpfulCount: increment(1) });
 }
 
-export async function getAllReviews(): Promise<Review[]> {
+export async function getAllReviews(maxCount = 20): Promise<Review[]> {
   try {
-    const q = query(collection(db, COLLECTIONS.REVIEWS), orderBy("createdAt", "desc"));
+    const q = query(
+      collection(db, COLLECTIONS.REVIEWS),
+      orderBy("createdAt", "desc"),
+      fbLimit(maxCount)
+    );
     const snapshot = await getDocs(q);
     return snapshot.docs.map(mapReviewDoc);
   } catch (err) {

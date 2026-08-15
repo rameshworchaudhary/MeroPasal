@@ -14,7 +14,7 @@ export default function CustomerReviews() {
   useEffect(() => {
     async function fetchReviews() {
       try {
-        const data = await getAllReviews();
+        const data = await getAllReviews(4);
         setReviews(data || []);
       } catch (err) {
         console.error("Failed to fetch customer reviews:", err);

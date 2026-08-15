@@ -1,5 +1,3 @@
-"use client";
-
 import React from "react";
 import { Truck, ShieldCheck, Banknote, RotateCcw, Headphones, Sparkles } from "lucide-react";
 

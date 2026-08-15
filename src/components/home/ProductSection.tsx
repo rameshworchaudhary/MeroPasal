@@ -1,9 +1,6 @@
-"use client";
-
-import React, { useRef } from "react";
+import React from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
-import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import ProductCard from "@/components/product/ProductCard";
 import ProductCardSkeleton from "@/components/product/ProductCardSkeleton";
 import type { Product } from "@/lib/types/product";
@@ -25,16 +22,6 @@ export default function ProductSection({
   loading = false,
   badge,
 }: ProductSectionProps) {
-  const scrollRef = useRef<HTMLDivElement>(null);
-
-  const scrollLeft = () => {
-    scrollRef.current?.scrollBy({ left: -320, behavior: "smooth" });
-  };
-
-  const scrollRight = () => {
-    scrollRef.current?.scrollBy({ left: 320, behavior: "smooth" });
-  };
-
   return (
     <section className="max-w-[1400px] mx-auto px-3 sm:px-6 my-4 sm:my-6">
       <div className="rounded-xl border border-neutral-200 bg-white p-4 sm:p-5 shadow-2xs">
@@ -78,15 +65,10 @@ export default function ProductSection({
                   <ProductCardSkeleton />
                 </div>
               ))
-            : products.slice(0, 10).map((product, index) => (
-                <motion.div
-                  key={product.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: Math.min(index * 0.02, 0.3) }}
-                >
+            : products.slice(0, 10).map((product) => (
+                <div key={product.id}>
                   <ProductCard product={product} />
-                </motion.div>
+                </div>
               ))}
         </div>
 

@@ -98,9 +98,13 @@ export default function Navbar({ categories = [] }: NavbarProps) {
 
   return (
     <>
-      {/* Voice & Image Search Modals */}
-      <VoiceSearchModal isOpen={voiceModalOpen} onClose={() => setVoiceModalOpen(false)} />
-      <ImageSearchModal isOpen={imageModalOpen} onClose={() => setImageModalOpen(false)} />
+      {/* Voice & Image Search Modals - Loaded on demand */}
+      {voiceModalOpen && (
+        <VoiceSearchModal isOpen={voiceModalOpen} onClose={() => setVoiceModalOpen(false)} />
+      )}
+      {imageModalOpen && (
+        <ImageSearchModal isOpen={imageModalOpen} onClose={() => setImageModalOpen(false)} />
+      )}
 
       {/* Top Announcement / Delivery Bar */}
       <div className="bg-[#070b14] border-b border-slate-800/80 px-3 sm:px-6 py-2 text-center text-[10px] sm:text-xs font-semibold text-slate-300">
