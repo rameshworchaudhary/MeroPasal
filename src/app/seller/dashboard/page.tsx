@@ -11,7 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/useAuth";
-import { getProducts } from "@/lib/firebase/products";
+import { getProductsBySeller } from "@/lib/firebase/products";
 import { getAllOrders } from "@/lib/firebase/orders";
 import { getUserProfile } from "@/lib/firebase/auth";
 import { useAuthStore } from "@/store/authStore";
@@ -46,10 +46,9 @@ export default function SellerDashboardPage() {
     // Refresh profile every time dashboard loads
     refreshProfile();
     Promise.all([
-      getProducts({ search: undefined }, 100),
+      getProductsBySeller(user.uid),
       getAllOrders(),
-    ]).then(([{ products: allProducts }, allOrders]) => {
-      const myProducts = allProducts.filter((p) => p.sellerId === user.uid);
+    ]).then(([myProducts, allOrders]) => {
       const myProductIds = new Set(myProducts.map((p) => p.id));
       const myOrders = allOrders.filter((o) =>
         o.items.some((item) => myProductIds.has(item.productId))

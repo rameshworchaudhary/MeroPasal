@@ -1,8 +1,195 @@
 rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
+
+    // ==========================================
+    // HELPER FUNCTIONS
+    // ==========================================
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function getUserRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && getUserRole() == "admin";
+    }
+
+    function isSeller() {
+      return isSignedIn() && getUserRole() == "seller";
+    }
+
+    function isAdminOrSeller() {
+      return isAdmin() || isSeller();
+    }
+
+    // ==========================================
+    // USERS COLLECTION
+    // ==========================================
+    match /users/{userId} {
+      // User can read own profile; Admin can read all users
+      allow read: if isOwner(userId) || isAdmin();
+
+      // User can create their account (customer or seller signup)
+      allow create: if isOwner(userId)
+        && request.resource.data.uid == userId
+        && (request.resource.data.role == "customer" || request.resource.data.role == "seller");
+
+      // User can update own profile (addresses, phone, recentlyViewed, etc.), but cannot elevate role
+      // Admin can update any user (e.g. approve/reject sellers, update roles)
+      allow update: if isAdmin() || (
+        isOwner(userId)
+        && request.resource.data.uid == resource.data.uid
+        && request.resource.data.role == resource.data.role
+      );
+
+      // Only admin can delete user accounts
+      allow delete: if isAdmin();
+    }
+
+    // ==========================================
+    // PRODUCTS COLLECTION
+    // ==========================================
+    match /products/{productId} {
+      // Products are public for all visitors
+      allow read: if true;
+
+      // Admin or authorized seller can create products
+      allow create: if isAdmin() || (
+        isSeller() && request.resource.data.sellerId == request.auth.uid
+      );
+
+      // Admin has full update access; Seller can update their own products;
+      // Customers/visitors can update viewCount, rating/reviewCount, or stock/soldCount during checkout
+      allow update: if isAdmin()
+        || (isSeller() && resource.data.sellerId == request.auth.uid && request.resource.data.sellerId == resource.data.sellerId)
+        || (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['viewCount']))
+        || (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['rating', 'reviewCount']))
+        || (isSignedIn() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['stock', 'soldCount', 'updatedAt']));
+
+      // Only admin or the owning seller can delete products
+      allow delete: if isAdmin() || (
+        isSeller() && resource.data.sellerId == request.auth.uid
+      );
+    }
+
+    // ==========================================
+    // CATEGORIES COLLECTION
+    // ==========================================
+    match /categories/{categoryId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    // ==========================================
+    // BANNERS COLLECTION
+    // ==========================================
+    match /banners/{bannerId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    // ==========================================
+    // SHIPPING ZONES COLLECTION
+    // ==========================================
+    match /shippingZones/{zoneId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    // ==========================================
+    // COUPONS COLLECTION
+    // ==========================================
+    match /coupons/{couponId} {
+      // Readable by public/customers for coupon validation during checkout
+      allow read: if true;
+
+      // Admin manages coupons; customers can increment usage count upon order placement
+      allow create, delete: if isAdmin();
+      allow update: if isAdmin() || (
+        isSignedIn() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['usedCount'])
+      );
+    }
+
+    // ==========================================
+    // ORDERS COLLECTION
+    // ==========================================
+    match /orders/{orderId} {
+      // Customer can read own orders; Sellers & Admin can read orders
+      allow read: if isAdmin() || isSeller() || (
+        isSignedIn() && resource.data.userId == request.auth.uid
+      );
+
+      // Signed-in customers can create an initial order with pending statuses
+      allow create: if isSignedIn()
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.status == "pending"
+        && request.resource.data.paymentStatus == "pending";
+
+      // Only admin can update or delete orders (protects payment, status, and prices)
+      allow update, delete: if isAdmin();
+    }
+
+    // ==========================================
+    // REVIEWS COLLECTION
+    // ==========================================
+    match /reviews/{reviewId} {
+      // Reviews are publicly viewable
+      allow read: if true;
+
+      // Signed-in customers can write reviews
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+
+      // Admin or review owner can edit review; any user can increment helpfulCount
+      allow update: if isAdmin()
+        || (isSignedIn() && resource.data.userId == request.auth.uid)
+        || (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['helpfulCount']));
+
+      // Only admin or review owner can delete reviews
+      allow delete: if isAdmin() || (
+        isSignedIn() && resource.data.userId == request.auth.uid
+      );
+    }
+
+    // ==========================================
+    // CARTS COLLECTION
+    // ==========================================
+    match /carts/{userId} {
+      allow read, create, update, delete: if isOwner(userId);
+    }
+
+    // ==========================================
+    // PRICE ALERTS COLLECTION
+    // ==========================================
+    match /price_alerts/{alertId} {
+      // Admin or owner (by userId or registered email) can read
+      allow read: if isAdmin() || (
+        isSignedIn() && (resource.data.userId == request.auth.uid || resource.data.email == request.auth.token.email)
+      );
+
+      // Anyone (guests or signed-in users) can subscribe to price alerts
+      allow create: if request.resource.data.email is string
+        && request.resource.data.status == "active";
+
+      // Owner or Admin can manage existing alerts
+      allow update, delete: if isAdmin() || (
+        isSignedIn() && (resource.data.userId == request.auth.uid || resource.data.email == request.auth.token.email)
+      );
+    }
+
+    // ==========================================
+    // DEFAULT DENY
+    // ==========================================
     match /{document=**} {
-      allow read, write: if request.time < timestamp.date(2026, 12, 31);
+      allow read, write: if false;
     }
   }
 }

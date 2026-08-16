@@ -41,7 +41,9 @@ export async function registerWithEmail(
   email: string,
   password: string,
   displayName: string,
-  phone?: string
+  phone?: string,
+  role: "customer" | "seller" = "customer",
+  sellerProfile?: Record<string, any>
 ): Promise<User> {
   // 1. Client-side validation check
   const clientVal = validateEmailClient(email);
@@ -71,7 +73,7 @@ export async function registerWithEmail(
 
   const credential = await createUserWithEmailAndPassword(auth, email, password);
   await updateProfile(credential.user, { displayName });
-  await createUserProfileDocument(credential.user, { displayName, phone });
+  await createUserProfileDocument(credential.user, { displayName, phone, role, sellerProfile });
 
   // Send verification email
   try {
@@ -175,7 +177,12 @@ export async function resendVerificationForEmail(email: string, password: string
  */
 export async function createUserProfileDocument(
   user: User,
-  extra?: { displayName?: string; phone?: string }
+  extra?: {
+    displayName?: string;
+    phone?: string;
+    role?: "customer" | "seller";
+    sellerProfile?: Record<string, any>;
+  }
 ): Promise<void> {
   const userRef = doc(db, "users", user.uid);
   const snapshot = await getDoc(userRef);
@@ -187,7 +194,8 @@ export async function createUserProfileDocument(
       displayName: extra?.displayName || user.displayName || "User",
       phone: extra?.phone || "",
       photoURL: user.photoURL || "",
-      role: "customer" as const,
+      role: extra?.role || ("customer" as const),
+      ...(extra?.sellerProfile ? { sellerProfile: extra.sellerProfile } : {}),
       addresses: [],
       wishlist: [],
       recentlyViewed: [],

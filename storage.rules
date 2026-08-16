@@ -3,52 +3,85 @@ rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
 
+    // ==========================================
+    // HELPER FUNCTIONS
+    // ==========================================
+
     function isSignedIn() {
       return request.auth != null;
     }
 
+    function getUserRole() {
+      return firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role;
+    }
+
     function isAdmin() {
-      return isSignedIn() &&
-        firestore.exists(/databases/(default)/documents/users/$(request.auth.uid)) &&
-        firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role == 'admin';
+      return isSignedIn() && getUserRole() == "admin";
+    }
+
+    function isSeller() {
+      return isSignedIn() && getUserRole() == "seller";
     }
 
     function isValidImage() {
-      return request.resource.size < 5 * 1024 * 1024 &&
-        request.resource.contentType.matches('image/.*');
+      return request.resource != null
+        && request.resource.size < 10 * 1024 * 1024
+        && request.resource.contentType.matches("image/.*");
     }
 
-    // Product images - public read, signed in write
+    // ==========================================
+    // PRODUCT IMAGES
+    // ==========================================
     match /products/{allPaths=**} {
+      // Anyone can view product images
       allow read: if true;
-      allow write: if isSignedIn() && isValidImage();
+
+      // Admin or sellers can upload and update product images (<10MB images)
+      allow create, update: if (isAdmin() || isSeller()) && isValidImage();
+
+      // Admin or sellers can delete product images (request.resource is not checked on delete)
+      allow delete: if isAdmin() || isSeller();
     }
 
-    // Category images - public read, signed in write
+    // ==========================================
+    // CATEGORY IMAGES
+    // ==========================================
     match /categories/{allPaths=**} {
       allow read: if true;
-      allow write: if isSignedIn() && isValidImage();
+      allow create, update: if isAdmin() && isValidImage();
+      allow delete: if isAdmin();
     }
 
-    // Banner images - public read, signed in write
+    // ==========================================
+    // BANNER IMAGES
+    // ==========================================
     match /banners/{allPaths=**} {
       allow read: if true;
-      allow write: if isSignedIn() && isValidImage();
+      allow create, update: if isAdmin() && isValidImage();
+      allow delete: if isAdmin();
     }
 
-    // User-uploaded review images - public read, owner write only
-    match /reviews/{userId}/{allPaths=**} {
+    // ==========================================
+    // REVIEW IMAGES
+    // ==========================================
+    match /reviews/{allPaths=**} {
       allow read: if true;
-      allow write: if isSignedIn() && request.auth.uid == userId && isValidImage();
+      allow create, update: if isSignedIn() && isValidImage();
+      allow delete: if isAdmin() || isSignedIn();
     }
 
-    // User profile photos
-    match /avatars/{userId}/{allPaths=**} {
+    // ==========================================
+    // USER PROFILE AVATARS
+    // ==========================================
+    match /avatars/{allPaths=**} {
       allow read: if true;
-      allow write: if isSignedIn() && request.auth.uid == userId && isValidImage();
+      allow create, update: if isSignedIn() && isValidImage();
+      allow delete: if isAdmin() || isSignedIn();
     }
 
-    // Default deny
+    // ==========================================
+    // DEFAULT DENY
+    // ==========================================
     match /{allPaths=**} {
       allow read, write: if false;
     }

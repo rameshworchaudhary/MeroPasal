@@ -647,7 +647,7 @@ export const getSimilarProducts = cache(async function getSimilarProducts(produc
   }
 });
 
-export async function getNewArrivals(count = 100, activeProducts?: Product[]): Promise<Product[]> {
+export async function getNewArrivals(count = 12, activeProducts?: Product[]): Promise<Product[]> {
   try {
     if (activeProducts && activeProducts.length > 0) {
       const sorted = [...activeProducts].sort((a, b) => {
@@ -674,13 +674,34 @@ export async function getNewArrivals(count = 100, activeProducts?: Product[]): P
   }
 }
 
-export async function getLowStockProducts(): Promise<Product[]> {
-  const snapshot = await getDocs(
-    query(collection(db, COLLECTIONS.PRODUCTS), where("isActive", "==", true))
-  );
-  return snapshot.docs
-    .map(mapProductDoc)
-    .filter((p) => p.stock <= p.lowStockThreshold && p.stock >= 0);
+export async function getLowStockProducts(limitCount = 50): Promise<Product[]> {
+  try {
+    const snapshot = await getDocs(
+      query(collection(db, COLLECTIONS.PRODUCTS), where("isActive", "==", true), fbLimit(150))
+    );
+    return snapshot.docs
+      .map(mapProductDoc)
+      .filter((p) => p.stock <= p.lowStockThreshold && p.stock >= 0)
+      .slice(0, limitCount);
+  } catch (err) {
+    console.error("Error fetching low stock products:", err);
+    return [];
+  }
+}
+
+export async function getProductsBySeller(sellerId: string): Promise<Product[]> {
+  if (!sellerId) return [];
+  try {
+    const q = query(
+      collection(db, COLLECTIONS.PRODUCTS),
+      where("sellerId", "==", sellerId)
+    );
+    const snap = await getDocs(q);
+    return snap.docs.map(mapProductDoc);
+  } catch (err) {
+    console.error("Error fetching products by seller:", err);
+    return [];
+  }
 }
 
 export async function getAllProductsForAdmin(): Promise<Product[]> {

@@ -5,7 +5,7 @@ import { DollarSign, Package, ShoppingCart, TrendingUp, Star } from "lucide-reac
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/hooks/useAuth";
 import { getAllOrders } from "@/lib/firebase/orders";
-import { getProducts } from "@/lib/firebase/products";
+import { getProductsBySeller } from "@/lib/firebase/products";
 import { formatCurrency, formatNumber } from "@/lib/utils";
 import type { Product } from "@/lib/types/product";
 import type { Order } from "@/lib/types/order";
@@ -23,10 +23,9 @@ export default function SellerAnalyticsPage() {
   useEffect(() => {
     if (!user) return;
     Promise.all([
-      getProducts({}, 200),
+      getProductsBySeller(user.uid),
       getAllOrders(),
-    ]).then(([{ products: allProducts }, allOrders]) => {
-      const myProducts = allProducts.filter((p) => p.sellerId === user.uid);
+    ]).then(([myProducts, allOrders]) => {
       const myProductIds = new Set(myProducts.map((p) => p.id));
       const myOrders = allOrders.filter((o) =>
         o.items.some((item) => myProductIds.has(item.productId))
