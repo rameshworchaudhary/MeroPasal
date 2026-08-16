@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/select";
 import { useAuth } from "@/hooks/useAuth";
 import { getAllOrders } from "@/lib/firebase/orders";
-import { getProducts } from "@/lib/firebase/products";
+import { getProductsBySeller } from "@/lib/firebase/products";
 import { formatCurrency, formatDateTime } from "@/lib/utils";
 import { ORDER_STATUS_LABELS, ORDER_STATUS_COLORS, PAYMENT_METHOD_LABELS } from "@/lib/constants/site";
 import type { Order } from "@/lib/types/order";
@@ -34,9 +34,8 @@ export default function SellerOrdersPage() {
     if (!user) return;
     Promise.all([
       getAllOrders(),
-      getProducts({}, 200),
-    ]).then(([allOrders, { products: allProducts }]) => {
-      const sellerProducts = allProducts.filter((p) => p.sellerId === user.uid);
+      getProductsBySeller(user.uid),
+    ]).then(([allOrders, sellerProducts]) => {
       const sellerProductIds = new Set(sellerProducts.map((p) => p.id));
       const sellerOrders = allOrders.filter((o) =>
         o.items.some((item) => sellerProductIds.has(item.productId))

@@ -3,9 +3,9 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // =========================
+    // ==========================================
     // HELPER FUNCTIONS
-    // =========================
+    // ==========================================
 
     function isSignedIn() {
       return request.auth != null;
@@ -15,253 +15,179 @@ service cloud.firestore {
       return isSignedIn() && request.auth.uid == userId;
     }
 
-    function userExists() {
-      return isSignedIn() &&
-        exists(/databases/$(database)/documents/users/$(request.auth.uid));
+    function getUserRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
     }
 
     function isAdmin() {
-      return userExists() &&
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == "admin";
+      return isSignedIn() && getUserRole() == "admin";
     }
 
     function isSeller() {
-      return userExists() &&
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == "seller";
+      return isSignedIn() && getUserRole() == "seller";
     }
 
     function isAdminOrSeller() {
       return isAdmin() || isSeller();
     }
 
-
-    // =========================
-    // USERS
-    // =========================
-
+    // ==========================================
+    // USERS COLLECTION
+    // ==========================================
     match /users/{userId} {
-
-      // User can read own profile.
-      // Admin can read all users.
+      // User can read own profile; Admin can read all users
       allow read: if isOwner(userId) || isAdmin();
 
-      // User can create only their own account.
-      // Prevent users from creating admin/seller accounts.
+      // User can create their account (customer or seller signup)
       allow create: if isOwner(userId)
         && request.resource.data.uid == userId
-        && request.resource.data.role == "customer";
+        && (request.resource.data.role == "customer" || request.resource.data.role == "seller");
 
-      // User can update own profile.
-      // Admin can update users.
-      //
-      // IMPORTANT:
-      // Normal users cannot change their role.
-      allow update: if
-        isAdmin()
-        ||
-        (
-          isOwner(userId)
-          && request.resource.data.uid == resource.data.uid
-          && request.resource.data.role == resource.data.role
-        );
+      // User can update own profile (addresses, phone, recentlyViewed, etc.), but cannot elevate role
+      // Admin can update any user (e.g. approve/reject sellers, update roles)
+      allow update: if isAdmin() || (
+        isOwner(userId)
+        && request.resource.data.uid == resource.data.uid
+        && request.resource.data.role == resource.data.role
+      );
 
-      // Only admin can delete users.
+      // Only admin can delete user accounts
       allow delete: if isAdmin();
     }
 
-
-    // =========================
-    // PRODUCTS
-    // =========================
-
+    // ==========================================
+    // PRODUCTS COLLECTION
+    // ==========================================
     match /products/{productId} {
-
-      // Products are public.
+      // Products are public for all visitors
       allow read: if true;
 
-      // Only admin/seller can create products.
-      allow create: if isAdminOrSeller();
+      // Admin or authorized seller can create products
+      allow create: if isAdmin() || (
+        isSeller() && request.resource.data.sellerId == request.auth.uid
+      );
 
-      // Admin can update anything.
-      // Seller can update only their own products.
-      allow update: if
-        isAdmin()
-        ||
-        (
-          isSeller()
-          && resource.data.sellerId == request.auth.uid
-          && request.resource.data.sellerId == resource.data.sellerId
-        );
+      // Admin has full update access; Seller can update their own products;
+      // Customers/visitors can update viewCount, rating/reviewCount, or stock/soldCount during checkout
+      allow update: if isAdmin()
+        || (isSeller() && resource.data.sellerId == request.auth.uid && request.resource.data.sellerId == resource.data.sellerId)
+        || (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['viewCount']))
+        || (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['rating', 'reviewCount']))
+        || (isSignedIn() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['stock', 'soldCount', 'updatedAt']));
 
-      // Only admin or owning seller can delete.
-      allow delete: if
-        isAdmin()
-        ||
-        (
-          isSeller()
-          && resource.data.sellerId == request.auth.uid
-        );
+      // Only admin or the owning seller can delete products
+      allow delete: if isAdmin() || (
+        isSeller() && resource.data.sellerId == request.auth.uid
+      );
     }
 
-
-    // =========================
-    // CATEGORIES
-    // =========================
-
+    // ==========================================
+    // CATEGORIES COLLECTION
+    // ==========================================
     match /categories/{categoryId} {
-
-      // Public read.
       allow read: if true;
-
-      // Only admin can create/update/delete.
       allow create, update, delete: if isAdmin();
     }
 
-
-    // =========================
-    // BANNERS
-    // =========================
-
+    // ==========================================
+    // BANNERS COLLECTION
+    // ==========================================
     match /banners/{bannerId} {
-
-      // Public read.
       allow read: if true;
-
-      // Only admin can manage banners.
       allow create, update, delete: if isAdmin();
     }
 
+    // ==========================================
+    // SHIPPING ZONES COLLECTION
+    // ==========================================
+    match /shippingZones/{zoneId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
 
-    // =========================
-    // ORDERS
-    // =========================
+    // ==========================================
+    // COUPONS COLLECTION
+    // ==========================================
+    match /coupons/{couponId} {
+      // Readable by public/customers for coupon validation during checkout
+      allow read: if true;
 
+      // Admin manages coupons; customers can increment usage count upon order placement
+      allow create, delete: if isAdmin();
+      allow update: if isAdmin() || (
+        isSignedIn() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['usedCount'])
+      );
+    }
+
+    // ==========================================
+    // ORDERS COLLECTION
+    // ==========================================
     match /orders/{orderId} {
+      // Customer can read own orders; Sellers & Admin can read orders
+      allow read: if isAdmin() || isSeller() || (
+        isSignedIn() && resource.data.userId == request.auth.uid
+      );
 
-      // Customer can read own orders.
-      // Admin can read all orders.
-      allow read: if
-        isAdmin()
-        ||
-        (
-          isSignedIn()
-          && resource.data.userId == request.auth.uid
-        );
-
-      // Signed-in customer can create an order only for themselves.
-      //
-      // Server/payment/admin fields are forced to initial values.
-      allow create: if
-        isSignedIn()
+      // Signed-in customers can create an initial order with pending statuses
+      allow create: if isSignedIn()
         && request.resource.data.userId == request.auth.uid
         && request.resource.data.status == "pending"
         && request.resource.data.paymentStatus == "pending";
 
-      // Only admin can update orders.
-      //
-      // This protects:
-      // - total
-      // - payment status
-      // - payment transaction ID
-      // - order ownership
-      // - order items
-      allow update: if isAdmin();
-
-      // Only admin can delete orders.
-      allow delete: if isAdmin();
+      // Only admin can update or delete orders (protects payment, status, and prices)
+      allow update, delete: if isAdmin();
     }
 
-
-    // =========================
-    // REVIEWS
-    // =========================
-
+    // ==========================================
+    // REVIEWS COLLECTION
+    // ==========================================
     match /reviews/{reviewId} {
-
-      // Reviews can be publicly displayed.
+      // Reviews are publicly viewable
       allow read: if true;
 
-      // Signed-in users can create reviews.
-      allow create: if
-        isSignedIn()
-        && request.resource.data.userId == request.auth.uid;
+      // Signed-in customers can write reviews
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
 
-      // User can update/delete own review.
-      // Admin can manage all reviews.
-      allow update, delete: if
-        isAdmin()
-        ||
-        (
-          isSignedIn()
-          && resource.data.userId == request.auth.uid
-        );
+      // Admin or review owner can edit review; any user can increment helpfulCount
+      allow update: if isAdmin()
+        || (isSignedIn() && resource.data.userId == request.auth.uid)
+        || (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['helpfulCount']));
+
+      // Only admin or review owner can delete reviews
+      allow delete: if isAdmin() || (
+        isSignedIn() && resource.data.userId == request.auth.uid
+      );
     }
 
-
-    // =========================
-    // COUPONS
-    // =========================
-
-    match /coupons/{couponId} {
-
-      // Customers don't need direct access to all coupon data.
-      // Admin manages coupons.
-      allow read: if isAdmin();
-
-      allow create, update, delete: if isAdmin();
-    }
-
-
-    // =========================
-    // SHIPPING ZONES
-    // =========================
-
-    match /shippingZones/{zoneId} {
-
-      // Customers need shipping information.
-      allow read: if true;
-
-      // Only admin can manage shipping zones.
-      allow create, update, delete: if isAdmin();
-    }
-
-
-    // =========================
-    // CARTS
-    // =========================
-
+    // ==========================================
+    // CARTS COLLECTION
+    // ==========================================
     match /carts/{userId} {
-
-      // User can access only their own cart.
       allow read, create, update, delete: if isOwner(userId);
     }
 
-
-    // =========================
-    // PRICE ALERTS
-    // =========================
-
+    // ==========================================
+    // PRICE ALERTS COLLECTION
+    // ==========================================
     match /price_alerts/{alertId} {
+      // Admin or owner (by userId or registered email) can read
+      allow read: if isAdmin() || (
+        isSignedIn() && (resource.data.userId == request.auth.uid || resource.data.email == request.auth.token.email)
+      );
 
-      // User can access only their own alerts.
-      allow read: if
-        isSignedIn()
-        && resource.data.userId == request.auth.uid;
+      // Anyone (guests or signed-in users) can subscribe to price alerts
+      allow create: if request.resource.data.email is string
+        && request.resource.data.status == "active";
 
-      allow create: if
-        isSignedIn()
-        && request.resource.data.userId == request.auth.uid;
-
-      allow update, delete: if
-        isSignedIn()
-        && resource.data.userId == request.auth.uid;
+      // Owner or Admin can manage existing alerts
+      allow update, delete: if isAdmin() || (
+        isSignedIn() && (resource.data.userId == request.auth.uid || resource.data.email == request.auth.token.email)
+      );
     }
 
-
-    // =========================
+    // ==========================================
     // DEFAULT DENY
-    // =========================
-
+    // ==========================================
     match /{document=**} {
       allow read, write: if false;
     }

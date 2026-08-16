@@ -1,0 +1,137 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // =========================
+    // HELPER FUNCTIONS
+    // =========================
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn() &&
+        firestore.exists(
+          /databases/(default)/documents/users/$(request.auth.uid)
+        ) &&
+        firestore.get(
+          /databases/(default)/documents/users/$(request.auth.uid)
+        ).data.role == "admin";
+    }
+
+    function isSeller() {
+      return isSignedIn() &&
+        firestore.exists(
+          /databases/(default)/documents/users/$(request.auth.uid)
+        ) &&
+        firestore.get(
+          /databases/(default)/documents/users/$(request.auth.uid)
+        ).data.role == "seller";
+    }
+
+    function isValidImage() {
+      return request.resource != null &&
+        request.resource.size < 5 * 1024 * 1024 &&
+        request.resource.contentType.matches("image/.*");
+    }
+
+
+    // =========================
+    // PRODUCT IMAGES
+    // =========================
+
+    match /products/{allPaths=**} {
+
+      // Anyone can view product images.
+      allow read: if true;
+
+      // Only admin or seller can upload/update/delete.
+      // Maximum file size: 5 MB.
+      // Only image files are accepted.
+      allow write: if
+        (isAdmin() || isSeller())
+        && isValidImage();
+    }
+
+
+    // =========================
+    // CATEGORY IMAGES
+    // =========================
+
+    match /categories/{allPaths=**} {
+
+      // Anyone can view category images.
+      allow read: if true;
+
+      // Only admin can manage category images.
+      allow write: if
+        isAdmin()
+        && isValidImage();
+    }
+
+
+    // =========================
+    // BANNER IMAGES
+    // =========================
+
+    match /banners/{allPaths=**} {
+
+      // Anyone can view banners.
+      allow read: if true;
+
+      // Only admin can manage banners.
+      allow write: if
+        isAdmin()
+        && isValidImage();
+    }
+
+
+    // =========================
+    // REVIEW IMAGES
+    // =========================
+
+    match /reviews/{userId}/{allPaths=**} {
+
+      // Anyone can view review images.
+      allow read: if true;
+
+      // Only the owner can upload/update/delete
+      // images inside their own review folder.
+      allow write: if
+        isSignedIn()
+        && request.auth.uid == userId
+        && isValidImage();
+    }
+
+
+    // =========================
+    // USER PROFILE AVATARS
+    // =========================
+
+    match /avatars/{userId}/{allPaths=**} {
+
+      // Profile images can be viewed publicly.
+      allow read: if true;
+
+      // Only the account owner can upload/update/delete
+      // their own profile image.
+      allow write: if
+        isSignedIn()
+        && request.auth.uid == userId
+        && isValidImage();
+    }
+
+
+    // =========================
+    // DEFAULT DENY
+    // =========================
+
+    // Anything not explicitly allowed above
+    // is completely blocked.
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

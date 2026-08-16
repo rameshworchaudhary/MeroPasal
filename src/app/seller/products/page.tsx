@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { useAuth } from "@/hooks/useAuth";
-import { getProducts, updateProduct } from "@/lib/firebase/products";
+import { getProductsBySeller, updateProduct } from "@/lib/firebase/products";
 import { formatCurrency } from "@/lib/utils";
 import type { Product } from "@/lib/types/product";
 import { toast } from "sonner";
@@ -23,9 +23,11 @@ export default function SellerProductsPage() {
 
   useEffect(() => {
     if (!user) return;
-    getProducts({}, 200).then(({ products: all }) => {
-      setProducts(all.filter((p) => p.sellerId === user.uid));
-    }).finally(() => setLoading(false));
+    getProductsBySeller(user.uid)
+      .then((myProducts) => {
+        setProducts(myProducts);
+      })
+      .finally(() => setLoading(false));
   }, [user]);
 
   const filtered = useMemo(() => {
