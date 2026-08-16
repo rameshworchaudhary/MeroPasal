@@ -1,8 +1,269 @@
 rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
+
+    // =========================
+    // HELPER FUNCTIONS
+    // =========================
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function userExists() {
+      return isSignedIn() &&
+        exists(/databases/$(database)/documents/users/$(request.auth.uid));
+    }
+
+    function isAdmin() {
+      return userExists() &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == "admin";
+    }
+
+    function isSeller() {
+      return userExists() &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == "seller";
+    }
+
+    function isAdminOrSeller() {
+      return isAdmin() || isSeller();
+    }
+
+
+    // =========================
+    // USERS
+    // =========================
+
+    match /users/{userId} {
+
+      // User can read own profile.
+      // Admin can read all users.
+      allow read: if isOwner(userId) || isAdmin();
+
+      // User can create only their own account.
+      // Prevent users from creating admin/seller accounts.
+      allow create: if isOwner(userId)
+        && request.resource.data.uid == userId
+        && request.resource.data.role == "customer";
+
+      // User can update own profile.
+      // Admin can update users.
+      //
+      // IMPORTANT:
+      // Normal users cannot change their role.
+      allow update: if
+        isAdmin()
+        ||
+        (
+          isOwner(userId)
+          && request.resource.data.uid == resource.data.uid
+          && request.resource.data.role == resource.data.role
+        );
+
+      // Only admin can delete users.
+      allow delete: if isAdmin();
+    }
+
+
+    // =========================
+    // PRODUCTS
+    // =========================
+
+    match /products/{productId} {
+
+      // Products are public.
+      allow read: if true;
+
+      // Only admin/seller can create products.
+      allow create: if isAdminOrSeller();
+
+      // Admin can update anything.
+      // Seller can update only their own products.
+      allow update: if
+        isAdmin()
+        ||
+        (
+          isSeller()
+          && resource.data.sellerId == request.auth.uid
+          && request.resource.data.sellerId == resource.data.sellerId
+        );
+
+      // Only admin or owning seller can delete.
+      allow delete: if
+        isAdmin()
+        ||
+        (
+          isSeller()
+          && resource.data.sellerId == request.auth.uid
+        );
+    }
+
+
+    // =========================
+    // CATEGORIES
+    // =========================
+
+    match /categories/{categoryId} {
+
+      // Public read.
+      allow read: if true;
+
+      // Only admin can create/update/delete.
+      allow create, update, delete: if isAdmin();
+    }
+
+
+    // =========================
+    // BANNERS
+    // =========================
+
+    match /banners/{bannerId} {
+
+      // Public read.
+      allow read: if true;
+
+      // Only admin can manage banners.
+      allow create, update, delete: if isAdmin();
+    }
+
+
+    // =========================
+    // ORDERS
+    // =========================
+
+    match /orders/{orderId} {
+
+      // Customer can read own orders.
+      // Admin can read all orders.
+      allow read: if
+        isAdmin()
+        ||
+        (
+          isSignedIn()
+          && resource.data.userId == request.auth.uid
+        );
+
+      // Signed-in customer can create an order only for themselves.
+      //
+      // Server/payment/admin fields are forced to initial values.
+      allow create: if
+        isSignedIn()
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.status == "pending"
+        && request.resource.data.paymentStatus == "pending";
+
+      // Only admin can update orders.
+      //
+      // This protects:
+      // - total
+      // - payment status
+      // - payment transaction ID
+      // - order ownership
+      // - order items
+      allow update: if isAdmin();
+
+      // Only admin can delete orders.
+      allow delete: if isAdmin();
+    }
+
+
+    // =========================
+    // REVIEWS
+    // =========================
+
+    match /reviews/{reviewId} {
+
+      // Reviews can be publicly displayed.
+      allow read: if true;
+
+      // Signed-in users can create reviews.
+      allow create: if
+        isSignedIn()
+        && request.resource.data.userId == request.auth.uid;
+
+      // User can update/delete own review.
+      // Admin can manage all reviews.
+      allow update, delete: if
+        isAdmin()
+        ||
+        (
+          isSignedIn()
+          && resource.data.userId == request.auth.uid
+        );
+    }
+
+
+    // =========================
+    // COUPONS
+    // =========================
+
+    match /coupons/{couponId} {
+
+      // Customers don't need direct access to all coupon data.
+      // Admin manages coupons.
+      allow read: if isAdmin();
+
+      allow create, update, delete: if isAdmin();
+    }
+
+
+    // =========================
+    // SHIPPING ZONES
+    // =========================
+
+    match /shippingZones/{zoneId} {
+
+      // Customers need shipping information.
+      allow read: if true;
+
+      // Only admin can manage shipping zones.
+      allow create, update, delete: if isAdmin();
+    }
+
+
+    // =========================
+    // CARTS
+    // =========================
+
+    match /carts/{userId} {
+
+      // User can access only their own cart.
+      allow read, create, update, delete: if isOwner(userId);
+    }
+
+
+    // =========================
+    // PRICE ALERTS
+    // =========================
+
+    match /price_alerts/{alertId} {
+
+      // User can access only their own alerts.
+      allow read: if
+        isSignedIn()
+        && resource.data.userId == request.auth.uid;
+
+      allow create: if
+        isSignedIn()
+        && request.resource.data.userId == request.auth.uid;
+
+      allow update, delete: if
+        isSignedIn()
+        && resource.data.userId == request.auth.uid;
+    }
+
+
+    // =========================
+    // DEFAULT DENY
+    // =========================
+
     match /{document=**} {
-      allow read, write: if request.time < timestamp.date(2026, 12, 31);
+      allow read, write: if false;
     }
   }
 }

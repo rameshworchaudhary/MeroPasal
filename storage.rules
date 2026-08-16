@@ -3,52 +3,133 @@ rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
 
+    // =========================
+    // HELPER FUNCTIONS
+    // =========================
+
     function isSignedIn() {
       return request.auth != null;
     }
 
     function isAdmin() {
       return isSignedIn() &&
-        firestore.exists(/databases/(default)/documents/users/$(request.auth.uid)) &&
-        firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role == 'admin';
+        firestore.exists(
+          /databases/(default)/documents/users/$(request.auth.uid)
+        ) &&
+        firestore.get(
+          /databases/(default)/documents/users/$(request.auth.uid)
+        ).data.role == "admin";
+    }
+
+    function isSeller() {
+      return isSignedIn() &&
+        firestore.exists(
+          /databases/(default)/documents/users/$(request.auth.uid)
+        ) &&
+        firestore.get(
+          /databases/(default)/documents/users/$(request.auth.uid)
+        ).data.role == "seller";
     }
 
     function isValidImage() {
-      return request.resource.size < 5 * 1024 * 1024 &&
-        request.resource.contentType.matches('image/.*');
+      return request.resource != null &&
+        request.resource.size < 5 * 1024 * 1024 &&
+        request.resource.contentType.matches("image/.*");
     }
 
-    // Product images - public read, signed in write
+
+    // =========================
+    // PRODUCT IMAGES
+    // =========================
+
     match /products/{allPaths=**} {
+
+      // Anyone can view product images.
       allow read: if true;
-      allow write: if isSignedIn() && isValidImage();
+
+      // Only admin or seller can upload/update/delete.
+      // Maximum file size: 5 MB.
+      // Only image files are accepted.
+      allow write: if
+        (isAdmin() || isSeller())
+        && isValidImage();
     }
 
-    // Category images - public read, signed in write
+
+    // =========================
+    // CATEGORY IMAGES
+    // =========================
+
     match /categories/{allPaths=**} {
+
+      // Anyone can view category images.
       allow read: if true;
-      allow write: if isSignedIn() && isValidImage();
+
+      // Only admin can manage category images.
+      allow write: if
+        isAdmin()
+        && isValidImage();
     }
 
-    // Banner images - public read, signed in write
+
+    // =========================
+    // BANNER IMAGES
+    // =========================
+
     match /banners/{allPaths=**} {
+
+      // Anyone can view banners.
       allow read: if true;
-      allow write: if isSignedIn() && isValidImage();
+
+      // Only admin can manage banners.
+      allow write: if
+        isAdmin()
+        && isValidImage();
     }
 
-    // User-uploaded review images - public read, owner write only
+
+    // =========================
+    // REVIEW IMAGES
+    // =========================
+
     match /reviews/{userId}/{allPaths=**} {
+
+      // Anyone can view review images.
       allow read: if true;
-      allow write: if isSignedIn() && request.auth.uid == userId && isValidImage();
+
+      // Only the owner can upload/update/delete
+      // images inside their own review folder.
+      allow write: if
+        isSignedIn()
+        && request.auth.uid == userId
+        && isValidImage();
     }
 
-    // User profile photos
+
+    // =========================
+    // USER PROFILE AVATARS
+    // =========================
+
     match /avatars/{userId}/{allPaths=**} {
+
+      // Profile images can be viewed publicly.
       allow read: if true;
-      allow write: if isSignedIn() && request.auth.uid == userId && isValidImage();
+
+      // Only the account owner can upload/update/delete
+      // their own profile image.
+      allow write: if
+        isSignedIn()
+        && request.auth.uid == userId
+        && isValidImage();
     }
 
-    // Default deny
+
+    // =========================
+    // DEFAULT DENY
+    // =========================
+
+    // Anything not explicitly allowed above
+    // is completely blocked.
     match /{allPaths=**} {
       allow read, write: if false;
     }
