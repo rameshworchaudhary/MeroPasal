@@ -1,3 +1,4 @@
+import { cache } from "react";
 import {
   collection,
   doc,
@@ -34,7 +35,7 @@ export function clearBannerCache() {
   allBannersCache = null;
 }
 
-export async function getAllBanners(): Promise<Banner[]> {
+export const getAllBanners = cache(async function getAllBanners(): Promise<Banner[]> {
   if (
     allBannersCache &&
     Date.now() - allBannersCache.timestamp < BANNER_CACHE_TTL
@@ -52,7 +53,7 @@ export async function getAllBanners(): Promise<Banner[]> {
     console.error("Error fetching all banners:", err);
     return allBannersCache ? allBannersCache.data : [];
   }
-}
+});
 
 export async function getActiveBannersByPosition(position: Banner["position"]): Promise<Banner[]> {
   try {

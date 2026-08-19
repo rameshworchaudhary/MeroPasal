@@ -65,7 +65,17 @@ async function handleEsewaVerification(request: NextRequest, orderId: string) {
     // If the status check API fails, fall back to trusting the verified signature
   }
 
-  await markOrderPaymentSuccess(orderId, decoded.transaction_code || decoded.transaction_uuid);
+  const paidAmount = Number(decoded.total_amount || 0);
+  const success = await markOrderPaymentSuccess(
+    orderId,
+    decoded.transaction_code || decoded.transaction_uuid,
+    paidAmount
+  );
+
+  if (!success) {
+    return NextResponse.redirect(`${appUrl}/checkout?payment=failed&reason=amount_mismatch&orderId=${orderId}`);
+  }
+
   return NextResponse.redirect(`${appUrl}/orders/${orderId}?success=true`);
 }
 
@@ -90,16 +100,38 @@ async function handleKhaltiVerification(request: NextRequest, orderId: string) {
     return NextResponse.redirect(`${appUrl}/checkout?payment=failed&orderId=${orderId}`);
   }
 
-  await markOrderPaymentSuccess(orderId, lookup.transaction_id || pidx);
+  // Khalti total_amount is in paisa (1 NPR = 100 paisa)
+  const paidAmountNpr = lookup.total_amount ? lookup.total_amount / 100 : 0;
+  const success = await markOrderPaymentSuccess(
+    orderId,
+    lookup.transaction_id || pidx,
+    paidAmountNpr
+  );
+
+  if (!success) {
+    return NextResponse.redirect(`${appUrl}/checkout?payment=failed&reason=amount_mismatch&orderId=${orderId}`);
+  }
+
   return NextResponse.redirect(`${appUrl}/orders/${orderId}?success=true`);
 }
 
-async function markOrderPaymentSuccess(orderId: string, transactionId: string) {
+async function markOrderPaymentSuccess(orderId: string, transactionId: string, paidAmount?: number): Promise<boolean> {
   const ref = adminDb.collection(COLLECTIONS.ORDERS).doc(orderId);
   const snap = await ref.get();
-  if (!snap.exists) return;
+  if (!snap.exists) return false;
 
   const data = snap.data();
+  const orderTotal = data?.total;
+
+  // Validate that paid amount matches order total within reasonable margin (< 1 NPR difference)
+  if (paidAmount !== undefined && orderTotal !== undefined) {
+    if (Math.abs(paidAmount - orderTotal) > 1) {
+      console.error(`Payment amount mismatch for order ${orderId}: expected ${orderTotal}, got ${paidAmount}`);
+      await markOrderPaymentFailed(orderId);
+      return false;
+    }
+  }
+
   const history = data?.statusHistory || [];
 
   await ref.update({
@@ -116,6 +148,8 @@ async function markOrderPaymentSuccess(orderId: string, transactionId: string) {
     ],
     updatedAt: FieldValue.serverTimestamp(),
   });
+
+  return true;
 }
 
 async function markOrderPaymentFailed(orderId: string) {

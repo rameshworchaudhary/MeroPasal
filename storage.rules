@@ -12,7 +12,9 @@ service firebase.storage {
     }
 
     function getUserRole() {
-      return firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role;
+      return firestore.exists(/databases/(default)/documents/users/$(request.auth.uid))
+        ? firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role
+        : null;
     }
 
     function isAdmin() {

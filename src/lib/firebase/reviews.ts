@@ -1,3 +1,4 @@
+import { cache } from "react";
 import {
   collection,
   doc,
@@ -28,7 +29,7 @@ function mapReviewDoc(docSnap: QueryDocumentSnapshot<DocumentData>): Review {
   } as Review;
 }
 
-export async function getReviewsByProduct(productId: string): Promise<Review[]> {
+export const getReviewsByProduct = cache(async function getReviewsByProduct(productId: string): Promise<Review[]> {
   try {
     const q = query(
       collection(db, COLLECTIONS.REVIEWS),
@@ -45,7 +46,7 @@ export async function getReviewsByProduct(productId: string): Promise<Review[]> 
     console.error("Error fetching reviews by product:", err);
     return [];
   }
-}
+});
 
 export function computeReviewSummary(reviews: Review[]): ReviewSummary {
   const breakdown = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };

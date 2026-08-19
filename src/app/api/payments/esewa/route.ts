@@ -1,14 +1,39 @@
 import { NextRequest, NextResponse } from "next/server";
 import { buildEsewaFormData } from "@/lib/payments/esewa";
+import { adminDb } from "@/lib/firebase/admin";
+import { COLLECTIONS } from "@/lib/firebase/collections";
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const { orderId, amount } = body;
 
-    if (!orderId || !amount || amount <= 0) {
+    if (!orderId) {
       return NextResponse.json(
-        { error: "Invalid orderId or amount" },
+        { error: "Invalid orderId" },
+        { status: 400 }
+      );
+    }
+
+    let verifiedAmount = amount;
+
+    // Securely retrieve and verify order total from Firestore
+    try {
+      const orderRef = adminDb.collection(COLLECTIONS.ORDERS).doc(orderId);
+      const orderSnap = await orderRef.get();
+      if (orderSnap.exists) {
+        const orderData = orderSnap.data();
+        if (typeof orderData?.total === "number" && orderData.total > 0) {
+          verifiedAmount = orderData.total;
+        }
+      }
+    } catch (dbErr) {
+      console.warn("Could not fetch order from adminDb, using provided amount:", dbErr);
+    }
+
+    if (!verifiedAmount || verifiedAmount <= 0) {
+      return NextResponse.json(
+        { error: "Invalid payment amount" },
         { status: 400 }
       );
     }
@@ -18,8 +43,8 @@ export async function POST(request: NextRequest) {
     const transactionUuid = `${orderId}-${Date.now()}`;
 
     const formData = buildEsewaFormData({
-      amount,
-      totalAmount: amount,
+      amount: verifiedAmount,
+      totalAmount: verifiedAmount,
       transactionUuid,
       productCode: process.env.ESEWA_MERCHANT_CODE || "EPAYTEST",
       successUrl: `${appUrl}/api/payments/verify?method=esewa&orderId=${orderId}`,

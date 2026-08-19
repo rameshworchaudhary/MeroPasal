@@ -16,7 +16,9 @@ service cloud.firestore {
     }
 
     function getUserRole() {
-      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+      return exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        ? get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role
+        : null;
     }
 
     function isAdmin() {
@@ -38,10 +40,13 @@ service cloud.firestore {
       // User can read own profile; Admin can read all users
       allow read: if isOwner(userId) || isAdmin();
 
-      // User can create their account (customer or seller signup)
+      // User can create their account (customer or unapproved seller signup)
       allow create: if isOwner(userId)
         && request.resource.data.uid == userId
-        && (request.resource.data.role == "customer" || request.resource.data.role == "seller");
+        && (
+          (request.resource.data.role == "customer") ||
+          (request.resource.data.role == "seller" && (!('sellerProfile' in request.resource.data) || request.resource.data.sellerProfile.isApproved == false))
+        );
 
       // User can update own profile (addresses, phone, recentlyViewed, etc.), but cannot elevate role
       // Admin can update any user (e.g. approve/reject sellers, update roles)
@@ -64,15 +69,24 @@ service cloud.firestore {
 
       // Admin or authorized seller can create products
       allow create: if isAdmin() || (
-        isSeller() && request.resource.data.sellerId == request.auth.uid
+        isSeller()
+        && request.resource.data.sellerId == request.auth.uid
+        && request.resource.data.rating == 0
+        && request.resource.data.reviewCount == 0
+        && request.resource.data.soldCount == 0
       );
 
       // Admin has full update access; Seller can update their own products;
-      // Customers/visitors can update viewCount, rating/reviewCount, or stock/soldCount during checkout
+      // Protected updates for viewCount, reviews, or stock/soldCount during checkout
       allow update: if isAdmin()
-        || (isSeller() && resource.data.sellerId == request.auth.uid && request.resource.data.sellerId == resource.data.sellerId)
+        || (
+          isSeller()
+          && resource.data.sellerId == request.auth.uid
+          && request.resource.data.sellerId == resource.data.sellerId
+          && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['rating', 'reviewCount', 'soldCount', 'isFeatured', 'isAdminApproved'])
+        )
         || (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['viewCount']))
-        || (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['rating', 'reviewCount']))
+        || (isSignedIn() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['rating', 'reviewCount']))
         || (isSignedIn() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['stock', 'soldCount', 'updatedAt']));
 
       // Only admin or the owning seller can delete products
@@ -145,12 +159,20 @@ service cloud.firestore {
       // Reviews are publicly viewable
       allow read: if true;
 
-      // Signed-in customers can write reviews
-      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      // Signed-in customers can write reviews with valid ratings (1-5)
+      allow create: if isSignedIn()
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.rating >= 1
+        && request.resource.data.rating <= 5;
 
-      // Admin or review owner can edit review; any user can increment helpfulCount
+      // Admin or review owner can edit review (without changing ownership or target product); any user can increment helpfulCount
       allow update: if isAdmin()
-        || (isSignedIn() && resource.data.userId == request.auth.uid)
+        || (
+          isSignedIn()
+          && resource.data.userId == request.auth.uid
+          && request.resource.data.userId == resource.data.userId
+          && request.resource.data.productId == resource.data.productId
+        )
         || (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['helpfulCount']));
 
       // Only admin or review owner can delete reviews

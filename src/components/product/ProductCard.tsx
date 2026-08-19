@@ -145,6 +145,7 @@ export default function ProductCard({
             className="object-contain p-2 transition-transform duration-300 group-hover:scale-105"
             onError={() => setImageError(true)}
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+            referrerPolicy="no-referrer"
           />
 
           {/* Badges */}
