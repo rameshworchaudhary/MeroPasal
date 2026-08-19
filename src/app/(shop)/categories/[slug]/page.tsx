@@ -115,7 +115,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
       {/* Subcategory pills */}
       {category.subCategories && category.subCategories.length > 0 && (
         <div className="flex gap-2 mb-6 overflow-x-auto scrollbar-hide pb-1">
-          <a
+          <Link
             href={`/categories/${slug}`}
             className={`whitespace-nowrap text-sm px-4 py-1.5 rounded-full border transition-colors ${
               !sp.subCategoryId
@@ -124,9 +124,9 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
             }`}
           >
             All
-          </a>
+          </Link>
           {category.subCategories.map((sub) => (
-            <a
+            <Link
               key={sub.id}
               href={`/categories/${slug}?subCategoryId=${sub.id}`}
               className={`whitespace-nowrap text-sm px-4 py-1.5 rounded-full border transition-colors ${
@@ -136,7 +136,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
               }`}
             >
               {sub.name}
-            </a>
+            </Link>
           ))}
         </div>
       )}

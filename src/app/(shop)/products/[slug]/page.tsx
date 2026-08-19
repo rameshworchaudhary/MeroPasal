@@ -32,7 +32,7 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
   };
 }
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 export const dynamicParams = true;
 
 async function SimilarProductsSection({ product }: { product: Product }) {
